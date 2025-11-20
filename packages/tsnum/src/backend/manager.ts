@@ -55,6 +55,14 @@ class BackendManager {
 
   private async loadWASM(): Promise<BackendInit> {
     try {
+      // Allow forcing TypeScript backend via environment variable (for benchmarks)
+      if (typeof process !== 'undefined' && process.env?.FORCE_TS_BACKEND === '1') {
+        return {
+          success: false,
+          error: 'TypeScript backend forced via FORCE_TS_BACKEND=1',
+        }
+      }
+
       // Check if WebAssembly is available
       if (typeof WebAssembly === 'undefined') {
         return {
