@@ -135,18 +135,12 @@ export function tan<T extends DType>(a: NDArray<T>): NDArray<T> {
  */
 export function arcsin<T extends DType>(a: NDArray<T>): NDArray<T> {
   const data = a.getData()
-  const newBuffer = createTypedArray(data.buffer.length, data.dtype)
 
-  for (let i = 0; i < data.buffer.length; i++) {
-    newBuffer[i] = Math.asin(data.buffer[i])
-  }
+  // Delegate to backend (WASM if available, TS fallback)
+  const backend = getBackend()
+  const resultData = backend.arcsin(data)
 
-  return new NDArray({
-    buffer: newBuffer,
-    shape: data.shape,
-    strides: data.strides,
-    dtype: data.dtype,
-  })
+  return new NDArray(resultData)
 }
 
 /**
@@ -154,18 +148,12 @@ export function arcsin<T extends DType>(a: NDArray<T>): NDArray<T> {
  */
 export function arccos<T extends DType>(a: NDArray<T>): NDArray<T> {
   const data = a.getData()
-  const newBuffer = createTypedArray(data.buffer.length, data.dtype)
 
-  for (let i = 0; i < data.buffer.length; i++) {
-    newBuffer[i] = Math.acos(data.buffer[i])
-  }
+  // Delegate to backend (WASM if available, TS fallback)
+  const backend = getBackend()
+  const resultData = backend.arccos(data)
 
-  return new NDArray({
-    buffer: newBuffer,
-    shape: data.shape,
-    strides: data.strides,
-    dtype: data.dtype,
-  })
+  return new NDArray(resultData)
 }
 
 /**
@@ -173,18 +161,12 @@ export function arccos<T extends DType>(a: NDArray<T>): NDArray<T> {
  */
 export function arctan<T extends DType>(a: NDArray<T>): NDArray<T> {
   const data = a.getData()
-  const newBuffer = createTypedArray(data.buffer.length, data.dtype)
 
-  for (let i = 0; i < data.buffer.length; i++) {
-    newBuffer[i] = Math.atan(data.buffer[i])
-  }
+  // Delegate to backend (WASM if available, TS fallback)
+  const backend = getBackend()
+  const resultData = backend.arctan(data)
 
-  return new NDArray({
-    buffer: newBuffer,
-    shape: data.shape,
-    strides: data.strides,
-    dtype: data.dtype,
-  })
+  return new NDArray(resultData)
 }
 
 /**
@@ -379,18 +361,12 @@ export function tanh<T extends DType>(a: NDArray<T>): NDArray<T> {
  */
 export function asinh<T extends DType>(a: NDArray<T>): NDArray<T> {
   const data = a.getData()
-  const newBuffer = createTypedArray(data.buffer.length, data.dtype)
 
-  for (let i = 0; i < data.buffer.length; i++) {
-    newBuffer[i] = Math.asinh(data.buffer[i])
-  }
+  // Delegate to backend (WASM if available, TS fallback)
+  const backend = getBackend()
+  const resultData = backend.asinh(data)
 
-  return new NDArray({
-    buffer: newBuffer,
-    shape: data.shape,
-    strides: data.strides,
-    dtype: data.dtype,
-  })
+  return new NDArray(resultData)
 }
 
 /**
@@ -398,18 +374,12 @@ export function asinh<T extends DType>(a: NDArray<T>): NDArray<T> {
  */
 export function acosh<T extends DType>(a: NDArray<T>): NDArray<T> {
   const data = a.getData()
-  const newBuffer = createTypedArray(data.buffer.length, data.dtype)
 
-  for (let i = 0; i < data.buffer.length; i++) {
-    newBuffer[i] = Math.acosh(data.buffer[i])
-  }
+  // Delegate to backend (WASM if available, TS fallback)
+  const backend = getBackend()
+  const resultData = backend.acosh(data)
 
-  return new NDArray({
-    buffer: newBuffer,
-    shape: data.shape,
-    strides: data.strides,
-    dtype: data.dtype,
-  })
+  return new NDArray(resultData)
 }
 
 /**
@@ -417,18 +387,12 @@ export function acosh<T extends DType>(a: NDArray<T>): NDArray<T> {
  */
 export function atanh<T extends DType>(a: NDArray<T>): NDArray<T> {
   const data = a.getData()
-  const newBuffer = createTypedArray(data.buffer.length, data.dtype)
 
-  for (let i = 0; i < data.buffer.length; i++) {
-    newBuffer[i] = Math.atanh(data.buffer[i])
-  }
+  // Delegate to backend (WASM if available, TS fallback)
+  const backend = getBackend()
+  const resultData = backend.atanh(data)
 
-  return new NDArray({
-    buffer: newBuffer,
-    shape: data.shape,
-    strides: data.strides,
-    dtype: data.dtype,
-  })
+  return new NDArray(resultData)
 }
 
 // ===== Additional Math Functions =====

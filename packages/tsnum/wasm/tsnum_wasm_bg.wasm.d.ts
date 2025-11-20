@@ -2,8 +2,14 @@
 /* eslint-disable */
 export const memory: WebAssembly.Memory;
 export const abs_array: (a: number, b: number) => [number, number];
+export const acosh_array: (a: number, b: number) => [number, number];
 export const add_arrays: (a: number, b: number, c: number, d: number) => [number, number];
 export const add_scalar: (a: number, b: number, c: number) => [number, number];
+export const arccos_array: (a: number, b: number) => [number, number];
+export const arcsin_array: (a: number, b: number) => [number, number];
+export const arctan_array: (a: number, b: number) => [number, number];
+export const asinh_array: (a: number, b: number) => [number, number];
+export const atanh_array: (a: number, b: number) => [number, number];
 export const cos_array: (a: number, b: number) => [number, number];
 export const cosh_array: (a: number, b: number) => [number, number];
 export const det_matrix: (a: number, b: number, c: number) => [number, number, number];

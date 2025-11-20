@@ -397,6 +397,96 @@ export class TypeScriptBackend implements Backend {
     }
   }
 
+  arcsin(a: NDArrayData): NDArrayData {
+    const newBuffer = createTypedArray(a.buffer.length, a.dtype)
+
+    for (let i = 0; i < a.buffer.length; i++) {
+      newBuffer[i] = Math.asin(a.buffer[i])
+    }
+
+    return {
+      buffer: newBuffer,
+      shape: a.shape,
+      strides: a.strides,
+      dtype: a.dtype,
+    }
+  }
+
+  arccos(a: NDArrayData): NDArrayData {
+    const newBuffer = createTypedArray(a.buffer.length, a.dtype)
+
+    for (let i = 0; i < a.buffer.length; i++) {
+      newBuffer[i] = Math.acos(a.buffer[i])
+    }
+
+    return {
+      buffer: newBuffer,
+      shape: a.shape,
+      strides: a.strides,
+      dtype: a.dtype,
+    }
+  }
+
+  arctan(a: NDArrayData): NDArrayData {
+    const newBuffer = createTypedArray(a.buffer.length, a.dtype)
+
+    for (let i = 0; i < a.buffer.length; i++) {
+      newBuffer[i] = Math.atan(a.buffer[i])
+    }
+
+    return {
+      buffer: newBuffer,
+      shape: a.shape,
+      strides: a.strides,
+      dtype: a.dtype,
+    }
+  }
+
+  asinh(a: NDArrayData): NDArrayData {
+    const newBuffer = createTypedArray(a.buffer.length, a.dtype)
+
+    for (let i = 0; i < a.buffer.length; i++) {
+      newBuffer[i] = Math.asinh(a.buffer[i])
+    }
+
+    return {
+      buffer: newBuffer,
+      shape: a.shape,
+      strides: a.strides,
+      dtype: a.dtype,
+    }
+  }
+
+  acosh(a: NDArrayData): NDArrayData {
+    const newBuffer = createTypedArray(a.buffer.length, a.dtype)
+
+    for (let i = 0; i < a.buffer.length; i++) {
+      newBuffer[i] = Math.acosh(a.buffer[i])
+    }
+
+    return {
+      buffer: newBuffer,
+      shape: a.shape,
+      strides: a.strides,
+      dtype: a.dtype,
+    }
+  }
+
+  atanh(a: NDArrayData): NDArrayData {
+    const newBuffer = createTypedArray(a.buffer.length, a.dtype)
+
+    for (let i = 0; i < a.buffer.length; i++) {
+      newBuffer[i] = Math.atanh(a.buffer[i])
+    }
+
+    return {
+      buffer: newBuffer,
+      shape: a.shape,
+      strides: a.strides,
+      dtype: a.dtype,
+    }
+  }
+
   // ===== Linear Algebra (Advanced) =====
 
   inv(a: NDArrayData): NDArrayData {

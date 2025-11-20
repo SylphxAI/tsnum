@@ -326,6 +326,60 @@ export class WASMBackend implements Backend {
     return this.toNDArrayData(result, a.shape, a.dtype)
   }
 
+  arcsin(a: NDArrayData): NDArrayData {
+    this.ensureReady()
+
+    const buffer = this.toFloat64Array(a.buffer)
+    const result = this.module.arcsin_array(buffer)
+
+    return this.toNDArrayData(result, a.shape, a.dtype)
+  }
+
+  arccos(a: NDArrayData): NDArrayData {
+    this.ensureReady()
+
+    const buffer = this.toFloat64Array(a.buffer)
+    const result = this.module.arccos_array(buffer)
+
+    return this.toNDArrayData(result, a.shape, a.dtype)
+  }
+
+  arctan(a: NDArrayData): NDArrayData {
+    this.ensureReady()
+
+    const buffer = this.toFloat64Array(a.buffer)
+    const result = this.module.arctan_array(buffer)
+
+    return this.toNDArrayData(result, a.shape, a.dtype)
+  }
+
+  asinh(a: NDArrayData): NDArrayData {
+    this.ensureReady()
+
+    const buffer = this.toFloat64Array(a.buffer)
+    const result = this.module.asinh_array(buffer)
+
+    return this.toNDArrayData(result, a.shape, a.dtype)
+  }
+
+  acosh(a: NDArrayData): NDArrayData {
+    this.ensureReady()
+
+    const buffer = this.toFloat64Array(a.buffer)
+    const result = this.module.acosh_array(buffer)
+
+    return this.toNDArrayData(result, a.shape, a.dtype)
+  }
+
+  atanh(a: NDArrayData): NDArrayData {
+    this.ensureReady()
+
+    const buffer = this.toFloat64Array(a.buffer)
+    const result = this.module.atanh_array(buffer)
+
+    return this.toNDArrayData(result, a.shape, a.dtype)
+  }
+
   // ===== Linear Algebra (Advanced) =====
 
   inv(a: NDArrayData): NDArrayData {
