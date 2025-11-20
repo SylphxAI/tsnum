@@ -1,7 +1,7 @@
 // ===== WASM Backend =====
 // High-performance WASM implementation
 
-import type { DType, NDArrayData } from '../core/types'
+import type { DType, NDArrayData, TypedArray } from '../core/types'
 import { broadcastShapes, broadcastTo, createTypedArray } from '../core/utils'
 import type { Backend } from './types'
 
@@ -148,9 +148,7 @@ export class WASMBackend implements Backend {
     return this.wasmModule!
   }
 
-  private toFloat64Array(
-    buffer: Float64Array | Int32Array | Int16Array | Int8Array | Float32Array,
-  ): Float64Array {
+  private toFloat64Array(buffer: TypedArray): Float64Array {
     if (buffer instanceof Float64Array) {
       return buffer
     }

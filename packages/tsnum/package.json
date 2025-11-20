@@ -1,6 +1,6 @@
 {
   "name": "tsnum",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "description": "High-performance TypeScript NumPy alternative with WASM acceleration",
   "type": "module",
   "exports": {
@@ -21,7 +21,9 @@
       "types": "./dist/linalg/index.d.ts"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc",
     "test": "bun test",
@@ -29,7 +31,14 @@
     "bench": "bun run src/benchmark.ts",
     "format": "biome format --write ."
   },
-  "keywords": ["numpy", "ndarray", "matrix", "linear-algebra", "wasm", "typescript"],
+  "keywords": [
+    "numpy",
+    "ndarray",
+    "matrix",
+    "linear-algebra",
+    "wasm",
+    "typescript"
+  ],
   "license": "MIT",
   "devDependencies": {
     "@types/bun": "^1.1.14",

@@ -84,16 +84,16 @@ export function corrcoef<T extends DType>(a: NDArray<T>, b?: NDArray<T>): NDArra
 
   // Compute correlation coefficient
   const n = aData.buffer.length
-  const aMean = mean(a)
-  const bMean = mean(b)
+  const aMean = mean(a) as number
+  const bMean = mean(b) as number
 
   let numerator = 0
   let aSumSq = 0
   let bSumSq = 0
 
   for (let i = 0; i < n; i++) {
-    const aDiff = aData.buffer[i] - aMean
-    const bDiff = bData.buffer[i] - bMean
+    const aDiff = Number(aData.buffer[i]) - aMean
+    const bDiff = Number(bData.buffer[i]) - bMean
 
     numerator += aDiff * bDiff
     aSumSq += aDiff * aDiff
@@ -128,13 +128,13 @@ export function cov<T extends DType>(a: NDArray<T>, b?: NDArray<T>): NDArray<T> 
   }
 
   const n = aData.buffer.length
-  const aMean = mean(a)
+  const aMean = mean(a) as number
 
   if (b === undefined) {
     // Variance of a
     let sum = 0
     for (let i = 0; i < n; i++) {
-      const diff = aData.buffer[i] - aMean
+      const diff = Number(aData.buffer[i]) - aMean
       sum += diff * diff
     }
     const variance = sum / (n - 1) // Sample variance (n-1)
@@ -156,7 +156,7 @@ export function cov<T extends DType>(a: NDArray<T>, b?: NDArray<T>): NDArray<T> 
     throw new Error('Arrays must be 1D and have same length')
   }
 
-  const bMean = mean(b)
+  const bMean = mean(b) as number
 
   // Compute covariances
   let covAB = 0
@@ -164,8 +164,8 @@ export function cov<T extends DType>(a: NDArray<T>, b?: NDArray<T>): NDArray<T> 
   let varB = 0
 
   for (let i = 0; i < n; i++) {
-    const aDiff = aData.buffer[i] - aMean
-    const bDiff = bData.buffer[i] - bMean
+    const aDiff = Number(aData.buffer[i]) - aMean
+    const bDiff = Number(bData.buffer[i]) - bMean
 
     covAB += aDiff * bDiff
     varA += aDiff * aDiff
