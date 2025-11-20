@@ -1,6 +1,6 @@
 {
   "name": "tsnum",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "High-performance TypeScript NumPy alternative with WASM acceleration",
   "type": "module",
   "exports": {
