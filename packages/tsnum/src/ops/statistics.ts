@@ -545,3 +545,160 @@ export function argwhere<T extends DType>(a: NDArray<T>): NDArray<'int32'> {
 
   throw new Error('argwhere only supports 1D and 2D arrays')
 }
+
+// ===== Enhanced Statistics Functions =====
+
+/**
+ * Compute weighted average
+ * average(a, weights=w) = sum(a * w) / sum(w)
+ *
+ * @param a Input array
+ * @param weights Weights array (same shape as a)
+ * @param axis Axis along which to average (default: flatten)
+ * @returns Weighted average
+ *
+ * @example
+ * average(array([1, 2, 3, 4]), array([1, 1, 1, 1])) // 2.5
+ * average(array([1, 2, 3, 4]), array([1, 2, 3, 4])) // 3.0
+ */
+export function average<T extends DType>(
+  a: NDArray<T>,
+  weights?: NDArray<T>,
+  axis?: number
+): number {
+  const data = a.getData()
+
+  if (!weights) {
+    // Unweighted average (same as mean)
+    if (axis !== undefined) {
+      throw new Error('axis parameter not yet supported for average without weights')
+    }
+    let sum = 0
+    for (let i = 0; i < data.buffer.length; i++) {
+      sum += data.buffer[i]
+    }
+    return sum / data.buffer.length
+  }
+
+  const wData = weights.getData()
+
+  if (data.buffer.length !== wData.buffer.length) {
+    throw new Error('weights must have same size as array')
+  }
+
+  if (axis !== undefined) {
+    throw new Error('axis parameter not yet supported for weighted average')
+  }
+
+  let weightedSum = 0
+  let weightSum = 0
+
+  for (let i = 0; i < data.buffer.length; i++) {
+    weightedSum += data.buffer[i] * wData.buffer[i]
+    weightSum += wData.buffer[i]
+  }
+
+  if (weightSum === 0) {
+    throw new Error('sum of weights is zero')
+  }
+
+  return weightedSum / weightSum
+}
+
+/**
+ * Peak to peak (maximum - minimum) value
+ *
+ * @param a Input array
+ * @param axis Axis along which to compute (default: flatten)
+ * @returns Peak to peak range
+ *
+ * @example
+ * ptp(array([1, 2, 3, 4, 5])) // 4 (5 - 1)
+ */
+export function ptp<T extends DType>(a: NDArray<T>, axis?: number): number {
+  const data = a.getData()
+
+  if (axis !== undefined) {
+    throw new Error('axis parameter not yet supported for ptp')
+  }
+
+  if (data.buffer.length === 0) {
+    return 0
+  }
+
+  let min = data.buffer[0]
+  let max = data.buffer[0]
+
+  for (let i = 1; i < data.buffer.length; i++) {
+    const val = data.buffer[i]
+    if (val < min) min = val
+    if (val > max) max = val
+  }
+
+  return max - min
+}
+
+/**
+ * Compute percentile while ignoring NaN values
+ *
+ * @param a Input array
+ * @param q Percentile (0-100)
+ * @returns Percentile value
+ *
+ * @example
+ * nanpercentile(array([1, 2, NaN, 3, 4]), 50) // 2.5
+ */
+export function nanpercentile<T extends DType>(a: NDArray<T>, q: number): number {
+  if (q < 0 || q > 100) {
+    throw new Error('Percentile must be between 0 and 100')
+  }
+
+  const data = a.getData()
+
+  // Filter out NaN values
+  const valid = []
+  for (let i = 0; i < data.buffer.length; i++) {
+    const val = data.buffer[i]
+    if (!Number.isNaN(val)) {
+      valid.push(val)
+    }
+  }
+
+  if (valid.length === 0) {
+    return Number.NaN
+  }
+
+  if (valid.length === 1) {
+    return valid[0]
+  }
+
+  // Sort
+  valid.sort((a, b) => a - b)
+
+  // Linear interpolation
+  const index = (q / 100) * (valid.length - 1)
+  const lower = Math.floor(index)
+  const upper = Math.ceil(index)
+  const weight = index - lower
+
+  return valid[lower] * (1 - weight) + valid[upper] * weight
+}
+
+/**
+ * Compute quantile while ignoring NaN values
+ * quantile(a, q) where q is in [0, 1]
+ *
+ * @param a Input array
+ * @param q Quantile (0-1)
+ * @returns Quantile value
+ *
+ * @example
+ * nanquantile(array([1, 2, NaN, 3, 4]), 0.5) // 2.5
+ */
+export function nanquantile<T extends DType>(a: NDArray<T>, q: number): number {
+  if (q < 0 || q > 1) {
+    throw new Error('Quantile must be between 0 and 1')
+  }
+
+  return nanpercentile(a, q * 100)
+}
