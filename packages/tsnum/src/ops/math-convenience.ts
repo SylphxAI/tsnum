@@ -9,9 +9,9 @@ import { NDArray as NDArrayImpl } from '../ndarray'
  * Convert angles from degrees to radians
  * @example deg2rad(array([0, 90, 180])) // [0, π/2, π]
  */
-export function deg2rad<T extends DType>(x: NDArray<T>): NDArray<T> {
+export function deg2rad<T extends DType>(x: NDArray<T>): NDArray<'float64'> {
   const data = x.getData()
-  const result = createTypedArray(data.buffer.length, data.dtype)
+  const result = createTypedArray(data.buffer.length, 'float64')
 
   for (let i = 0; i < data.buffer.length; i++) {
     result[i] = (data.buffer[i] * Math.PI) / 180
@@ -21,7 +21,7 @@ export function deg2rad<T extends DType>(x: NDArray<T>): NDArray<T> {
     buffer: result,
     shape: data.shape.slice(),
     strides: data.strides.slice(),
-    dtype: data.dtype,
+    dtype: 'float64',
   })
 }
 
@@ -29,9 +29,9 @@ export function deg2rad<T extends DType>(x: NDArray<T>): NDArray<T> {
  * Convert angles from radians to degrees
  * @example rad2deg(array([0, Math.PI/2, Math.PI])) // [0, 90, 180]
  */
-export function rad2deg<T extends DType>(x: NDArray<T>): NDArray<T> {
+export function rad2deg<T extends DType>(x: NDArray<T>): NDArray<'float64'> {
   const data = x.getData()
-  const result = createTypedArray(data.buffer.length, data.dtype)
+  const result = createTypedArray(data.buffer.length, 'float64')
 
   for (let i = 0; i < data.buffer.length; i++) {
     result[i] = (data.buffer[i] * 180) / Math.PI
@@ -41,7 +41,7 @@ export function rad2deg<T extends DType>(x: NDArray<T>): NDArray<T> {
     buffer: result,
     shape: data.shape.slice(),
     strides: data.strides.slice(),
-    dtype: data.dtype,
+    dtype: 'float64',
   })
 }
 
@@ -50,7 +50,7 @@ export function rad2deg<T extends DType>(x: NDArray<T>): NDArray<T> {
  * More stable than manual computation
  * @example hypot(array([3, 4]), array([4, 3])) // [5, 5]
  */
-export function hypot<T extends DType>(x1: NDArray<T>, x2: NDArray<T>): NDArray<T> {
+export function hypot<T extends DType>(x1: NDArray<T>, x2: NDArray<T>): NDArray<'float64'> {
   const data1 = x1.getData()
   const data2 = x2.getData()
 
@@ -58,7 +58,7 @@ export function hypot<T extends DType>(x1: NDArray<T>, x2: NDArray<T>): NDArray<
     throw new Error('Arrays must have same size')
   }
 
-  const result = createTypedArray(data1.buffer.length, data1.dtype)
+  const result = createTypedArray(data1.buffer.length, 'float64')
 
   for (let i = 0; i < data1.buffer.length; i++) {
     result[i] = Math.hypot(data1.buffer[i], data2.buffer[i])
@@ -68,7 +68,7 @@ export function hypot<T extends DType>(x1: NDArray<T>, x2: NDArray<T>): NDArray<
     buffer: result,
     shape: data1.shape.slice(),
     strides: data1.strides.slice(),
-    dtype: data1.dtype,
+    dtype: 'float64',
   })
 }
 
@@ -77,9 +77,9 @@ export function hypot<T extends DType>(x1: NDArray<T>, x2: NDArray<T>): NDArray<
  * sinc(0) = 1
  * @example sinc(array([0, 1, 2])) // [1, 0, 0]
  */
-export function sinc<T extends DType>(x: NDArray<T>): NDArray<T> {
+export function sinc<T extends DType>(x: NDArray<T>): NDArray<'float64'> {
   const data = x.getData()
-  const result = createTypedArray(data.buffer.length, data.dtype)
+  const result = createTypedArray(data.buffer.length, 'float64')
 
   for (let i = 0; i < data.buffer.length; i++) {
     const val = data.buffer[i]
@@ -95,7 +95,7 @@ export function sinc<T extends DType>(x: NDArray<T>): NDArray<T> {
     buffer: result,
     shape: data.shape.slice(),
     strides: data.strides.slice(),
-    dtype: data.dtype,
+    dtype: 'float64',
   })
 }
 
@@ -103,9 +103,9 @@ export function sinc<T extends DType>(x: NDArray<T>): NDArray<T> {
  * Cube root
  * @example cbrt(array([8, 27, 64])) // [2, 3, 4]
  */
-export function cbrt<T extends DType>(x: NDArray<T>): NDArray<T> {
+export function cbrt<T extends DType>(x: NDArray<T>): NDArray<'float64'> {
   const data = x.getData()
-  const result = createTypedArray(data.buffer.length, data.dtype)
+  const result = createTypedArray(data.buffer.length, 'float64')
 
   for (let i = 0; i < data.buffer.length; i++) {
     result[i] = Math.cbrt(data.buffer[i])
@@ -115,7 +115,7 @@ export function cbrt<T extends DType>(x: NDArray<T>): NDArray<T> {
     buffer: result,
     shape: data.shape.slice(),
     strides: data.strides.slice(),
-    dtype: data.dtype,
+    dtype: 'float64',
   })
 }
 
@@ -123,9 +123,9 @@ export function cbrt<T extends DType>(x: NDArray<T>): NDArray<T> {
  * Element-wise square: x^2
  * @example square(array([1, 2, 3])) // [1, 4, 9]
  */
-export function square<T extends DType>(x: NDArray<T>): NDArray<T> {
+export function square<T extends DType>(x: NDArray<T>): NDArray<'float64'> {
   const data = x.getData()
-  const result = createTypedArray(data.buffer.length, data.dtype)
+  const result = createTypedArray(data.buffer.length, 'float64')
 
   for (let i = 0; i < data.buffer.length; i++) {
     result[i] = data.buffer[i] * data.buffer[i]
@@ -135,7 +135,7 @@ export function square<T extends DType>(x: NDArray<T>): NDArray<T> {
     buffer: result,
     shape: data.shape.slice(),
     strides: data.strides.slice(),
-    dtype: data.dtype,
+    dtype: 'float64',
   })
 }
 
@@ -143,9 +143,9 @@ export function square<T extends DType>(x: NDArray<T>): NDArray<T> {
  * Element-wise reciprocal: 1/x
  * @example reciprocal(array([1, 2, 4])) // [1, 0.5, 0.25]
  */
-export function reciprocal<T extends DType>(x: NDArray<T>): NDArray<T> {
+export function reciprocal<T extends DType>(x: NDArray<T>): NDArray<'float64'> {
   const data = x.getData()
-  const result = createTypedArray(data.buffer.length, data.dtype)
+  const result = createTypedArray(data.buffer.length, 'float64')
 
   for (let i = 0; i < data.buffer.length; i++) {
     result[i] = 1 / data.buffer[i]
@@ -155,7 +155,7 @@ export function reciprocal<T extends DType>(x: NDArray<T>): NDArray<T> {
     buffer: result,
     shape: data.shape.slice(),
     strides: data.strides.slice(),
-    dtype: data.dtype,
+    dtype: 'float64',
   })
 }
 
@@ -237,9 +237,9 @@ export function lcm<T extends DType>(x1: NDArray<T>, x2: NDArray<T>): NDArray<'i
  * H(x) = 0 if x < 0, H(0) = h0, H(x) = 1 if x > 0
  * @example heaviside(array([-1, 0, 1]), 0.5) // [0, 0.5, 1]
  */
-export function heaviside<T extends DType>(x: NDArray<T>, h0 = 0.5): NDArray<T> {
+export function heaviside<T extends DType>(x: NDArray<T>, h0 = 0.5): NDArray<'float64'> {
   const data = x.getData()
-  const result = createTypedArray(data.buffer.length, data.dtype)
+  const result = createTypedArray(data.buffer.length, 'float64')
 
   for (let i = 0; i < data.buffer.length; i++) {
     const val = data.buffer[i]
@@ -256,7 +256,7 @@ export function heaviside<T extends DType>(x: NDArray<T>, h0 = 0.5): NDArray<T> 
     buffer: result,
     shape: data.shape.slice(),
     strides: data.strides.slice(),
-    dtype: data.dtype,
+    dtype: 'float64',
   })
 }
 
@@ -267,7 +267,7 @@ export function heaviside<T extends DType>(x: NDArray<T>, h0 = 0.5): NDArray<T> 
 export function divmod<T extends DType>(
   x1: NDArray<T>,
   x2: NDArray<T>,
-): { quotient: NDArray<T>; remainder: NDArray<T> } {
+): { quotient: NDArray<'float64'>; remainder: NDArray<'float64'> } {
   const data1 = x1.getData()
   const data2 = x2.getData()
 
@@ -275,8 +275,8 @@ export function divmod<T extends DType>(
     throw new Error('Arrays must have same size')
   }
 
-  const quotient = createTypedArray(data1.buffer.length, data1.dtype)
-  const remainder = createTypedArray(data1.buffer.length, data1.dtype)
+  const quotient = createTypedArray(data1.buffer.length, 'float64')
+  const remainder = createTypedArray(data1.buffer.length, 'float64')
 
   for (let i = 0; i < data1.buffer.length; i++) {
     const a = data1.buffer[i]
@@ -290,13 +290,13 @@ export function divmod<T extends DType>(
       buffer: quotient,
       shape: data1.shape.slice(),
       strides: data1.strides.slice(),
-      dtype: data1.dtype,
+      dtype: 'float64',
     }),
     remainder: new NDArrayImpl({
       buffer: remainder,
       shape: data1.shape.slice(),
       strides: data1.strides.slice(),
-      dtype: data1.dtype,
+      dtype: 'float64',
     }),
   }
 }
