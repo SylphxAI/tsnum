@@ -436,6 +436,85 @@ export function meshgrid<T extends DType = 'float64'>(
   }
 }
 
+/**
+ * Construct array by executing function over each coordinate
+ */
+export function fromfunction<T extends DType = 'float64'>(
+  fn: (...indices: number[]) => number,
+  shape: number[],
+  options?: ArrayOptions,
+): NDArray<T> {
+  validateShape(shape)
+  const dtype = (options?.dtype ?? 'float64') as T
+  const size = computeSize(shape)
+  const buffer = createTypedArray(size, dtype)
+
+  // Generate all coordinates and evaluate function
+  const ndim = shape.length
+  const coords = new Array(ndim).fill(0)
+
+  for (let i = 0; i < size; i++) {
+    // Convert flat index to coordinates
+    let remaining = i
+    for (let d = ndim - 1; d >= 0; d--) {
+      coords[d] = remaining % shape[d]
+      remaining = Math.floor(remaining / shape[d])
+    }
+
+    // Evaluate function at coordinates
+    buffer[i] = fn(...coords)
+  }
+
+  return new NDArray<T>({
+    buffer,
+    shape: [...shape],
+    strides: computeStrides(shape),
+    dtype,
+  })
+}
+
+/**
+ * Return arrays representing indices of a grid
+ */
+export function indices<T extends DType = 'int32'>(
+  dimensions: number[],
+  options?: ArrayOptions,
+): NDArray<T>[] {
+  validateShape(dimensions)
+  const dtype = (options?.dtype ?? 'int32') as T
+  const ndim = dimensions.length
+  const totalSize = computeSize(dimensions)
+
+  const result: NDArray<T>[] = []
+
+  for (let dim = 0; dim < ndim; dim++) {
+    const buffer = createTypedArray(totalSize, dtype)
+
+    // Fill with coordinate values for this dimension
+    for (let i = 0; i < totalSize; i++) {
+      let remaining = i
+      for (let d = ndim - 1; d >= 0; d--) {
+        const coord = remaining % dimensions[d]
+        remaining = Math.floor(remaining / dimensions[d])
+        if (d === dim) {
+          buffer[i] = coord
+        }
+      }
+    }
+
+    result.push(
+      new NDArray<T>({
+        buffer,
+        shape: [...dimensions],
+        strides: computeStrides(dimensions),
+        dtype,
+      }),
+    )
+  }
+
+  return result
+}
+
 // ===== Helper functions =====
 function inferShapeAndFlatten(data: number | number[] | number[][] | number[][][]): {
   shape: number[]

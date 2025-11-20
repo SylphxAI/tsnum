@@ -13,6 +13,8 @@ export {
   diag,
   tri,
   meshgrid,
+  fromfunction,
+  indices,
   // Like functions
   zerosLike,
   onesLike,
@@ -53,6 +55,12 @@ export {
   at,
   slice,
   take,
+  put,
+  putmask,
+  // Advanced indexing
+  ix_,
+  ravel_multi_index,
+  unravel_index,
   // Math
   abs,
   sign,
@@ -199,6 +207,9 @@ export {
 
 // 2d. FFT
 export { fft, ifft, rfft, irfft, fft2, ifft2, rfft2, irfft2 } from './fft'
+
+// 2e. Polynomial
+export { polyfit, polyval, roots } from './polynomial'
 
 // 3. NDArray (data container)
 export { NDArray } from './ndarray'

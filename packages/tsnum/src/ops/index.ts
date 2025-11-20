@@ -16,6 +16,9 @@ export { expandDims, flatten, reshape, squeeze, swapaxes, transpose } from './sh
 export { at, slice, take } from './indexing'
 export type { SliceRange } from './indexing'
 
+// Advanced indexing
+export { ix_, ravel_multi_index, unravel_index, put, putmask } from './advanced-indexing'
+
 // Math functions
 export {
   abs,
