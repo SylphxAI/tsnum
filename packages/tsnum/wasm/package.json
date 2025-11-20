@@ -1,6 +1,5 @@
 {
   "name": "tsnum-wasm",
-  "type": "module",
   "collaborators": [
     "SylphxAI"
   ],
@@ -13,8 +12,5 @@
     "tsnum_wasm.d.ts"
   ],
   "main": "tsnum_wasm.js",
-  "types": "tsnum_wasm.d.ts",
-  "sideEffects": [
-    "./snippets/*"
-  ]
+  "types": "tsnum_wasm.d.ts"
 }

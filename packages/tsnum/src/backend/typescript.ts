@@ -439,6 +439,66 @@ export class TypeScriptBackend implements Backend {
     }
   }
 
+  round(a: NDArrayData): NDArrayData {
+    const newBuffer = createTypedArray(a.buffer.length, a.dtype)
+
+    for (let i = 0; i < a.buffer.length; i++) {
+      newBuffer[i] = Math.round(a.buffer[i])
+    }
+
+    return {
+      buffer: newBuffer,
+      shape: [...a.shape],
+      strides: [...a.strides],
+      dtype: a.dtype,
+    }
+  }
+
+  floor(a: NDArrayData): NDArrayData {
+    const newBuffer = createTypedArray(a.buffer.length, a.dtype)
+
+    for (let i = 0; i < a.buffer.length; i++) {
+      newBuffer[i] = Math.floor(a.buffer[i])
+    }
+
+    return {
+      buffer: newBuffer,
+      shape: [...a.shape],
+      strides: [...a.strides],
+      dtype: a.dtype,
+    }
+  }
+
+  ceil(a: NDArrayData): NDArrayData {
+    const newBuffer = createTypedArray(a.buffer.length, a.dtype)
+
+    for (let i = 0; i < a.buffer.length; i++) {
+      newBuffer[i] = Math.ceil(a.buffer[i])
+    }
+
+    return {
+      buffer: newBuffer,
+      shape: [...a.shape],
+      strides: [...a.strides],
+      dtype: a.dtype,
+    }
+  }
+
+  trunc(a: NDArrayData): NDArrayData {
+    const newBuffer = createTypedArray(a.buffer.length, a.dtype)
+
+    for (let i = 0; i < a.buffer.length; i++) {
+      newBuffer[i] = Math.trunc(a.buffer[i])
+    }
+
+    return {
+      buffer: newBuffer,
+      shape: [...a.shape],
+      strides: [...a.strides],
+      dtype: a.dtype,
+    }
+  }
+
   sin(a: NDArrayData): NDArrayData {
     const newBuffer = createTypedArray(a.buffer.length, a.dtype)
 

@@ -112,8 +112,10 @@ describe('Math Functions', () => {
   test('round: round to nearest integer', () => {
     const a = array([1.2, 1.5, 1.7, 2.5, -1.5], { dtype: 'float64' })
     const result = round(a)
-    // Note: Math.round uses "round half towards positive infinity"
-    expect(Array.from(result.getData().buffer)).toEqual([1, 2, 2, 3, -1])
+    // Note: Rust f64::round() uses "round half away from zero" (banker's rounding)
+    // Math.round uses "round half towards positive infinity"
+    // -1.5 rounds to -2 in Rust, -1 in JS Math.round
+    expect(Array.from(result.getData().buffer)).toEqual([1, 2, 2, 3, -2])
   })
 
   test('floor: round down', () => {

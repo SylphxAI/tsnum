@@ -295,6 +295,28 @@ pub fn atanh_array(a: &[f64]) -> Vec<f64> {
     a.iter().map(|x| x.atanh()).collect()
 }
 
+// ===== Rounding Functions =====
+
+#[wasm_bindgen]
+pub fn round_array(a: &[f64]) -> Vec<f64> {
+    a.iter().map(|x| x.round()).collect()
+}
+
+#[wasm_bindgen]
+pub fn floor_array(a: &[f64]) -> Vec<f64> {
+    a.iter().map(|x| x.floor()).collect()
+}
+
+#[wasm_bindgen]
+pub fn ceil_array(a: &[f64]) -> Vec<f64> {
+    a.iter().map(|x| x.ceil()).collect()
+}
+
+#[wasm_bindgen]
+pub fn trunc_array(a: &[f64]) -> Vec<f64> {
+    a.iter().map(|x| x.trunc()).collect()
+}
+
 // ===== Linear Algebra (Advanced) =====
 
 /// Matrix inverse for 2x2 and 3x3 matrices

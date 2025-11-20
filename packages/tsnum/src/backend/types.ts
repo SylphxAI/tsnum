@@ -45,6 +45,10 @@ export interface Backend {
   log2(a: NDArrayData): NDArrayData
   log10(a: NDArrayData): NDArrayData
   log1p(a: NDArrayData): NDArrayData
+  round(a: NDArrayData): NDArrayData
+  floor(a: NDArrayData): NDArrayData
+  ceil(a: NDArrayData): NDArrayData
+  trunc(a: NDArrayData): NDArrayData
   sin(a: NDArrayData): NDArrayData
   cos(a: NDArrayData): NDArrayData
   tan(a: NDArrayData): NDArrayData

@@ -23,13 +23,8 @@ export class WASMBackend implements Backend {
 
   async init(): Promise<void> {
     try {
-      // Import the WASM module
+      // Import the WASM module (Node.js target auto-initializes)
       const module = await import('../../wasm/tsnum_wasm.js')
-
-      // Initialize WASM by loading the .wasm file
-      // For web target, need to explicitly call the init function
-      const wasmPath = new URL('../../wasm/tsnum_wasm_bg.wasm', import.meta.url)
-      await module.default(wasmPath)
 
       this.wasmModule = module as unknown as WASMModule
       this._isReady = true
@@ -324,6 +319,42 @@ export class WASMBackend implements Backend {
     const result = this.module.log1p_array(buffer)
 
     return this.toNDArrayData(result, a.shape, 'float64')
+  }
+
+  round(a: NDArrayData): NDArrayData {
+    this.ensureReady()
+
+    const buffer = this.toFloat64Array(a.buffer)
+    const result = this.module.round_array(buffer)
+
+    return this.toNDArrayData(result, a.shape, a.dtype)
+  }
+
+  floor(a: NDArrayData): NDArrayData {
+    this.ensureReady()
+
+    const buffer = this.toFloat64Array(a.buffer)
+    const result = this.module.floor_array(buffer)
+
+    return this.toNDArrayData(result, a.shape, a.dtype)
+  }
+
+  ceil(a: NDArrayData): NDArrayData {
+    this.ensureReady()
+
+    const buffer = this.toFloat64Array(a.buffer)
+    const result = this.module.ceil_array(buffer)
+
+    return this.toNDArrayData(result, a.shape, a.dtype)
+  }
+
+  trunc(a: NDArrayData): NDArrayData {
+    this.ensureReady()
+
+    const buffer = this.toFloat64Array(a.buffer)
+    const result = this.module.trunc_array(buffer)
+
+    return this.toNDArrayData(result, a.shape, a.dtype)
   }
 
   sin(a: NDArrayData): NDArrayData {

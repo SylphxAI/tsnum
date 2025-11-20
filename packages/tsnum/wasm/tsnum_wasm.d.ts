@@ -9,6 +9,10 @@ export function mean(a: Float64Array): number;
  */
 export function min(a: Float64Array): number;
 /**
+ * Determinant for 2x2 and 3x3 matrices
+ */
+export function det_matrix(a: Float64Array, n: number): number;
+/**
  * Add scalar to array
  */
 export function add_scalar(a: Float64Array, scalar: number): Float64Array;
@@ -20,10 +24,7 @@ export function std(a: Float64Array): number;
  * Sum all elements
  */
 export function sum(a: Float64Array): number;
-/**
- * Matrix transpose
- */
-export function transpose_matrix(a: Float64Array, rows: number, cols: number): Float64Array;
+export function ceil_array(a: Float64Array): Float64Array;
 export function log2_array(a: Float64Array): Float64Array;
 /**
  * Element-wise natural logarithm
@@ -35,12 +36,14 @@ export function log_array(a: Float64Array): Float64Array;
 export function mul_scalar(a: Float64Array, scalar: number): Float64Array;
 export function acosh_array(a: Float64Array): Float64Array;
 /**
- * Inverse Fast Fourier Transform
- * Input: interleaved [real, imag] pairs (length 2n)
- * Output: interleaved [real, imag] pairs (length 2n)
+ * Matrix inverse for 2x2 and 3x3 matrices
  */
-export function ifft(input: Float64Array, n: number): Float64Array;
+export function inv_matrix(a: Float64Array, n: number): Float64Array;
 export function arccos_array(a: Float64Array): Float64Array;
+/**
+ * Matrix transpose
+ */
+export function transpose_matrix(a: Float64Array, rows: number, cols: number): Float64Array;
 /**
  * Power: raise array elements to exponent
  */
@@ -55,12 +58,7 @@ export function abs_array(a: Float64Array): Float64Array;
  */
 export function div_scalar(a: Float64Array, scalar: number): Float64Array;
 export function atanh_array(a: Float64Array): Float64Array;
-/**
- * Fast Fourier Transform (Cooley-Tukey algorithm)
- * Input: real-valued array of length n (must be power of 2)
- * Output: interleaved [real, imag] pairs (length 2n)
- */
-export function fft(input: Float64Array): Float64Array;
+export function trunc_array(a: Float64Array): Float64Array;
 /**
  * Element-wise exponential (e^x)
  */
@@ -69,23 +67,29 @@ export function exp_array(a: Float64Array): Float64Array;
  * Element-wise cosine
  */
 export function cos_array(a: Float64Array): Float64Array;
-/**
- * Determinant for 2x2 and 3x3 matrices
- */
-export function det_matrix(a: Float64Array, n: number): number;
+export function floor_array(a: Float64Array): Float64Array;
 export function cbrt_array(a: Float64Array): Float64Array;
 /**
  * Dot product (inner product) of two 1D arrays
  */
 export function dot(a: Float64Array, b: Float64Array): number;
+export function round_array(a: Float64Array): Float64Array;
 /**
- * Matrix inverse for 2x2 and 3x3 matrices
+ * Fast Fourier Transform (Cooley-Tukey algorithm)
+ * Input: real-valued array of length n (must be power of 2)
+ * Output: interleaved [real, imag] pairs (length 2n)
  */
-export function inv_matrix(a: Float64Array, n: number): Float64Array;
+export function fft(input: Float64Array): Float64Array;
 /**
  * Subtract scalar from array
  */
 export function sub_scalar(a: Float64Array, scalar: number): Float64Array;
+/**
+ * Inverse Fast Fourier Transform
+ * Input: interleaved [real, imag] pairs (length 2n)
+ * Output: interleaved [real, imag] pairs (length 2n)
+ */
+export function ifft(input: Float64Array, n: number): Float64Array;
 /**
  * Subtract two arrays element-wise
  */
@@ -140,80 +144,3 @@ export function sqrt_array(a: Float64Array): Float64Array;
  * Divide two arrays element-wise
  */
 export function div_arrays(a: Float64Array, b: Float64Array): Float64Array;
-
-export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
-
-export interface InitOutput {
-  readonly memory: WebAssembly.Memory;
-  readonly abs_array: (a: number, b: number) => [number, number];
-  readonly acosh_array: (a: number, b: number) => [number, number];
-  readonly add_arrays: (a: number, b: number, c: number, d: number) => [number, number];
-  readonly add_scalar: (a: number, b: number, c: number) => [number, number];
-  readonly arccos_array: (a: number, b: number) => [number, number];
-  readonly arcsin_array: (a: number, b: number) => [number, number];
-  readonly arctan_array: (a: number, b: number) => [number, number];
-  readonly asinh_array: (a: number, b: number) => [number, number];
-  readonly atanh_array: (a: number, b: number) => [number, number];
-  readonly cbrt_array: (a: number, b: number) => [number, number];
-  readonly cos_array: (a: number, b: number) => [number, number];
-  readonly cosh_array: (a: number, b: number) => [number, number];
-  readonly det_matrix: (a: number, b: number, c: number) => [number, number, number];
-  readonly div_arrays: (a: number, b: number, c: number, d: number) => [number, number];
-  readonly div_scalar: (a: number, b: number, c: number) => [number, number];
-  readonly dot: (a: number, b: number, c: number, d: number) => number;
-  readonly exp2_array: (a: number, b: number) => [number, number];
-  readonly exp_array: (a: number, b: number) => [number, number];
-  readonly expm1_array: (a: number, b: number) => [number, number];
-  readonly fft: (a: number, b: number) => [number, number];
-  readonly ifft: (a: number, b: number, c: number) => [number, number];
-  readonly inv_matrix: (a: number, b: number, c: number) => [number, number, number, number];
-  readonly log10_array: (a: number, b: number) => [number, number];
-  readonly log1p_array: (a: number, b: number) => [number, number];
-  readonly log2_array: (a: number, b: number) => [number, number];
-  readonly log_array: (a: number, b: number) => [number, number];
-  readonly matmul: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => [number, number];
-  readonly max: (a: number, b: number) => number;
-  readonly mean: (a: number, b: number) => number;
-  readonly min: (a: number, b: number) => number;
-  readonly mul_arrays: (a: number, b: number, c: number, d: number) => [number, number];
-  readonly mul_scalar: (a: number, b: number, c: number) => [number, number];
-  readonly pow_scalar: (a: number, b: number, c: number) => [number, number];
-  readonly sin_array: (a: number, b: number) => [number, number];
-  readonly sinh_array: (a: number, b: number) => [number, number];
-  readonly sqrt_array: (a: number, b: number) => [number, number];
-  readonly square_array: (a: number, b: number) => [number, number];
-  readonly std: (a: number, b: number) => number;
-  readonly sub_arrays: (a: number, b: number, c: number, d: number) => [number, number];
-  readonly sub_scalar: (a: number, b: number, c: number) => [number, number];
-  readonly sum: (a: number, b: number) => number;
-  readonly tan_array: (a: number, b: number) => [number, number];
-  readonly tanh_array: (a: number, b: number) => [number, number];
-  readonly transpose_matrix: (a: number, b: number, c: number, d: number) => [number, number];
-  readonly variance: (a: number, b: number) => number;
-  readonly __wbindgen_externrefs: WebAssembly.Table;
-  readonly __wbindgen_malloc: (a: number, b: number) => number;
-  readonly __wbindgen_free: (a: number, b: number, c: number) => void;
-  readonly __externref_table_dealloc: (a: number) => void;
-  readonly __wbindgen_start: () => void;
-}
-
-export type SyncInitInput = BufferSource | WebAssembly.Module;
-/**
-* Instantiates the given `module`, which can either be bytes or
-* a precompiled `WebAssembly.Module`.
-*
-* @param {{ module: SyncInitInput }} module - Passing `SyncInitInput` directly is deprecated.
-*
-* @returns {InitOutput}
-*/
-export function initSync(module: { module: SyncInitInput } | SyncInitInput): InitOutput;
-
-/**
-* If `module_or_path` is {RequestInfo} or {URL}, makes a request and
-* for everything else, calls `WebAssembly.instantiate` directly.
-*
-* @param {{ module_or_path: InitInput | Promise<InitInput> }} module_or_path - Passing `InitInput` directly is deprecated.
-*
-* @returns {Promise<InitOutput>}
-*/
-export default function __wbg_init (module_or_path?: { module_or_path: InitInput | Promise<InitInput> } | InitInput | Promise<InitInput>): Promise<InitOutput>;
