@@ -551,3 +551,176 @@ export function beta(
     dtype,
   })
 }
+
+/**
+ * Chi-square distribution with k degrees of freedom
+ * χ² = sum of k squared standard normal variables
+ */
+export function chisquare(df: number, shape: number | number[] = 1, dtype: DType = 'float64'): NDArray {
+  if (df <= 0) {
+    throw new Error('Degrees of freedom must be positive')
+  }
+
+  const shapeArray = typeof shape === 'number' ? [shape] : shape
+  const size = shapeArray.reduce((a, b) => a * b, 1)
+  const buffer = createTypedArray(size, dtype)
+
+  // Chi-square is sum of k squared standard normals
+  for (let i = 0; i < size; i++) {
+    let sum = 0
+    for (let j = 0; j < df; j++) {
+      const u1 = rand()
+      const u2 = rand()
+      const z = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2)
+      sum += z * z
+    }
+    buffer[i] = sum
+  }
+
+  const strides = new Array(shapeArray.length)
+  strides[shapeArray.length - 1] = 1
+  for (let i = shapeArray.length - 2; i >= 0; i--) {
+    strides[i] = strides[i + 1] * shapeArray[i + 1]
+  }
+
+  return new NDArray({
+    buffer,
+    shape: shapeArray,
+    strides,
+    dtype,
+  })
+}
+
+/**
+ * Log-normal distribution
+ * If X ~ Normal(mean, sigma), then exp(X) ~ LogNormal
+ */
+export function lognormal(mean: number = 0, sigma: number = 1, shape: number | number[] = 1, dtype: DType = 'float64'): NDArray {
+  if (sigma <= 0) {
+    throw new Error('Sigma must be positive')
+  }
+
+  const shapeArray = typeof shape === 'number' ? [shape] : shape
+  const size = shapeArray.reduce((a, b) => a * b, 1)
+  const buffer = createTypedArray(size, dtype)
+
+  // Generate normal samples and exponentiate
+  for (let i = 0; i < size; i++) {
+    const u1 = rand()
+    const u2 = rand()
+    const z = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2)
+    buffer[i] = Math.exp(mean + sigma * z)
+  }
+
+  const strides = new Array(shapeArray.length)
+  strides[shapeArray.length - 1] = 1
+  for (let i = shapeArray.length - 2; i >= 0; i--) {
+    strides[i] = strides[i + 1] * shapeArray[i + 1]
+  }
+
+  return new NDArray({
+    buffer,
+    shape: shapeArray,
+    strides,
+    dtype,
+  })
+}
+
+/**
+ * Triangular distribution over [left, right] with mode at mode
+ */
+export function triangular(left: number, mode: number, right: number, shape: number | number[] = 1, dtype: DType = 'float64'): NDArray {
+  if (left > mode || mode > right) {
+    throw new Error('Must have left <= mode <= right')
+  }
+
+  const shapeArray = typeof shape === 'number' ? [shape] : shape
+  const size = shapeArray.reduce((a, b) => a * b, 1)
+  const buffer = createTypedArray(size, dtype)
+
+  const fc = (mode - left) / (right - left)
+
+  for (let i = 0; i < size; i++) {
+    const u = rand()
+    if (u < fc) {
+      buffer[i] = left + Math.sqrt(u * (right - left) * (mode - left))
+    } else {
+      buffer[i] = right - Math.sqrt((1 - u) * (right - left) * (right - mode))
+    }
+  }
+
+  const strides = new Array(shapeArray.length)
+  strides[shapeArray.length - 1] = 1
+  for (let i = shapeArray.length - 2; i >= 0; i--) {
+    strides[i] = strides[i + 1] * shapeArray[i + 1]
+  }
+
+  return new NDArray({
+    buffer,
+    shape: shapeArray,
+    strides,
+    dtype,
+  })
+}
+
+/**
+ * Weibull distribution with shape parameter k and scale parameter λ
+ */
+export function weibull(k: number, lambda: number = 1, shape: number | number[] = 1, dtype: DType = 'float64'): NDArray {
+  if (k <= 0 || lambda <= 0) {
+    throw new Error('Shape and scale parameters must be positive')
+  }
+
+  const shapeArray = typeof shape === 'number' ? [shape] : shape
+  const size = shapeArray.reduce((a, b) => a * b, 1)
+  const buffer = createTypedArray(size, dtype)
+
+  for (let i = 0; i < size; i++) {
+    const u = rand()
+    buffer[i] = lambda * Math.pow(-Math.log(1 - u), 1 / k)
+  }
+
+  const strides = new Array(shapeArray.length)
+  strides[shapeArray.length - 1] = 1
+  for (let i = shapeArray.length - 2; i >= 0; i--) {
+    strides[i] = strides[i + 1] * shapeArray[i + 1]
+  }
+
+  return new NDArray({
+    buffer,
+    shape: shapeArray,
+    strides,
+    dtype,
+  })
+}
+
+/**
+ * Pareto distribution (power law) with shape parameter a
+ */
+export function pareto(a: number, shape: number | number[] = 1, dtype: DType = 'float64'): NDArray {
+  if (a <= 0) {
+    throw new Error('Shape parameter must be positive')
+  }
+
+  const shapeArray = typeof shape === 'number' ? [shape] : shape
+  const size = shapeArray.reduce((acc, b) => acc * b, 1)
+  const buffer = createTypedArray(size, dtype)
+
+  for (let i = 0; i < size; i++) {
+    const u = rand()
+    buffer[i] = Math.pow(1 - u, -1 / a)
+  }
+
+  const strides = new Array(shapeArray.length)
+  strides[shapeArray.length - 1] = 1
+  for (let i = shapeArray.length - 2; i >= 0; i--) {
+    strides[i] = strides[i + 1] * shapeArray[i + 1]
+  }
+
+  return new NDArray({
+    buffer,
+    shape: shapeArray,
+    strides,
+    dtype,
+  })
+}

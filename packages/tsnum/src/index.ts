@@ -296,6 +296,11 @@ export {
   poisson,
   gamma,
   beta,
+  chisquare,
+  lognormal,
+  triangular,
+  weibull,
+  pareto,
 } from './random'
 
 // 2d. FFT
