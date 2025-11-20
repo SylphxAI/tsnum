@@ -1,11 +1,11 @@
 # Architecture
 
 ## System Overview
-Hybrid functional-OOP design: Pure data structures (NDArrayData) with immutable operations, wrapped in ergonomic NDArray class. Two API styles coexist:
-1. **OOP shell** (`array([1,2]).add(3).sum()`) - NumPy-like, method chaining
-2. **Functional core** (`pipe(array([1,2]), arr => add(arr, 3), sum)`) - tree-shakeable, composable
+**Pure functional-first design**: Pure data structures (NDArrayData) with immutable operations. NDArray is a lightweight data container with read-only properties only. All operations are module-level pure functions.
 
-**Data flow:** TypedArray storage → NDArrayData (pure) → NDArray (methods) or functional ops → new NDArrayData
+**API style:** Functional composition (`pipe(array([1,2]), a => add(a, 3), sum)`) - tree-shakeable, composable, matches NumPy's functional core.
+
+**Data flow:** TypedArray storage → NDArrayData (pure) → NDArray (data container) → functional ops → new NDArrayData
 
 **Monorepo structure:** Turbo-based, single package (`packages/tsnum`) initially, future WASM package separate.
 
@@ -14,16 +14,19 @@ Hybrid functional-OOP design: Pure data structures (NDArrayData) with immutable 
   - `types.ts`: DType definitions, NDArrayData interface
   - `utils.ts`: Shape computation, strides, broadcasting logic
 
-- **`src/ndarray.ts`**: NDArray class (thin OOP wrapper over NDArrayData)
-  - Delegates to internal operations
-  - Immutable by default (returns new instances)
-  - Properties: `.shape`, `.dtype`, `.T`, `.ndim`
+- **`src/ndarray.ts`**: NDArray class (pure data container, no operation methods)
+  - Read-only properties: `.shape`, `.dtype`, `.T`, `.ndim`, `.size`
+  - Utility methods: `.copy()`, `.toString()`, `.getData()`
+  - Zero operation methods (all ops are pure functions)
 
 - **`src/creation.ts`**: Factory functions (`array`, `zeros`, `ones`, `arange`, `linspace`, `eye`)
 
 - **`src/ops/`**: Pure functional operations (tree-shakeable)
-  - Export individual functions: `add`, `mul`, `sum`, `transpose`
-  - Delegate to NDArray methods internally (v1), future: direct implementation
+  - `arithmetic.ts`: add, sub, mul, div, pow
+  - `comparison.ts`: equal, less, greater, lessEqual, greaterEqual
+  - `reductions.ts`: sum, mean, max, min, std, variance
+  - `shape.ts`: reshape, transpose, flatten
+  - All operate directly on NDArrayData (no method delegation)
 
 - **`src/functional.ts`**: Composition utilities (`pipe`, `compose`)
 
@@ -31,23 +34,26 @@ Hybrid functional-OOP design: Pure data structures (NDArrayData) with immutable 
 
 ## Design Patterns
 
-### Pattern: Functional Core + OOP Shell
-**Why:** Combine tree-shaking benefits (functional) with ergonomic API (OOP). Users import only what they use.
+### Pattern: Pure Functional-First (ADR-004)
+**Why:** Maximum tree-shaking, best performance (no OOP overhead), matches NumPy's actual design, enables elegant `pipe` composition.
 
-**Where:** All operations exist as:
-1. NDArray methods: `arr.add(5)`
-2. Standalone functions: `add(arr, 5)`
+**Where:** All operations are module-level functions in `src/ops/`
 
-**Trade-off:** Code duplication vs flexibility. Small duplication acceptable for API ergonomics. Future: methods delegate to pure functions.
+**Trade-off:** No method chaining vs better performance and composition. `pipe` utility provides superior composition to method chaining.
 
 **Example:**
 ```ts
-// OOP style
-array([1,2,3]).add(10).sum()
-
-// Functional style (tree-shakeable)
-import { add, sum } from 'tsnum/ops'
+// Primary API (functional)
+import { add, sum } from 'tsnum'
 sum(add(array([1,2,3]), 10))
+
+// Elegant composition with pipe
+import { pipe } from 'tsnum'
+pipe(
+  array([1,2,3]),
+  a => add(a, 10),
+  sum
+)
 ```
 
 ### Pattern: Pure Data + Computed Strides

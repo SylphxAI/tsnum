@@ -1,11 +1,41 @@
-// Core types
-export type { DType, TypedArray, NDArrayData, ArrayOptions, AxisOptions } from './core/types'
+// ===== tsnum - TypeScript NumPy Alternative (Functional-First) =====
 
-// NDArray class
-export { NDArray } from './ndarray'
-
-// Creation functions
+// 1. Creation functions (most common)
 export { array, asarray, zeros, ones, full, eye, arange, linspace } from './creation'
 
-// Utils (for advanced users)
+// 2. Operations (functional API - primary)
+export {
+  // Arithmetic
+  add,
+  sub,
+  mul,
+  div,
+  pow,
+  // Comparison
+  equal,
+  less,
+  greater,
+  lessEqual,
+  greaterEqual,
+  // Reductions
+  sum,
+  mean,
+  max,
+  min,
+  std,
+  variance,
+  // Shape
+  reshape,
+  transpose,
+  flatten,
+} from './ops'
+
+// 3. NDArray (data container)
+export { NDArray } from './ndarray'
+
+// 4. Types
+export type { DType, TypedArray, NDArrayData, ArrayOptions, AxisOptions } from './core/types'
+
+// 5. Utilities
+export { pipe, compose, partial } from './functional'
 export { computeSize, computeStrides, broadcastShapes, canBroadcast } from './core/utils'

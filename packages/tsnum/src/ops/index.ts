@@ -1,56 +1,13 @@
-// Placeholder for functional ops exports
-// These will be pure functions for tree-shaking
+// ===== Functional API (Pure Functions) =====
 
-import type { DType } from '../core/types'
-import type { NDArray } from '../ndarray'
+// Arithmetic
+export { add, sub, mul, div, pow } from './arithmetic'
 
-// ===== Arithmetic operations (functional) =====
-export function add<T extends DType>(a: NDArray<T>, b: NDArray<T> | number): NDArray<T> {
-  return a.add(b as any)
-}
+// Comparison
+export { equal, less, greater, lessEqual, greaterEqual } from './comparison'
 
-export function sub<T extends DType>(a: NDArray<T>, b: NDArray<T> | number): NDArray<T> {
-  return a.sub(b as any)
-}
+// Reductions
+export { sum, mean, max, min, std, variance } from './reductions'
 
-export function mul<T extends DType>(a: NDArray<T>, b: NDArray<T> | number): NDArray<T> {
-  return a.mul(b as any)
-}
-
-export function div<T extends DType>(a: NDArray<T>, b: NDArray<T> | number): NDArray<T> {
-  return a.div(b as any)
-}
-
-export function pow<T extends DType>(a: NDArray<T>, exponent: number): NDArray<T> {
-  return a.pow(exponent)
-}
-
-// ===== Reduction operations (functional) =====
-export function sum(a: NDArray): number {
-  return a.sum() as number
-}
-
-export function mean(a: NDArray): number {
-  return a.mean() as number
-}
-
-export function max(a: NDArray): number {
-  return a.max() as number
-}
-
-export function min(a: NDArray): number {
-  return a.min() as number
-}
-
-// ===== Shape operations (functional) =====
-export function reshape<T extends DType>(a: NDArray<T>, shape: number[]): NDArray<T> {
-  return a.reshape(shape)
-}
-
-export function transpose<T extends DType>(a: NDArray<T>): NDArray<T> {
-  return a.transpose()
-}
-
-export function flatten<T extends DType>(a: NDArray<T>): NDArray<T> {
-  return a.flatten()
-}
+// Shape
+export { reshape, transpose, flatten } from './shape'

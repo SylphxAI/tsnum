@@ -41,11 +41,11 @@ TypeScript NumPy alternative (tsnum): High-performance n-dimensional array libra
 
 ## Boundaries
 **In scope:**
-- NDArray class with full dtype system
-- NumPy-compatible API (creation, indexing, slicing, arithmetic, broadcasting)
+- NDArray class with full dtype system (data container only)
+- NumPy-compatible functional API (creation, indexing, slicing, arithmetic, broadcasting)
 - Linear algebra (dot, matmul, inv, solve, svd)
 - Reductions (sum, mean, std, argmax)
-- Both OOP (`arr.add()`) and functional (`add(arr)`) APIs
+- Pure functional-first design (`add(arr, 5)`, `pipe(arr, fn1, fn2)`)
 - WASM acceleration for performance-critical operations
 
 **Out of scope:**

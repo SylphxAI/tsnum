@@ -1,6 +1,6 @@
 # 001. Hybrid Functional/OOP API Design
 
-**Status:** ✅ Accepted
+**Status:** 📦 Superseded by ADR-004
 **Date:** 2025-01-XX
 
 ## Context
