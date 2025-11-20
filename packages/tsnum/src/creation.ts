@@ -226,6 +226,87 @@ export function linspace<T extends DType = 'float64'>(
 }
 
 /**
+ * Return numbers spaced evenly on a log scale
+ */
+export function logspace<T extends DType = 'float64'>(
+  start: number,
+  stop: number,
+  num = 50,
+  base = 10.0,
+  options?: ArrayOptions,
+): NDArray<T> {
+  if (num < 0) {
+    throw new Error('Number of samples must be non-negative')
+  }
+
+  const dtype = (options?.dtype ?? 'float64') as T
+  const buffer = createTypedArray(num, dtype)
+
+  if (num === 1) {
+    buffer[0] = Math.pow(base, start)
+  } else {
+    const step = (stop - start) / (num - 1)
+    for (let i = 0; i < num; i++) {
+      const exponent = start + i * step
+      buffer[i] = Math.pow(base, exponent)
+    }
+  }
+
+  return new NDArray<T>({
+    buffer,
+    shape: [num],
+    strides: [1],
+    dtype,
+  })
+}
+
+/**
+ * Return numbers spaced evenly on a log scale (geometric progression)
+ */
+export function geomspace<T extends DType = 'float64'>(
+  start: number,
+  stop: number,
+  num = 50,
+  options?: ArrayOptions,
+): NDArray<T> {
+  if (num < 0) {
+    throw new Error('Number of samples must be non-negative')
+  }
+
+  if (start === 0 || stop === 0) {
+    throw new Error('geomspace cannot include zero')
+  }
+
+  if (start * stop < 0) {
+    throw new Error('geomspace start and stop must have the same sign')
+  }
+
+  const dtype = (options?.dtype ?? 'float64') as T
+  const buffer = createTypedArray(num, dtype)
+
+  if (num === 1) {
+    buffer[0] = start
+  } else {
+    // Use logarithmic spacing: log(start), log(stop)
+    const logStart = Math.log(Math.abs(start))
+    const logStop = Math.log(Math.abs(stop))
+    const step = (logStop - logStart) / (num - 1)
+    const sign = start < 0 ? -1 : 1
+
+    for (let i = 0; i < num; i++) {
+      buffer[i] = sign * Math.exp(logStart + i * step)
+    }
+  }
+
+  return new NDArray<T>({
+    buffer,
+    shape: [num],
+    strides: [1],
+    dtype,
+  })
+}
+
+/**
  * Return a new array of given shape and type, filled with zeros, matching the shape of a given array
  */
 export function zerosLike<T extends DType>(a: NDArray, options?: ArrayOptions): NDArray<T> {

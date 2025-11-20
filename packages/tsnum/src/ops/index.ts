@@ -130,3 +130,15 @@ export { extract, place, compress, choose } from './selection'
 
 // Numerical integration
 export { trapz, cumtrapz } from './integration'
+
+// Array information
+export { ndim, size, shape, itemsize, nbytes } from './array-info'
+
+// Interpolation
+export { interp } from './interpolation'
+
+// Array utilities
+export { trim_zeros, ediff1d, around } from './array-utils'
+
+// Type testing
+export { isscalar, isreal, iscomplex, iscomplexobj, isrealobj } from './type-testing'

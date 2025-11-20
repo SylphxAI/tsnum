@@ -10,6 +10,8 @@ export {
   eye,
   arange,
   linspace,
+  logspace,
+  geomspace,
   diag,
   tri,
   meshgrid,
@@ -191,6 +193,24 @@ export {
   // Integration
   trapz,
   cumtrapz,
+  // Array info
+  ndim,
+  size,
+  shape,
+  itemsize,
+  nbytes,
+  // Interpolation
+  interp,
+  // Array utilities
+  trim_zeros,
+  ediff1d,
+  around,
+  // Type testing
+  isscalar,
+  isreal,
+  iscomplex,
+  iscomplexobj,
+  isrealobj,
 } from './ops'
 
 // 2b. Linear Algebra
