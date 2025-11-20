@@ -940,3 +940,196 @@ function fftRecursive(real: Float64Array, imag: Float64Array, n: number): void {
     imag[k + halfN] = evenImag[k] - tImag
   }
 }
+
+// ===== FFT Utility Functions =====
+
+/**
+ * Return the Discrete Fourier Transform sample frequencies
+ *
+ * @param n Window length (number of samples)
+ * @param d Sample spacing (inverse of sampling rate), default 1.0
+ * @returns Array of length n containing sample frequencies
+ *
+ * @example
+ * fftfreq(8, 0.125)
+ * // [0, 1, 2, 3, -4, -3, -2, -1]
+ */
+export function fftfreq(n: number, d: number = 1.0): NDArray<'float64'> {
+  const freq = createTypedArray(n, 'float64')
+  const val = 1.0 / (n * d)
+
+  const halfN = Math.floor((n + 1) / 2)
+
+  // Positive frequencies
+  for (let i = 0; i < halfN; i++) {
+    freq[i] = i * val
+  }
+
+  // Negative frequencies
+  for (let i = halfN; i < n; i++) {
+    freq[i] = (i - n) * val
+  }
+
+  return new NDArrayImpl({
+    buffer: freq,
+    shape: [n],
+    strides: [1],
+    dtype: 'float64',
+  })
+}
+
+/**
+ * Return the Discrete Fourier Transform sample frequencies for rfft
+ * (real FFT - returns only non-negative frequencies)
+ *
+ * @param n Window length
+ * @param d Sample spacing (inverse of sampling rate), default 1.0
+ * @returns Array of length n//2 + 1 containing sample frequencies
+ *
+ * @example
+ * rfftfreq(8, 0.125)
+ * // [0, 1, 2, 3, 4]
+ */
+export function rfftfreq(n: number, d: number = 1.0): NDArray<'float64'> {
+  const outputLen = Math.floor(n / 2) + 1
+  const freq = createTypedArray(outputLen, 'float64')
+  const val = 1.0 / (n * d)
+
+  for (let i = 0; i < outputLen; i++) {
+    freq[i] = i * val
+  }
+
+  return new NDArrayImpl({
+    buffer: freq,
+    shape: [outputLen],
+    strides: [1],
+    dtype: 'float64',
+  })
+}
+
+/**
+ * Shift zero-frequency component to center of spectrum
+ * For 1D or multi-dimensional arrays
+ *
+ * @param a Input array (typically FFT output)
+ * @param axes Axes along which to shift (default: all axes)
+ * @returns Shifted array
+ *
+ * @example
+ * const x = fft(signal)
+ * const centered = fftshift(x)
+ */
+export function fftshift<T extends DType>(a: NDArray<T>, axes?: number[]): NDArray<T> {
+  const data = a.getData()
+  const ndim = data.shape.length
+
+  const targetAxes = axes ?? Array.from({ length: ndim }, (_, i) => i)
+
+  let result = a
+  for (const axis of targetAxes) {
+    if (axis < 0 || axis >= ndim) {
+      throw new Error(`axis ${axis} is out of bounds for array with ${ndim} dimensions`)
+    }
+
+    const n = data.shape[axis]
+    const shift = Math.floor(n / 2)
+
+    result = rollAxis(result, axis, shift)
+  }
+
+  return result
+}
+
+/**
+ * Inverse of fftshift - shift zero-frequency component back to beginning
+ *
+ * @param a Input array
+ * @param axes Axes along which to shift (default: all axes)
+ * @returns Shifted array
+ *
+ * @example
+ * const centered = fftshift(x)
+ * const original = ifftshift(centered)
+ */
+export function ifftshift<T extends DType>(a: NDArray<T>, axes?: number[]): NDArray<T> {
+  const data = a.getData()
+  const ndim = data.shape.length
+
+  const targetAxes = axes ?? Array.from({ length: ndim }, (_, i) => i)
+
+  let result = a
+  for (const axis of targetAxes) {
+    if (axis < 0 || axis >= ndim) {
+      throw new Error(`axis ${axis} is out of bounds for array with ${ndim} dimensions`)
+    }
+
+    const n = data.shape[axis]
+    const shift = Math.floor((n + 1) / 2)
+
+    result = rollAxis(result, axis, shift)
+  }
+
+  return result
+}
+
+/**
+ * Helper: Roll array along specific axis
+ */
+function rollAxis<T extends DType>(a: NDArray<T>, axis: number, shift: number): NDArray<T> {
+  const data = a.getData()
+  const shape = data.shape.slice()
+  const n = shape[axis]
+
+  if (shift === 0 || n === 0) {
+    return a
+  }
+
+  const normalizedShift = ((shift % n) + n) % n
+
+  const result = createTypedArray(data.buffer.length, data.dtype)
+
+  // Calculate strides for indexing
+  const strides = new Array(shape.length)
+  strides[shape.length - 1] = 1
+  for (let i = shape.length - 2; i >= 0; i--) {
+    strides[i] = strides[i + 1] * shape[i + 1]
+  }
+
+  // Iterate through all elements
+  const iterateIndices = (indices: number[], dim: number) => {
+    if (dim === shape.length) {
+      // Calculate source and destination flat indices
+      let srcIdx = 0
+      let dstIdx = 0
+
+      for (let i = 0; i < indices.length; i++) {
+        if (i === axis) {
+          const srcAxisIdx = indices[i]
+          const dstAxisIdx = (indices[i] + normalizedShift) % n
+          srcIdx += srcAxisIdx * strides[i]
+          dstIdx += dstAxisIdx * strides[i]
+        } else {
+          srcIdx += indices[i] * strides[i]
+          dstIdx += indices[i] * strides[i]
+        }
+      }
+
+      result[dstIdx] = data.buffer[srcIdx]
+      return
+    }
+
+    for (let i = 0; i < shape[dim]; i++) {
+      indices[dim] = i
+      iterateIndices(indices, dim + 1)
+    }
+  }
+
+  iterateIndices(new Array(shape.length).fill(0), 0)
+
+  return new NDArrayImpl({
+    buffer: result,
+    shape: shape,
+    strides: strides,
+    dtype: data.dtype,
+  })
+}
