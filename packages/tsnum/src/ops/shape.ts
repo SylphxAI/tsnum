@@ -1,3 +1,4 @@
+import { getBackend } from '../backend'
 import type { DType, NDArrayData } from '../core/types'
 import { computeSize, computeStrides, indexToOffset } from '../core/utils'
 import { NDArray } from '../ndarray'
@@ -28,28 +29,11 @@ export function transpose<T extends DType>(a: NDArray<T>): NDArray<T> {
     throw new Error('Transpose only supported for 2D arrays')
   }
 
-  const [rows, cols] = a.shape
-  const newShape = [cols, rows]
-  const newStrides = computeStrides(newShape)
-  const newBuffer = new (aData.buffer.constructor as any)(a.size)
+  // Delegate to backend (WASM if available, TS fallback)
+  const backend = getBackend()
+  const resultData = backend.transpose(aData)
 
-  // Copy with transposed indices
-  for (let i = 0; i < rows; i++) {
-    for (let j = 0; j < cols; j++) {
-      const srcOffset = indexToOffset([i, j], aData.strides)
-      const dstOffset = indexToOffset([j, i], newStrides)
-      newBuffer[dstOffset] = aData.buffer[srcOffset]
-    }
-  }
-
-  const newData: NDArrayData = {
-    buffer: newBuffer,
-    shape: newShape,
-    strides: newStrides,
-    dtype: aData.dtype,
-  }
-
-  return new NDArray(newData)
+  return new NDArray(resultData)
 }
 
 export function flatten<T extends DType>(a: NDArray<T>): NDArray<T> {

@@ -182,22 +182,10 @@ export function det<T extends DType>(a: NDArray<T>): number {
 
   const n = data.shape[0]
 
-  if (n === 2) {
-    // 2x2 determinant: ad - bc
-    return data.buffer[0] * data.buffer[3] - data.buffer[1] * data.buffer[2]
-  }
-
-  if (n === 3) {
-    // 3x3 determinant using rule of Sarrus
-    const [a11, a12, a13, a21, a22, a23, a31, a32, a33] = data.buffer
-    return (
-      a11 * a22 * a33 +
-      a12 * a23 * a31 +
-      a13 * a21 * a32 -
-      a13 * a22 * a31 -
-      a12 * a21 * a33 -
-      a11 * a23 * a32
-    )
+  // Delegate to backend for 2x2 and 3x3 (WASM if available, TS fallback)
+  if (n === 2 || n === 3) {
+    const backend = getBackend()
+    return backend.det(data)
   }
 
   throw new Error('det only supports 2x2 and 3x3 matrices')
@@ -517,7 +505,7 @@ export function svd<T extends DType>(
 }
 
 /**
- * Matrix inverse using Gauss-Jordan elimination (2x2 and 3x3 only)
+ * Matrix inverse (delegates to backend for 2x2 and 3x3)
  */
 export function inv<T extends DType>(a: NDArray<T>): NDArray<T> {
   const data = a.getData()
@@ -528,55 +516,11 @@ export function inv<T extends DType>(a: NDArray<T>): NDArray<T> {
 
   const n = data.shape[0]
 
-  if (n === 2) {
-    const [a11, a12, a21, a22] = data.buffer
-    const detVal = a11 * a22 - a12 * a21
-
-    if (Math.abs(detVal) < 1e-10) {
-      throw new Error('Matrix is singular')
-    }
-
-    const invBuffer = createTypedArray(4, data.dtype)
-    invBuffer[0] = a22 / detVal
-    invBuffer[1] = -a12 / detVal
-    invBuffer[2] = -a21 / detVal
-    invBuffer[3] = a11 / detVal
-
-    return new NDArray({
-      buffer: invBuffer,
-      shape: [2, 2],
-      strides: [2, 1],
-      dtype: data.dtype,
-    })
-  }
-
-  if (n === 3) {
-    const detVal = det(a)
-
-    if (Math.abs(detVal) < 1e-10) {
-      throw new Error('Matrix is singular')
-    }
-
-    const [a11, a12, a13, a21, a22, a23, a31, a32, a33] = data.buffer
-
-    // Compute adjugate matrix
-    const invBuffer = createTypedArray(9, data.dtype)
-    invBuffer[0] = (a22 * a33 - a23 * a32) / detVal
-    invBuffer[1] = (a13 * a32 - a12 * a33) / detVal
-    invBuffer[2] = (a12 * a23 - a13 * a22) / detVal
-    invBuffer[3] = (a23 * a31 - a21 * a33) / detVal
-    invBuffer[4] = (a11 * a33 - a13 * a31) / detVal
-    invBuffer[5] = (a13 * a21 - a11 * a23) / detVal
-    invBuffer[6] = (a21 * a32 - a22 * a31) / detVal
-    invBuffer[7] = (a12 * a31 - a11 * a32) / detVal
-    invBuffer[8] = (a11 * a22 - a12 * a21) / detVal
-
-    return new NDArray({
-      buffer: invBuffer,
-      shape: [3, 3],
-      strides: [3, 1],
-      dtype: data.dtype,
-    })
+  // Delegate to backend for 2x2 and 3x3 (WASM if available, TS fallback)
+  if (n === 2 || n === 3) {
+    const backend = getBackend()
+    const resultData = backend.inv(data)
+    return new NDArray(resultData)
   }
 
   throw new Error('inv only supports 2x2 and 3x3 matrices')

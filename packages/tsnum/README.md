@@ -121,11 +121,11 @@ Complete tracking table for all operations with backend implementation status.
 | `kron` | 🟦 | ⬜ | ✅ | Kronecker product |
 | `tensordot` | 🟦 | ⬜ | ✅ | Tensor contraction |
 | `multi_dot` | 🟦 | ⬜ | ✅ | Chained dot products |
-| `inv` | 🟦 | ⬜ | ✅ | Matrix inverse |
+| `inv` | 🟦 | 🟧 | ✅ | Matrix inverse |
 | `pinv` | 🟦 | ⬜ | ✅ | Pseudoinverse |
 | `solve` | 🟦 | ⬜ | ✅ | Linear system solver |
 | `lstsq` | 🟦 | ⬜ | ✅ | Least squares |
-| `det` | 🟦 | ⬜ | ✅ | Determinant |
+| `det` | 🟦 | 🟧 | ✅ | Determinant |
 | `slogdet` | 🟦 | ⬜ | ✅ | Sign and log det |
 | `trace` | 🟦 | ⬜ | ✅ | Matrix trace |
 | `norm` | 🟦 | ⬜ | ✅ | Vector/matrix norm |
@@ -140,14 +140,14 @@ Complete tracking table for all operations with backend implementation status.
 #### 4. Math Functions (40)
 | Operation | TS | WASM | Tested | Notes |
 |-----------|:--:|:----:|:------:|-------|
-| `sin`, `cos`, `tan` | 🟦 | ⬜ | ✅ | Trigonometric |
+| `sin`, `cos`, `tan` | 🟦 | 🟧 | ✅ | Trigonometric |
 | `arcsin`, `arccos`, `arctan`, `arctan2` | 🟦 | ⬜ | ✅ | Inverse trig |
 | `sinh`, `cosh`, `tanh` | 🟦 | ⬜ | ✅ | Hyperbolic |
 | `asinh`, `acosh`, `atanh` | 🟦 | ⬜ | ✅ | Inverse hyperbolic |
-| `exp`, `exp2`, `expm1` | 🟦 | ⬜ | ✅ | Exponential |
-| `log`, `log2`, `log10`, `log1p` | 🟦 | ⬜ | ✅ | Logarithmic |
-| `sqrt`, `cbrt`, `square` | 🟦 | ⬜ | ✅ | Powers/roots |
-| `abs`, `sign` | 🟦 | ⬜ | ✅ | Sign operations |
+| `exp`, `exp2`, `expm1` | 🟦 | 🟧 | ✅ | Exponential |
+| `log`, `log2`, `log10`, `log1p` | 🟦 | 🟧 | ✅ | Logarithmic |
+| `sqrt`, `cbrt`, `square` | 🟦 | 🟧 | ✅ | Powers/roots |
+| `abs`, `sign` | 🟦 | 🟧 | ✅ | Sign operations |
 | `round`, `floor`, `ceil`, `trunc` | 🟦 | ⬜ | ✅ | Rounding |
 | `maximum`, `minimum`, `clip` | 🟦 | ⬜ | ✅ | Comparisons |
 | `deg2rad`, `rad2deg`, `hypot`, `sinc`, `heaviside`, `gcd`, `lcm`, `reciprocal` | 🟦 | ⬜ | ✅ | Utilities |
@@ -155,7 +155,7 @@ Complete tracking table for all operations with backend implementation status.
 #### 5. FFT (16)
 | Operation | TS | WASM | Tested | Notes |
 |-----------|:--:|:----:|:------:|-------|
-| `fft`, `ifft` | 🟦 | ⬜ | ✅ | **1D FFT (priority)** |
+| `fft`, `ifft` | 🟦 | 🟧 | ✅ | **1D FFT (priority)** |
 | `rfft`, `irfft` | 🟦 | ⬜ | ✅ | Real FFT |
 | `fft2`, `ifft2` | 🟦 | ⬜ | ✅ | 2D FFT |
 | `rfft2`, `irfft2` | 🟦 | ⬜ | ✅ | 2D real FFT |
