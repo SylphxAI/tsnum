@@ -134,6 +134,12 @@ pub fn variance(a: &[f64]) -> f64 {
     sum_squared_diff / a.len() as f64
 }
 
+/// Product of all elements
+#[wasm_bindgen]
+pub fn prod(a: &[f64]) -> f64 {
+    a.iter().product()
+}
+
 // ===== Linear Algebra =====
 
 /// Matrix multiplication: C = A @ B

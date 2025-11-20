@@ -61,14 +61,9 @@ export function prod(a: NDArray, options?: AxisOptions): number | NDArray {
     throw new Error('Axis reduction not yet implemented')
   }
 
-  const data = a.getData()
-  let product = 1
-
-  for (let i = 0; i < data.buffer.length; i++) {
-    product *= data.buffer[i]
-  }
-
-  return product
+  // Delegate to backend (WASM if available, TS fallback)
+  const backend = getBackend()
+  return backend.prod(a.getData())
 }
 
 /**

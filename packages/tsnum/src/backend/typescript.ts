@@ -95,6 +95,14 @@ export class TypeScriptBackend implements Backend {
     return sumSquares / a.buffer.length
   }
 
+  prod(a: NDArrayData): number {
+    let product = 1
+    for (let i = 0; i < a.buffer.length; i++) {
+      product *= a.buffer[i]
+    }
+    return product
+  }
+
   // ===== Linear Algebra Operations =====
 
   matmul(a: NDArrayData, b: NDArrayData): NDArrayData {

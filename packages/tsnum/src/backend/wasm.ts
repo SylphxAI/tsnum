@@ -131,6 +131,12 @@ export class WASMBackend implements Backend {
     return this.module.variance(buffer)
   }
 
+  prod(a: NDArrayData): number {
+    this.ensureReady()
+    const buffer = this.toFloat64Array(a.buffer)
+    return this.module.prod(buffer)
+  }
+
   // ===== Linear Algebra Operations =====
 
   matmul(a: NDArrayData, b: NDArrayData): NDArrayData {

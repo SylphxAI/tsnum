@@ -44,6 +44,7 @@ export const minimum_arrays: (a: number, b: number, c: number, d: number) => [nu
 export const mul_arrays: (a: number, b: number, c: number, d: number) => [number, number];
 export const mul_scalar: (a: number, b: number, c: number) => [number, number];
 export const pow_scalar: (a: number, b: number, c: number) => [number, number];
+export const prod: (a: number, b: number) => number;
 export const rad2deg_array: (a: number, b: number) => [number, number];
 export const reciprocal_array: (a: number, b: number) => [number, number];
 export const round_array: (a: number, b: number) => [number, number];
