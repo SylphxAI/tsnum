@@ -222,9 +222,9 @@ Complete tracking table for all operations with backend implementation status.
 ### WASM Implementation Priority
 
 **🎯 Next Priority** (Expected Performance Gains):
-1. **FFT Operations** (fft, ifft) - 5-20x speedup
-2. **Math Functions** (sin, cos, exp, log) - 2-5x speedup (SIMD)
-3. **Linear Algebra** (inv, solve, qr) - 10-30x speedup
+1. **Linear Algebra** (solve, qr, svd, eig) - 10-30x speedup
+2. **Hyperbolic Functions** (sinh, cosh, tanh) - 2-5x speedup (SIMD)
+3. **2D/ND FFT** (fft2, fftn, rfft2, rfftn) - 5-20x speedup
 
 **✅ Dual Backend** (26 operations):
 - Arithmetic: add, sub, mul, div, pow (5)
@@ -393,8 +393,9 @@ User Code → NDArray API → Backend Interface → WASM (fast) or TypeScript (f
 **Current Backend Coverage**:
 - ✅ Arithmetic operations (add, sub, mul, div, pow)
 - ✅ Reductions (sum, mean, max, min, std, variance)
-- ✅ Linear algebra (matmul, dot)
-- 🚧 FFT operations (coming soon)
+- ✅ Linear algebra (matmul, dot, inv, det, transpose)
+- ✅ FFT operations (fft, ifft)
+- ✅ Math functions (sin, cos, tan, exp, log, log10, abs, sqrt)
 
 ### Benchmarks
 
