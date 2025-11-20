@@ -584,3 +584,108 @@ export function fmod<T extends DType>(a: NDArray<T>, b: number | NDArray<T>): ND
     dtype: aData.dtype,
   })
 }
+
+// ===== Numerical Stability Math Functions =====
+
+/**
+ * Calculate 2**x element-wise
+ * More accurate than pow(2, x) for some implementations
+ *
+ * @param a Input array
+ * @returns 2 raised to power of each element
+ *
+ * @example
+ * exp2(array([0, 1, 2, 3])) // [1, 2, 4, 8]
+ */
+export function exp2<T extends DType>(a: NDArray<T>): NDArray<'float64'> {
+  const data = a.getData()
+  const result = createTypedArray(data.buffer.length, 'float64')
+
+  for (let i = 0; i < data.buffer.length; i++) {
+    result[i] = 2 ** data.buffer[i]
+  }
+
+  return new NDArrayImpl({
+    buffer: result,
+    shape: data.shape.slice(),
+    strides: data.strides.slice(),
+    dtype: 'float64',
+  })
+}
+
+/**
+ * Calculate log base 2 element-wise
+ *
+ * @param a Input array
+ * @returns Base-2 logarithm of each element
+ *
+ * @example
+ * log2(array([1, 2, 4, 8])) // [0, 1, 2, 3]
+ */
+export function log2<T extends DType>(a: NDArray<T>): NDArray<'float64'> {
+  const data = a.getData()
+  const result = createTypedArray(data.buffer.length, 'float64')
+
+  for (let i = 0; i < data.buffer.length; i++) {
+    result[i] = Math.log2(data.buffer[i])
+  }
+
+  return new NDArrayImpl({
+    buffer: result,
+    shape: data.shape.slice(),
+    strides: data.strides.slice(),
+    dtype: 'float64',
+  })
+}
+
+/**
+ * Calculate log(1 + x) element-wise
+ * More accurate than log(1 + x) for small x
+ *
+ * @param a Input array
+ * @returns Natural logarithm of (1 + x)
+ *
+ * @example
+ * log1p(array([0, 0.1, 1, 10])) // [0, 0.0953..., 0.693..., 2.397...]
+ */
+export function log1p<T extends DType>(a: NDArray<T>): NDArray<'float64'> {
+  const data = a.getData()
+  const result = createTypedArray(data.buffer.length, 'float64')
+
+  for (let i = 0; i < data.buffer.length; i++) {
+    result[i] = Math.log1p(data.buffer[i])
+  }
+
+  return new NDArrayImpl({
+    buffer: result,
+    shape: data.shape.slice(),
+    strides: data.strides.slice(),
+    dtype: 'float64',
+  })
+}
+
+/**
+ * Calculate exp(x) - 1 element-wise
+ * More accurate than exp(x) - 1 for small x
+ *
+ * @param a Input array
+ * @returns e^x - 1
+ *
+ * @example
+ * expm1(array([0, 0.1, 1])) // [0, 0.1051..., 1.718...]
+ */
+export function expm1<T extends DType>(a: NDArray<T>): NDArray<'float64'> {
+  const data = a.getData()
+  const result = createTypedArray(data.buffer.length, 'float64')
+
+  for (let i = 0; i < data.buffer.length; i++) {
+    result[i] = Math.expm1(data.buffer[i])
+  }
+
+  return new NDArrayImpl({
+    buffer: result,
+    shape: data.shape.slice(),
+    strides: data.strides.slice(),
+    dtype: 'float64',
+  })
+}
