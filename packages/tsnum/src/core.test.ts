@@ -165,7 +165,7 @@ describe('Reduction Operations (Functional)', () => {
   test('variance', () => {
     const a = array([2, 4, 6, 8])
     const result = variance(a)
-    expect(result).toBeGreaterThan(5)
+    expect(result).toBe(5) // Variance of [2,4,6,8] is exactly 5
   })
 })
 

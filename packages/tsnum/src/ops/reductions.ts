@@ -1,72 +1,54 @@
+import { getBackend } from '../backend/manager'
 import type { AxisOptions } from '../core/types'
 import type { NDArray } from '../ndarray'
 
 // ===== Reduction Operations (Pure Functions) =====
+// Delegated to backend (WASM or TypeScript)
 
 export function sum(a: NDArray, options?: AxisOptions): number | NDArray {
   if (options?.axis === undefined) {
-    const data = a.getData()
-    let total = 0
-    for (let i = 0; i < data.buffer.length; i++) {
-      total += data.buffer[i]
-    }
-    return total
+    const backend = getBackend()
+    return backend.sum(a.getData())
   }
   throw new Error('Axis reduction not yet implemented')
 }
 
 export function mean(a: NDArray, options?: AxisOptions): number | NDArray {
   if (options?.axis === undefined) {
-    const total = sum(a) as number
-    return total / a.size
+    const backend = getBackend()
+    return backend.mean(a.getData())
   }
   throw new Error('Axis reduction not yet implemented')
 }
 
 export function max(a: NDArray, options?: AxisOptions): number | NDArray {
   if (options?.axis === undefined) {
-    const data = a.getData()
-    let maxVal = Number.NEGATIVE_INFINITY
-    for (let i = 0; i < data.buffer.length; i++) {
-      maxVal = Math.max(maxVal, data.buffer[i])
-    }
-    return maxVal
+    const backend = getBackend()
+    return backend.max(a.getData())
   }
   throw new Error('Axis reduction not yet implemented')
 }
 
 export function min(a: NDArray, options?: AxisOptions): number | NDArray {
   if (options?.axis === undefined) {
-    const data = a.getData()
-    let minVal = Number.POSITIVE_INFINITY
-    for (let i = 0; i < data.buffer.length; i++) {
-      minVal = Math.min(minVal, data.buffer[i])
-    }
-    return minVal
+    const backend = getBackend()
+    return backend.min(a.getData())
   }
   throw new Error('Axis reduction not yet implemented')
 }
 
 export function std(a: NDArray, options?: AxisOptions): number | NDArray {
   if (options?.axis === undefined) {
-    const m = mean(a) as number
-    const data = a.getData()
-    let sumSquaredDiff = 0
-
-    for (let i = 0; i < data.buffer.length; i++) {
-      const diff = data.buffer[i] - m
-      sumSquaredDiff += diff * diff
-    }
-
-    return Math.sqrt(sumSquaredDiff / data.buffer.length)
+    const backend = getBackend()
+    return backend.std(a.getData())
   }
   throw new Error('Axis reduction not yet implemented')
 }
 
 export function variance(a: NDArray, options?: AxisOptions): number | NDArray {
   if (options?.axis === undefined) {
-    const s = std(a) as number
-    return s * s
+    const backend = getBackend()
+    return backend.variance(a.getData())
   }
   throw new Error('Axis reduction not yet implemented')
 }

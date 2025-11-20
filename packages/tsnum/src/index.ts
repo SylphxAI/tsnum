@@ -44,3 +44,7 @@ export type { SliceRange } from './ops'
 // 5. Utilities
 export { pipe, compose, partial } from './functional'
 export { computeSize, computeStrides, broadcastShapes, canBroadcast } from './core/utils'
+
+// 6. Backend (WASM-first with TS fallback)
+export { getBackend, initWASM, getBackendInfo } from './backend'
+export type { Backend, BackendInit } from './backend'

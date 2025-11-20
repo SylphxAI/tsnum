@@ -7,7 +7,7 @@ High-performance TypeScript NumPy alternative with **functional-first** API.
 - 🚀 NumPy-compatible API for TypeScript
 - 📊 **Broadcasting** - NumPy-style array broadcasting
 - 🔍 **Indexing & Slicing** - Element access, slicing, fancy indexing
-- ⚡ High-performance TypedArray backend
+- ⚡ **WASM-first backend** - Automatic WASM acceleration with TS fallback
 - 🌳 Tree-shakeable - import only what you need
 - 📦 Lightweight core (~7KB gzipped)
 - 🔒 Full TypeScript type safety
@@ -291,11 +291,33 @@ pipe(
 
 ## Performance
 
-- **TypedArray backend** - Native performance
-- **Zero-copy operations** - Where possible
-- **Tree-shakeable** - Only bundle what you use
-- **No OOP overhead** - Pure functions
-- **Benchmark**: Competitive with NumPy.js alternatives
+### WASM-First Architecture
+
+tsnum uses a **WASM-first backend** with automatic TypeScript fallback:
+
+```typescript
+import { initWASM, getBackendInfo } from 'tsnum'
+
+// Optional: Preload WASM during app startup
+await initWASM()
+
+// Check which backend is active
+const info = getBackendInfo()
+console.log(info.name)  // 'wasm' or 'typescript'
+console.log(info.usingWASM)  // true if WASM loaded
+```
+
+**How it works:**
+- 🚀 **WASM-first**: If WebAssembly available, use it (near-native performance)
+- 🔄 **Automatic fallback**: If WASM unavailable, seamlessly fall back to TypeScript
+- 🎯 **No configuration**: Just works - no threshold logic or manual switching
+- ⚡ **Lazy loading**: WASM loads on first operation (or manually with `initWASM()`)
+
+**Performance:**
+- **WASM backend**: Near-native performance, SIMD support
+- **TypeScript backend**: Competitive with NumPy.js, zero overhead
+- **Tree-shakeable**: Only bundle what you use
+- **No OOP overhead**: Pure functions throughout
 
 ## Development
 
@@ -317,10 +339,11 @@ bun run lint
 
 - [x] v0.1: Core functional API (creation, arithmetic, reductions, shapes)
 - [x] v0.2: Broadcasting, indexing, slicing
-- [ ] v0.3: WASM acceleration for large arrays
-- [ ] v0.4: Linear algebra (matmul, inv, solve, svd)
-- [ ] v0.5: Random number generation, advanced statistics
-- [ ] v0.6: FFT operations
+- [x] v0.3: WASM-first backend infrastructure (Rust WASM module in progress)
+- [ ] v0.4: Complete WASM implementation (arithmetic, reductions)
+- [ ] v0.5: Linear algebra (matmul, inv, solve, svd)
+- [ ] v0.6: Random number generation, advanced statistics
+- [ ] v0.7: FFT operations
 
 ## Why tsnum?
 
