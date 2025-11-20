@@ -251,7 +251,7 @@ export class WASMBackend implements Backend {
     const buffer = this.toFloat64Array(a.buffer)
     const result = this.module.cbrt_array(buffer)
 
-    return this.toNDArrayData(result, a.shape, a.dtype)
+    return this.toNDArrayData(result, a.shape, 'float64')
   }
 
   square(a: NDArrayData): NDArrayData {
@@ -260,7 +260,7 @@ export class WASMBackend implements Backend {
     const buffer = this.toFloat64Array(a.buffer)
     const result = this.module.square_array(buffer)
 
-    return this.toNDArrayData(result, a.shape, a.dtype)
+    return this.toNDArrayData(result, a.shape, 'float64')
   }
 
   exp(a: NDArrayData): NDArrayData {
@@ -278,7 +278,7 @@ export class WASMBackend implements Backend {
     const buffer = this.toFloat64Array(a.buffer)
     const result = this.module.exp2_array(buffer)
 
-    return this.toNDArrayData(result, a.shape, a.dtype)
+    return this.toNDArrayData(result, a.shape, 'float64')
   }
 
   expm1(a: NDArrayData): NDArrayData {
@@ -287,7 +287,7 @@ export class WASMBackend implements Backend {
     const buffer = this.toFloat64Array(a.buffer)
     const result = this.module.expm1_array(buffer)
 
-    return this.toNDArrayData(result, a.shape, a.dtype)
+    return this.toNDArrayData(result, a.shape, 'float64')
   }
 
   log(a: NDArrayData): NDArrayData {
@@ -305,7 +305,7 @@ export class WASMBackend implements Backend {
     const buffer = this.toFloat64Array(a.buffer)
     const result = this.module.log2_array(buffer)
 
-    return this.toNDArrayData(result, a.shape, a.dtype)
+    return this.toNDArrayData(result, a.shape, 'float64')
   }
 
   log10(a: NDArrayData): NDArrayData {
@@ -323,7 +323,7 @@ export class WASMBackend implements Backend {
     const buffer = this.toFloat64Array(a.buffer)
     const result = this.module.log1p_array(buffer)
 
-    return this.toNDArrayData(result, a.shape, a.dtype)
+    return this.toNDArrayData(result, a.shape, 'float64')
   }
 
   sin(a: NDArrayData): NDArrayData {
