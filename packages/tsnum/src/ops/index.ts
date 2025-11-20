@@ -86,6 +86,9 @@ export {
   nanstd,
   nanmedian,
   nanvar,
+  bincount,
+  digitize,
+  argwhere,
 } from './statistics'
 
 // Set operations
@@ -107,3 +110,6 @@ export {
 
 // Copy and view operations
 export { ascontiguousarray, copy, view } from './copy'
+
+// Broadcasting utilities
+export { atleast_1d, atleast_2d, atleast_3d, broadcast_arrays, broadcast_to } from './broadcasting'

@@ -123,6 +123,9 @@ export {
   nanstd,
   nanmedian,
   nanvar,
+  bincount,
+  digitize,
+  argwhere,
   // Cumulative
   cumsum,
   cumprod,
@@ -147,6 +150,12 @@ export {
   copy,
   view,
   ascontiguousarray,
+  // Broadcasting
+  atleast_1d,
+  atleast_2d,
+  atleast_3d,
+  broadcast_to,
+  broadcast_arrays,
 } from './ops'
 
 // 2b. Linear Algebra

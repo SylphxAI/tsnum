@@ -398,3 +398,150 @@ export function nanvar<T extends DType>(a: NDArray<T>): number {
 
   return count > 0 ? sumSq / count : Number.NaN
 }
+
+// ===== Additional Statistics =====
+
+/**
+ * Count occurrences of each value in array of non-negative integers
+ */
+export function bincount<T extends DType>(a: NDArray<T>, minlength = 0): NDArray<'int32'> {
+  const data = a.getData()
+
+  // Find max value
+  let maxVal = minlength - 1
+  for (let i = 0; i < data.buffer.length; i++) {
+    const val = Math.floor(data.buffer[i])
+    if (val < 0) {
+      throw new Error('bincount requires non-negative integers')
+    }
+    if (val > maxVal) {
+      maxVal = val
+    }
+  }
+
+  const length = maxVal + 1
+  const counts = new Int32Array(length)
+
+  // Count occurrences
+  for (let i = 0; i < data.buffer.length; i++) {
+    const val = Math.floor(data.buffer[i])
+    counts[val]++
+  }
+
+  return new NDArrayImpl({
+    buffer: counts,
+    shape: [length],
+    strides: [1],
+    dtype: 'int32',
+  })
+}
+
+/**
+ * Return indices of bins to which each value belongs
+ */
+export function digitize<T extends DType>(
+  a: NDArray<T>,
+  bins: NDArray<T>,
+  right = false,
+): NDArray<'int32'> {
+  const aData = a.getData()
+  const binsData = bins.getData()
+
+  if (binsData.shape.length !== 1) {
+    throw new Error('bins must be 1D array')
+  }
+
+  const indices = new Int32Array(aData.buffer.length)
+
+  for (let i = 0; i < aData.buffer.length; i++) {
+    const value = aData.buffer[i]
+    let binIdx = 0
+
+    if (right) {
+      // Find first bin where value < bin
+      for (let j = 0; j < binsData.buffer.length; j++) {
+        if (value < binsData.buffer[j]) {
+          break
+        }
+        binIdx = j + 1
+      }
+    } else {
+      // Find first bin where value <= bin
+      for (let j = 0; j < binsData.buffer.length; j++) {
+        if (value <= binsData.buffer[j]) {
+          break
+        }
+        binIdx = j + 1
+      }
+    }
+
+    indices[i] = binIdx
+  }
+
+  return new NDArrayImpl({
+    buffer: indices,
+    shape: aData.shape,
+    strides: aData.strides,
+    dtype: 'int32',
+  })
+}
+
+/**
+ * Return indices where condition is non-zero
+ */
+export function argwhere<T extends DType>(a: NDArray<T>): NDArray<'int32'> {
+  const data = a.getData()
+
+  // First pass: count non-zero elements
+  let count = 0
+  for (let i = 0; i < data.buffer.length; i++) {
+    if (data.buffer[i] !== 0) {
+      count++
+    }
+  }
+
+  if (data.shape.length === 1) {
+    // 1D: return [count, 1] array of indices
+    const indices = new Int32Array(count)
+    let idx = 0
+
+    for (let i = 0; i < data.buffer.length; i++) {
+      if (data.buffer[i] !== 0) {
+        indices[idx++] = i
+      }
+    }
+
+    return new NDArrayImpl({
+      buffer: indices,
+      shape: [count],
+      strides: [1],
+      dtype: 'int32',
+    })
+  }
+
+  if (data.shape.length === 2) {
+    // 2D: return [count, 2] array of [row, col] indices
+    const [rows, cols] = data.shape
+    const indices = new Int32Array(count * 2)
+    let idx = 0
+
+    for (let i = 0; i < rows; i++) {
+      for (let j = 0; j < cols; j++) {
+        if (data.buffer[i * cols + j] !== 0) {
+          indices[idx * 2] = i
+          indices[idx * 2 + 1] = j
+          idx++
+        }
+      }
+    }
+
+    return new NDArrayImpl({
+      buffer: indices,
+      shape: [count, 2],
+      strides: [2, 1],
+      dtype: 'int32',
+    })
+  }
+
+  throw new Error('argwhere only supports 1D and 2D arrays')
+}
