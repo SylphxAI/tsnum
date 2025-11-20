@@ -101,6 +101,18 @@ export {
   maximum,
   minimum,
   clip,
+  // Math convenience
+  deg2rad,
+  rad2deg,
+  hypot,
+  sinc,
+  cbrt,
+  square,
+  reciprocal,
+  gcd,
+  lcm,
+  heaviside,
+  divmod,
   // Logical
   all,
   any,
@@ -133,6 +145,11 @@ export {
   append,
   resize,
   roll,
+  // Array assembly
+  block,
+  column_stack,
+  array_split,
+  dstack,
   // Statistics
   median,
   percentile,
@@ -236,6 +253,9 @@ export {
   matrix_rank,
   matrix_power,
   lstsq,
+  cond,
+  slogdet,
+  multi_dot,
 } from './linalg'
 
 // 2c. Random
@@ -257,7 +277,7 @@ export {
 } from './random'
 
 // 2d. FFT
-export { fft, ifft, rfft, irfft, fft2, ifft2, rfft2, irfft2 } from './fft'
+export { fft, ifft, rfft, irfft, fft2, ifft2, rfft2, irfft2, fftn, ifftn, rfftn, irfftn } from './fft'
 
 // 2e. Polynomial
 export { polyfit, polyval, roots, polyder, polyint } from './polynomial'

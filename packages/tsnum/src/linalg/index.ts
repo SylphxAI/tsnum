@@ -6,6 +6,9 @@ import { eye } from '../creation'
 import type { NDArray } from '../ndarray'
 import { NDArray as NDArrayImpl } from '../ndarray'
 
+// Export numerical stability functions
+export { cond, slogdet, multi_dot } from './numerical-stability'
+
 /**
  * Dot product of two arrays
  * For 1D: inner product
@@ -825,7 +828,7 @@ export function lstsq<T extends DType>(
   a: NDArray<T>,
   b: NDArray<T>,
   rcond = 1e-15,
-): { x: NDArray<T>; residuals: number; rank: number } {
+): { x: NDArray<DType>; residuals: number; rank: number } {
   const aData = a.getData()
   const bData = b.getData()
 

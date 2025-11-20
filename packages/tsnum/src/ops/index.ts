@@ -51,6 +51,21 @@ export {
   fmod,
 } from './math'
 
+// Math convenience functions
+export {
+  deg2rad,
+  rad2deg,
+  hypot,
+  sinc,
+  cbrt,
+  square,
+  reciprocal,
+  gcd,
+  lcm,
+  heaviside,
+  divmod,
+} from './math-convenience'
+
 // Logical operations
 export { all, any, logicalAnd, logicalNot, logicalOr, logicalXor, where } from './logical'
 
@@ -78,6 +93,9 @@ export {
   resize,
   roll,
 } from './manipulation'
+
+// Array assembly
+export { block, column_stack, array_split, dstack } from './array-assembly'
 
 // Statistics
 export {
