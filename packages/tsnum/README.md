@@ -7,10 +7,10 @@ A TypeScript library that brings NumPy's powerful array operations to JavaScript
 ## Features
 
 - 🚀 **High Performance** - WASM-accelerated operations with optimized TypeScript fallback
-- 🎯 **NumPy-Inspired** - Familiar functional API for array operations (~41% feature parity with NumPy)
+- 🎯 **NumPy-Inspired** - Familiar functional API for array operations (~42% feature parity with NumPy)
 - 📦 **Type Safe** - Full TypeScript support with generic types
 - 🔢 **Multiple Data Types** - Support for int32, float32, float64, uint8
-- 🧮 **Comprehensive** - 244+ functions covering linear algebra, statistics, FFT, and more
+- 🧮 **Comprehensive** - 251+ functions covering linear algebra, statistics, FFT, and more
 - ⚡ **Pragmatic FP** - Immutable external API with optimized internal operations for maximum performance
 
 ## Installation
@@ -76,9 +76,9 @@ const rms = pipe(data, x => mul(x, x), mean, sqrt)
 
 ## Feature Coverage
 
-**Current Progress: 244 / ~600 NumPy functions (~41% feature parity)**
+**Current Progress: 251 / ~600 NumPy functions (~42% feature parity)**
 
-### ✅ Implemented Functions (244)
+### ✅ Implemented Functions (251)
 
 #### Array Creation (28 functions)
 - **Basic**: `array`, `zeros`, `ones`, `full`, `empty`, `arange`, `linspace`, `logspace`, `geomspace`
@@ -138,9 +138,9 @@ const rms = pipe(data, x => mul(x, x), mean, sqrt)
 #### Bitwise Operations (8 functions)
 `bitwise_and`, `bitwise_or`, `bitwise_xor`, `bitwise_not`, `left_shift`, `right_shift`, `invert`
 
-#### Indexing & Selection (14 functions)
+#### Indexing & Selection (16 functions)
 - **Basic**: `at`, `slice`, `take`, `put`, `putmask`
-- **Advanced**: `ix_`, `ravel_multi_index`, `unravel_index`, `flatnonzero`
+- **Advanced**: `ix_`, `ravel_multi_index`, `unravel_index`, `flatnonzero`, `booleanIndex`, `integerArrayIndex`
 - **Conditional**: `where`, `extract`, `place`, `compress`, `choose`
 
 #### Validation (10 functions)
@@ -161,9 +161,9 @@ const rms = pipe(data, x => mul(x, x), mean, sqrt)
 #### Signal Processing (2 functions)
 `convolve`, `correlate`
 
-#### Random (14 functions)
+#### Random (19 functions)
 - **Basic**: `random`, `randint`, `randn`, `choice`, `shuffle`
-- **Distributions**: `uniform`, `normal`, `exponential`, `binomial`, `poisson`, `gamma`, `beta`
+- **Distributions**: `uniform`, `normal`, `exponential`, `binomial`, `poisson`, `gamma`, `beta`, `chisquare`, `lognormal`, `triangular`, `weibull`, `pareto`
 - **Seed**: `setSeed`, `getSeed`
 
 #### Cumulative Operations (4 functions)
