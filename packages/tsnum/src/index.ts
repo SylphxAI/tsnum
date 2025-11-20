@@ -32,7 +32,59 @@ export {
   at,
   slice,
   take,
+  // Math
+  abs,
+  sign,
+  sqrt,
+  exp,
+  log,
+  log10,
+  sin,
+  cos,
+  tan,
+  arcsin,
+  arccos,
+  arctan,
+  round,
+  floor,
+  ceil,
+  trunc,
+  maximum,
+  minimum,
+  clip,
+  // Logical
+  all,
+  any,
+  logicalAnd,
+  logicalOr,
+  logicalNot,
+  logicalXor,
+  where,
+  // Sorting
+  sort,
+  argsort,
+  argmax,
+  argmin,
+  // Manipulation
+  concat,
+  stack,
+  vstack,
+  hstack,
+  repeat,
+  // Statistics
+  median,
+  percentile,
+  quantile,
+  corrcoef,
+  cov,
+  histogram,
 } from './ops'
+
+// 2b. Linear Algebra
+export { dot, matmul, outer, inner, norm, det, trace } from './linalg'
+
+// 2c. Random
+export { random, randint, randn, shuffle, choice, setSeed, getSeed } from './random'
 
 // 3. NDArray (data container)
 export { NDArray } from './ndarray'

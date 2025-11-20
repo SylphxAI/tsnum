@@ -47,3 +47,6 @@ export { argmax, argmin, argsort, sort } from './sorting'
 
 // Array manipulation
 export { concat, hstack, repeat, stack, vstack } from './manipulation'
+
+// Statistics
+export { corrcoef, cov, histogram, median, percentile, quantile } from './statistics'
