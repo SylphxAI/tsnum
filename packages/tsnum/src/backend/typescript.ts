@@ -262,6 +262,50 @@ export class TypeScriptBackend implements Backend {
     }
   }
 
+  cbrt(a: NDArrayData): NDArrayData {
+    const newBuffer = createTypedArray(a.buffer.length, 'float64')
+
+    for (let i = 0; i < a.buffer.length; i++) {
+      newBuffer[i] = Math.cbrt(a.buffer[i])
+    }
+
+    // Calculate strides for result shape
+    const strides = new Array(a.shape.length)
+    strides[a.shape.length - 1] = 1
+    for (let i = a.shape.length - 2; i >= 0; i--) {
+      strides[i] = strides[i + 1] * a.shape[i + 1]
+    }
+
+    return {
+      buffer: newBuffer,
+      shape: [...a.shape],
+      strides,
+      dtype: 'float64',
+    }
+  }
+
+  square(a: NDArrayData): NDArrayData {
+    const newBuffer = createTypedArray(a.buffer.length, 'float64')
+
+    for (let i = 0; i < a.buffer.length; i++) {
+      newBuffer[i] = a.buffer[i] * a.buffer[i]
+    }
+
+    // Calculate strides for result shape
+    const strides = new Array(a.shape.length)
+    strides[a.shape.length - 1] = 1
+    for (let i = a.shape.length - 2; i >= 0; i--) {
+      strides[i] = strides[i + 1] * a.shape[i + 1]
+    }
+
+    return {
+      buffer: newBuffer,
+      shape: [...a.shape],
+      strides,
+      dtype: 'float64',
+    }
+  }
+
   exp(a: NDArrayData): NDArrayData {
     const newBuffer = createTypedArray(a.buffer.length, a.dtype)
 
@@ -274,6 +318,50 @@ export class TypeScriptBackend implements Backend {
       shape: a.shape,
       strides: a.strides,
       dtype: a.dtype,
+    }
+  }
+
+  exp2(a: NDArrayData): NDArrayData {
+    const newBuffer = createTypedArray(a.buffer.length, 'float64')
+
+    for (let i = 0; i < a.buffer.length; i++) {
+      newBuffer[i] = 2 ** a.buffer[i]
+    }
+
+    // Calculate strides for result shape
+    const strides = new Array(a.shape.length)
+    strides[a.shape.length - 1] = 1
+    for (let i = a.shape.length - 2; i >= 0; i--) {
+      strides[i] = strides[i + 1] * a.shape[i + 1]
+    }
+
+    return {
+      buffer: newBuffer,
+      shape: [...a.shape],
+      strides,
+      dtype: 'float64',
+    }
+  }
+
+  expm1(a: NDArrayData): NDArrayData {
+    const newBuffer = createTypedArray(a.buffer.length, 'float64')
+
+    for (let i = 0; i < a.buffer.length; i++) {
+      newBuffer[i] = Math.expm1(a.buffer[i])
+    }
+
+    // Calculate strides for result shape
+    const strides = new Array(a.shape.length)
+    strides[a.shape.length - 1] = 1
+    for (let i = a.shape.length - 2; i >= 0; i--) {
+      strides[i] = strides[i + 1] * a.shape[i + 1]
+    }
+
+    return {
+      buffer: newBuffer,
+      shape: [...a.shape],
+      strides,
+      dtype: 'float64',
     }
   }
 
@@ -292,6 +380,28 @@ export class TypeScriptBackend implements Backend {
     }
   }
 
+  log2(a: NDArrayData): NDArrayData {
+    const newBuffer = createTypedArray(a.buffer.length, 'float64')
+
+    for (let i = 0; i < a.buffer.length; i++) {
+      newBuffer[i] = Math.log2(a.buffer[i])
+    }
+
+    // Calculate strides for result shape
+    const strides = new Array(a.shape.length)
+    strides[a.shape.length - 1] = 1
+    for (let i = a.shape.length - 2; i >= 0; i--) {
+      strides[i] = strides[i + 1] * a.shape[i + 1]
+    }
+
+    return {
+      buffer: newBuffer,
+      shape: [...a.shape],
+      strides,
+      dtype: 'float64',
+    }
+  }
+
   log10(a: NDArrayData): NDArrayData {
     const newBuffer = createTypedArray(a.buffer.length, a.dtype)
 
@@ -304,6 +414,28 @@ export class TypeScriptBackend implements Backend {
       shape: a.shape,
       strides: a.strides,
       dtype: a.dtype,
+    }
+  }
+
+  log1p(a: NDArrayData): NDArrayData {
+    const newBuffer = createTypedArray(a.buffer.length, 'float64')
+
+    for (let i = 0; i < a.buffer.length; i++) {
+      newBuffer[i] = Math.log1p(a.buffer[i])
+    }
+
+    // Calculate strides for result shape
+    const strides = new Array(a.shape.length)
+    strides[a.shape.length - 1] = 1
+    for (let i = a.shape.length - 2; i >= 0; i--) {
+      strides[i] = strides[i + 1] * a.shape[i + 1]
+    }
+
+    return {
+      buffer: newBuffer,
+      shape: [...a.shape],
+      strides,
+      dtype: 'float64',
     }
   }
 

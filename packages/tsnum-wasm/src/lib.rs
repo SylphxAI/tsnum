@@ -184,10 +184,30 @@ pub fn sqrt_array(a: &[f64]) -> Vec<f64> {
     a.iter().map(|x| x.sqrt()).collect()
 }
 
+#[wasm_bindgen]
+pub fn cbrt_array(a: &[f64]) -> Vec<f64> {
+    a.iter().map(|x| x.cbrt()).collect()
+}
+
+#[wasm_bindgen]
+pub fn square_array(a: &[f64]) -> Vec<f64> {
+    a.iter().map(|x| x * x).collect()
+}
+
 /// Element-wise exponential (e^x)
 #[wasm_bindgen]
 pub fn exp_array(a: &[f64]) -> Vec<f64> {
     a.iter().map(|x| x.exp()).collect()
+}
+
+#[wasm_bindgen]
+pub fn exp2_array(a: &[f64]) -> Vec<f64> {
+    a.iter().map(|x| x.exp2()).collect()
+}
+
+#[wasm_bindgen]
+pub fn expm1_array(a: &[f64]) -> Vec<f64> {
+    a.iter().map(|x| x.exp_m1()).collect()
 }
 
 /// Element-wise natural logarithm
@@ -196,10 +216,20 @@ pub fn log_array(a: &[f64]) -> Vec<f64> {
     a.iter().map(|x| x.ln()).collect()
 }
 
+#[wasm_bindgen]
+pub fn log2_array(a: &[f64]) -> Vec<f64> {
+    a.iter().map(|x| x.log2()).collect()
+}
+
 /// Element-wise base-10 logarithm
 #[wasm_bindgen]
 pub fn log10_array(a: &[f64]) -> Vec<f64> {
     a.iter().map(|x| x.log10()).collect()
+}
+
+#[wasm_bindgen]
+pub fn log1p_array(a: &[f64]) -> Vec<f64> {
+    a.iter().map(|x| x.ln_1p()).collect()
 }
 
 /// Element-wise sine

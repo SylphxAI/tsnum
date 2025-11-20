@@ -215,23 +215,23 @@ Complete tracking table for all operations with backend implementation status.
 
 | Category | Total | Implemented | TS Backend | WASM Backend | Tested |
 |----------|:-----:|:-----------:|:----------:|:------------:|:------:|
-| **Core Ops** | 251 | 251 ✅ | 251 🟦 | 35 🟧 | 251 ✅ |
-| **WASM Coverage** | 35/251 | **13.9%** | - | - | - |
+| **Core Ops** | 251 | 251 ✅ | 251 🟦 | 41 🟧 | 251 ✅ |
+| **WASM Coverage** | 41/251 | **16.3%** | - | - | - |
 | **Test Coverage** | 415 tests | **100%** | - | - | - |
 
 ### WASM Implementation Priority
 
 **🎯 Next Priority** (Expected Performance Gains):
 1. **Linear Algebra** (solve, qr, svd, eig) - 10-30x speedup
-2. **Exponential Functions** (exp2, expm1, log2, log1p, cbrt, square) - 2-5x speedup (SIMD)
-3. **2D/ND FFT** (fft2, fftn, rfft2, rfftn) - 5-20x speedup
+2. **2D/ND FFT** (fft2, fftn, rfft2, rfftn) - 5-20x speedup
+3. **Rounding Functions** (round, floor, ceil, trunc) - 2-3x speedup (SIMD)
 
-**✅ Dual Backend** (35 operations):
+**✅ Dual Backend** (41 operations):
 - Arithmetic: add, sub, mul, div, pow (5)
 - Reductions: sum, mean, max, min, std, variance (6)
 - Linear Algebra: matmul, dot, inv, det, transpose (5)
 - FFT: fft, ifft (2)
-- Math: abs, sqrt, exp, log, log10, sin, cos, tan, sinh, cosh, tanh, arcsin, arccos, arctan, asinh, acosh, atanh (17)
+- Math: abs, sqrt, cbrt, square, exp, exp2, expm1, log, log2, log10, log1p, sin, cos, tan, sinh, cosh, tanh, arcsin, arccos, arctan, asinh, acosh, atanh (23)
 
 ### ✅ Implemented Functions (251)
 
@@ -395,7 +395,7 @@ User Code → NDArray API → Backend Interface → WASM (fast) or TypeScript (f
 - ✅ Reductions (sum, mean, max, min, std, variance)
 - ✅ Linear algebra (matmul, dot, inv, det, transpose)
 - ✅ FFT operations (fft, ifft)
-- ✅ Math functions (sin, cos, tan, sinh, cosh, tanh, arcsin, arccos, arctan, asinh, acosh, atanh, exp, log, log10, abs, sqrt)
+- ✅ Math functions (sin, cos, tan, sinh, cosh, tanh, arcsin, arccos, arctan, asinh, acosh, atanh, exp, exp2, expm1, log, log2, log10, log1p, abs, sqrt, cbrt, square)
 
 ### Benchmarks
 

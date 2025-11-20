@@ -245,11 +245,47 @@ export class WASMBackend implements Backend {
     return this.toNDArrayData(result, a.shape, a.dtype)
   }
 
+  cbrt(a: NDArrayData): NDArrayData {
+    this.ensureReady()
+
+    const buffer = this.toFloat64Array(a.buffer)
+    const result = this.module.cbrt_array(buffer)
+
+    return this.toNDArrayData(result, a.shape, a.dtype)
+  }
+
+  square(a: NDArrayData): NDArrayData {
+    this.ensureReady()
+
+    const buffer = this.toFloat64Array(a.buffer)
+    const result = this.module.square_array(buffer)
+
+    return this.toNDArrayData(result, a.shape, a.dtype)
+  }
+
   exp(a: NDArrayData): NDArrayData {
     this.ensureReady()
 
     const buffer = this.toFloat64Array(a.buffer)
     const result = this.module.exp_array(buffer)
+
+    return this.toNDArrayData(result, a.shape, a.dtype)
+  }
+
+  exp2(a: NDArrayData): NDArrayData {
+    this.ensureReady()
+
+    const buffer = this.toFloat64Array(a.buffer)
+    const result = this.module.exp2_array(buffer)
+
+    return this.toNDArrayData(result, a.shape, a.dtype)
+  }
+
+  expm1(a: NDArrayData): NDArrayData {
+    this.ensureReady()
+
+    const buffer = this.toFloat64Array(a.buffer)
+    const result = this.module.expm1_array(buffer)
 
     return this.toNDArrayData(result, a.shape, a.dtype)
   }
@@ -263,11 +299,29 @@ export class WASMBackend implements Backend {
     return this.toNDArrayData(result, a.shape, a.dtype)
   }
 
+  log2(a: NDArrayData): NDArrayData {
+    this.ensureReady()
+
+    const buffer = this.toFloat64Array(a.buffer)
+    const result = this.module.log2_array(buffer)
+
+    return this.toNDArrayData(result, a.shape, a.dtype)
+  }
+
   log10(a: NDArrayData): NDArrayData {
     this.ensureReady()
 
     const buffer = this.toFloat64Array(a.buffer)
     const result = this.module.log10_array(buffer)
+
+    return this.toNDArrayData(result, a.shape, a.dtype)
+  }
+
+  log1p(a: NDArrayData): NDArrayData {
+    this.ensureReady()
+
+    const buffer = this.toFloat64Array(a.buffer)
+    const result = this.module.log1p_array(buffer)
 
     return this.toNDArrayData(result, a.shape, a.dtype)
   }

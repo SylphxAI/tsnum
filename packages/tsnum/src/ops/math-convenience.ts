@@ -1,5 +1,6 @@
 // ===== Math Convenience Functions =====
 
+import { getBackend } from '../backend'
 import type { DType } from '../core/types'
 import { createTypedArray } from '../core/utils'
 import { NDArray } from '../ndarray'
@@ -104,18 +105,12 @@ export function sinc<T extends DType>(x: NDArray<T>): NDArray<'float64'> {
  */
 export function cbrt<T extends DType>(x: NDArray<T>): NDArray<'float64'> {
   const data = x.getData()
-  const result = createTypedArray(data.buffer.length, 'float64')
 
-  for (let i = 0; i < data.buffer.length; i++) {
-    result[i] = Math.cbrt(data.buffer[i])
-  }
+  // Delegate to backend (WASM if available, TS fallback)
+  const backend = getBackend()
+  const resultData = backend.cbrt(data)
 
-  return new NDArray({
-    buffer: result,
-    shape: data.shape.slice(),
-    strides: data.strides.slice(),
-    dtype: 'float64',
-  })
+  return new NDArray(resultData)
 }
 
 /**
@@ -124,18 +119,12 @@ export function cbrt<T extends DType>(x: NDArray<T>): NDArray<'float64'> {
  */
 export function square<T extends DType>(x: NDArray<T>): NDArray<'float64'> {
   const data = x.getData()
-  const result = createTypedArray(data.buffer.length, 'float64')
 
-  for (let i = 0; i < data.buffer.length; i++) {
-    result[i] = data.buffer[i] * data.buffer[i]
-  }
+  // Delegate to backend (WASM if available, TS fallback)
+  const backend = getBackend()
+  const resultData = backend.square(data)
 
-  return new NDArray({
-    buffer: result,
-    shape: data.shape.slice(),
-    strides: data.strides.slice(),
-    dtype: 'float64',
-  })
+  return new NDArray(resultData)
 }
 
 /**

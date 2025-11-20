@@ -497,18 +497,12 @@ export function fmod<T extends DType>(a: NDArray<T>, b: number | NDArray<T>): ND
  */
 export function exp2<T extends DType>(a: NDArray<T>): NDArray<'float64'> {
   const data = a.getData()
-  const result = createTypedArray(data.buffer.length, 'float64')
 
-  for (let i = 0; i < data.buffer.length; i++) {
-    result[i] = 2 ** data.buffer[i]
-  }
+  // Delegate to backend (WASM if available, TS fallback)
+  const backend = getBackend()
+  const resultData = backend.exp2(data)
 
-  return new NDArray({
-    buffer: result,
-    shape: data.shape.slice(),
-    strides: data.strides.slice(),
-    dtype: 'float64',
-  })
+  return new NDArray(resultData)
 }
 
 /**
@@ -522,18 +516,12 @@ export function exp2<T extends DType>(a: NDArray<T>): NDArray<'float64'> {
  */
 export function log2<T extends DType>(a: NDArray<T>): NDArray<'float64'> {
   const data = a.getData()
-  const result = createTypedArray(data.buffer.length, 'float64')
 
-  for (let i = 0; i < data.buffer.length; i++) {
-    result[i] = Math.log2(data.buffer[i])
-  }
+  // Delegate to backend (WASM if available, TS fallback)
+  const backend = getBackend()
+  const resultData = backend.log2(data)
 
-  return new NDArray({
-    buffer: result,
-    shape: data.shape.slice(),
-    strides: data.strides.slice(),
-    dtype: 'float64',
-  })
+  return new NDArray(resultData)
 }
 
 /**
@@ -548,18 +536,12 @@ export function log2<T extends DType>(a: NDArray<T>): NDArray<'float64'> {
  */
 export function log1p<T extends DType>(a: NDArray<T>): NDArray<'float64'> {
   const data = a.getData()
-  const result = createTypedArray(data.buffer.length, 'float64')
 
-  for (let i = 0; i < data.buffer.length; i++) {
-    result[i] = Math.log1p(data.buffer[i])
-  }
+  // Delegate to backend (WASM if available, TS fallback)
+  const backend = getBackend()
+  const resultData = backend.log1p(data)
 
-  return new NDArray({
-    buffer: result,
-    shape: data.shape.slice(),
-    strides: data.strides.slice(),
-    dtype: 'float64',
-  })
+  return new NDArray(resultData)
 }
 
 /**
@@ -574,16 +556,10 @@ export function log1p<T extends DType>(a: NDArray<T>): NDArray<'float64'> {
  */
 export function expm1<T extends DType>(a: NDArray<T>): NDArray<'float64'> {
   const data = a.getData()
-  const result = createTypedArray(data.buffer.length, 'float64')
 
-  for (let i = 0; i < data.buffer.length; i++) {
-    result[i] = Math.expm1(data.buffer[i])
-  }
+  // Delegate to backend (WASM if available, TS fallback)
+  const backend = getBackend()
+  const resultData = backend.expm1(data)
 
-  return new NDArray({
-    buffer: result,
-    shape: data.shape.slice(),
-    strides: data.strides.slice(),
-    dtype: 'float64',
-  })
+  return new NDArray(resultData)
 }

@@ -115,27 +115,43 @@ export function sum(a) {
 }
 
 /**
+ * Matrix transpose
  * @param {Float64Array} a
+ * @param {number} rows
+ * @param {number} cols
  * @returns {Float64Array}
  */
-export function sinh_array(a) {
+export function transpose_matrix(a, rows, cols) {
     const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.sinh_array(ptr0, len0);
+    const ret = wasm.transpose_matrix(ptr0, len0, rows, cols);
     var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
     wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
     return v2;
 }
 
 /**
- * Element-wise tangent
  * @param {Float64Array} a
  * @returns {Float64Array}
  */
-export function tan_array(a) {
+export function log2_array(a) {
     const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.tan_array(ptr0, len0);
+    const ret = wasm.log2_array(ptr0, len0);
+    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+    return v2;
+}
+
+/**
+ * Element-wise natural logarithm
+ * @param {Float64Array} a
+ * @returns {Float64Array}
+ */
+export function log_array(a) {
+    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.log_array(ptr0, len0);
     var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
     wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
     return v2;
@@ -151,6 +167,19 @@ export function mul_scalar(a, scalar) {
     const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
     const ret = wasm.mul_scalar(ptr0, len0, scalar);
+    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+    return v2;
+}
+
+/**
+ * @param {Float64Array} a
+ * @returns {Float64Array}
+ */
+export function acosh_array(a) {
+    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.acosh_array(ptr0, len0);
     var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
     wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
     return v2;
@@ -173,25 +202,17 @@ export function ifft(input, n) {
     return v2;
 }
 
-function takeFromExternrefTable0(idx) {
-    const value = wasm.__wbindgen_externrefs.get(idx);
-    wasm.__externref_table_dealloc(idx);
-    return value;
-}
 /**
- * Determinant for 2x2 and 3x3 matrices
  * @param {Float64Array} a
- * @param {number} n
- * @returns {number}
+ * @returns {Float64Array}
  */
-export function det_matrix(a, n) {
+export function arccos_array(a) {
     const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.det_matrix(ptr0, len0, n);
-    if (ret[2]) {
-        throw takeFromExternrefTable0(ret[1]);
-    }
-    return ret[0];
+    const ret = wasm.arccos_array(ptr0, len0);
+    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+    return v2;
 }
 
 /**
@@ -213,10 +234,10 @@ export function pow_scalar(a, exponent) {
  * @param {Float64Array} a
  * @returns {Float64Array}
  */
-export function asinh_array(a) {
+export function sinh_array(a) {
     const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.asinh_array(ptr0, len0);
+    const ret = wasm.sinh_array(ptr0, len0);
     var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
     wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
     return v2;
@@ -252,27 +273,29 @@ export function div_scalar(a, scalar) {
 }
 
 /**
- * Element-wise base-10 logarithm
  * @param {Float64Array} a
  * @returns {Float64Array}
  */
-export function log10_array(a) {
+export function atanh_array(a) {
     const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.log10_array(ptr0, len0);
+    const ret = wasm.atanh_array(ptr0, len0);
     var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
     wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
     return v2;
 }
 
 /**
- * @param {Float64Array} a
+ * Fast Fourier Transform (Cooley-Tukey algorithm)
+ * Input: real-valued array of length n (must be power of 2)
+ * Output: interleaved [real, imag] pairs (length 2n)
+ * @param {Float64Array} input
  * @returns {Float64Array}
  */
-export function arccos_array(a) {
-    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
+export function fft(input) {
+    const ptr0 = passArrayF64ToWasm0(input, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.arccos_array(ptr0, len0);
+    const ret = wasm.fft(ptr0, len0);
     var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
     wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
     return v2;
@@ -293,6 +316,54 @@ export function exp_array(a) {
 }
 
 /**
+ * Element-wise cosine
+ * @param {Float64Array} a
+ * @returns {Float64Array}
+ */
+export function cos_array(a) {
+    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.cos_array(ptr0, len0);
+    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+    return v2;
+}
+
+function takeFromExternrefTable0(idx) {
+    const value = wasm.__wbindgen_externrefs.get(idx);
+    wasm.__externref_table_dealloc(idx);
+    return value;
+}
+/**
+ * Determinant for 2x2 and 3x3 matrices
+ * @param {Float64Array} a
+ * @param {number} n
+ * @returns {number}
+ */
+export function det_matrix(a, n) {
+    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.det_matrix(ptr0, len0, n);
+    if (ret[2]) {
+        throw takeFromExternrefTable0(ret[1]);
+    }
+    return ret[0];
+}
+
+/**
+ * @param {Float64Array} a
+ * @returns {Float64Array}
+ */
+export function cbrt_array(a) {
+    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.cbrt_array(ptr0, len0);
+    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+    return v2;
+}
+
+/**
  * Dot product (inner product) of two 1D arrays
  * @param {Float64Array} a
  * @param {Float64Array} b
@@ -305,6 +376,24 @@ export function dot(a, b) {
     const len1 = WASM_VECTOR_LEN;
     const ret = wasm.dot(ptr0, len0, ptr1, len1);
     return ret;
+}
+
+/**
+ * Matrix inverse for 2x2 and 3x3 matrices
+ * @param {Float64Array} a
+ * @param {number} n
+ * @returns {Float64Array}
+ */
+export function inv_matrix(a, n) {
+    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.inv_matrix(ptr0, len0, n);
+    if (ret[3]) {
+        throw takeFromExternrefTable0(ret[2]);
+    }
+    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+    return v2;
 }
 
 /**
@@ -340,28 +429,26 @@ export function sub_arrays(a, b) {
 }
 
 /**
- * Element-wise cosine
  * @param {Float64Array} a
  * @returns {Float64Array}
  */
-export function cos_array(a) {
+export function expm1_array(a) {
     const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.cos_array(ptr0, len0);
+    const ret = wasm.expm1_array(ptr0, len0);
     var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
     wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
     return v2;
 }
 
 /**
- * Element-wise sine
  * @param {Float64Array} a
  * @returns {Float64Array}
  */
-export function sin_array(a) {
+export function exp2_array(a) {
     const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.sin_array(ptr0, len0);
+    const ret = wasm.exp2_array(ptr0, len0);
     var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
     wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
     return v2;
@@ -401,6 +488,20 @@ export function max(a) {
 }
 
 /**
+ * Element-wise sine
+ * @param {Float64Array} a
+ * @returns {Float64Array}
+ */
+export function sin_array(a) {
+    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.sin_array(ptr0, len0);
+    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+    return v2;
+}
+
+/**
  * @param {Float64Array} a
  * @returns {Float64Array}
  */
@@ -414,60 +515,13 @@ export function arcsin_array(a) {
 }
 
 /**
- * Matrix inverse for 2x2 and 3x3 matrices
- * @param {Float64Array} a
- * @param {number} n
- * @returns {Float64Array}
- */
-export function inv_matrix(a, n) {
-    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.inv_matrix(ptr0, len0, n);
-    if (ret[3]) {
-        throw takeFromExternrefTable0(ret[2]);
-    }
-    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
-    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
-    return v2;
-}
-
-/**
  * @param {Float64Array} a
  * @returns {Float64Array}
  */
-export function atanh_array(a) {
+export function tanh_array(a) {
     const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.atanh_array(ptr0, len0);
-    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
-    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
-    return v2;
-}
-
-/**
- * Matrix transpose
- * @param {Float64Array} a
- * @param {number} rows
- * @param {number} cols
- * @returns {Float64Array}
- */
-export function transpose_matrix(a, rows, cols) {
-    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.transpose_matrix(ptr0, len0, rows, cols);
-    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
-    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
-    return v2;
-}
-
-/**
- * @param {Float64Array} a
- * @returns {Float64Array}
- */
-export function cosh_array(a) {
-    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.cosh_array(ptr0, len0);
+    const ret = wasm.tanh_array(ptr0, len0);
     var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
     wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
     return v2;
@@ -481,6 +535,34 @@ export function arctan_array(a) {
     const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
     const ret = wasm.arctan_array(ptr0, len0);
+    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+    return v2;
+}
+
+/**
+ * Element-wise base-10 logarithm
+ * @param {Float64Array} a
+ * @returns {Float64Array}
+ */
+export function log10_array(a) {
+    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.log10_array(ptr0, len0);
+    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+    return v2;
+}
+
+/**
+ * Element-wise tangent
+ * @param {Float64Array} a
+ * @returns {Float64Array}
+ */
+export function tan_array(a) {
+    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.tan_array(ptr0, len0);
     var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
     wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
     return v2;
@@ -507,10 +589,10 @@ export function add_arrays(a, b) {
  * @param {Float64Array} a
  * @returns {Float64Array}
  */
-export function acosh_array(a) {
+export function cosh_array(a) {
     const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.acosh_array(ptr0, len0);
+    const ret = wasm.cosh_array(ptr0, len0);
     var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
     wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
     return v2;
@@ -534,14 +616,13 @@ export function mul_arrays(a, b) {
 }
 
 /**
- * Element-wise natural logarithm
  * @param {Float64Array} a
  * @returns {Float64Array}
  */
-export function log_array(a) {
+export function square_array(a) {
     const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.log_array(ptr0, len0);
+    const ret = wasm.square_array(ptr0, len0);
     var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
     wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
     return v2;
@@ -560,16 +641,13 @@ export function variance(a) {
 }
 
 /**
- * Fast Fourier Transform (Cooley-Tukey algorithm)
- * Input: real-valued array of length n (must be power of 2)
- * Output: interleaved [real, imag] pairs (length 2n)
- * @param {Float64Array} input
+ * @param {Float64Array} a
  * @returns {Float64Array}
  */
-export function fft(input) {
-    const ptr0 = passArrayF64ToWasm0(input, wasm.__wbindgen_malloc);
+export function asinh_array(a) {
+    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.fft(ptr0, len0);
+    const ret = wasm.asinh_array(ptr0, len0);
     var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
     wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
     return v2;
@@ -579,10 +657,10 @@ export function fft(input) {
  * @param {Float64Array} a
  * @returns {Float64Array}
  */
-export function tanh_array(a) {
+export function log1p_array(a) {
     const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.tanh_array(ptr0, len0);
+    const ret = wasm.log1p_array(ptr0, len0);
     var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
     wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
     return v2;

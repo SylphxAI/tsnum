@@ -36,9 +36,15 @@ export interface Backend {
   // Math functions (element-wise)
   abs(a: NDArrayData): NDArrayData
   sqrt(a: NDArrayData): NDArrayData
+  cbrt(a: NDArrayData): NDArrayData
+  square(a: NDArrayData): NDArrayData
   exp(a: NDArrayData): NDArrayData
+  exp2(a: NDArrayData): NDArrayData
+  expm1(a: NDArrayData): NDArrayData
   log(a: NDArrayData): NDArrayData
+  log2(a: NDArrayData): NDArrayData
   log10(a: NDArrayData): NDArrayData
+  log1p(a: NDArrayData): NDArrayData
   sin(a: NDArrayData): NDArrayData
   cos(a: NDArrayData): NDArrayData
   tan(a: NDArrayData): NDArrayData
