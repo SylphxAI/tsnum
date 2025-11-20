@@ -215,8 +215,8 @@ Complete tracking table for all operations with backend implementation status.
 
 | Category | Total | Implemented | TS Backend | WASM Backend | Tested |
 |----------|:-----:|:-----------:|:----------:|:------------:|:------:|
-| **Core Ops** | 251 | 251 ✅ | 251 🟦 | 13 🟧 | 251 ✅ |
-| **WASM Coverage** | 13/251 | **5.2%** | - | - | - |
+| **Core Ops** | 251 | 251 ✅ | 251 🟦 | 26 🟧 | 251 ✅ |
+| **WASM Coverage** | 26/251 | **10.4%** | - | - | - |
 | **Test Coverage** | 415 tests | **100%** | - | - | - |
 
 ### WASM Implementation Priority
@@ -226,10 +226,12 @@ Complete tracking table for all operations with backend implementation status.
 2. **Math Functions** (sin, cos, exp, log) - 2-5x speedup (SIMD)
 3. **Linear Algebra** (inv, solve, qr) - 10-30x speedup
 
-**✅ Dual Backend** (13 operations):
+**✅ Dual Backend** (26 operations):
 - Arithmetic: add, sub, mul, div, pow (5)
 - Reductions: sum, mean, max, min, std, variance (6)
-- Linear Algebra: matmul, dot (2)
+- Linear Algebra: matmul, dot, inv, det, transpose (5)
+- FFT: fft, ifft (2)
+- Math: abs, sqrt, exp, log, log10, sin, cos, tan (8)
 
 ### ✅ Implemented Functions (251)
 
