@@ -96,8 +96,8 @@ Complete tracking table for all operations with backend implementation status.
 | `mul` | 🟦 | 🟧 | ✅ | Element-wise multiplication |
 | `div` | 🟦 | 🟧 | ✅ | Element-wise division |
 | `pow` | 🟦 | 🟧 | ✅ | Power operation |
-| `mod` | 🟦 | ⬜ | ✅ | Modulo |
-| `fmod` | 🟦 | ⬜ | ✅ | Float modulo |
+| `mod` | 🟦 | 🟧 | ✅ | Modulo |
+| `fmod` | 🟦 | 🟧 | ✅ | Float modulo |
 | `divmod` | 🟦 | ⬜ | ✅ | Combined div+mod |
 
 #### 2. Reductions (6)
@@ -216,7 +216,7 @@ Complete tracking table for all operations with backend implementation status.
 
 | Category | Total | Implemented | TS Backend | WASM Backend | Tested |
 |----------|:-----:|:-----------:|:----------:|:------------:|:------:|
-| **Core Ops** | 251 | 251 ✅ | 251 🟦 | 52 🟧 | 251 ✅ |
+| **Core Ops** | 251 | 251 ✅ | 251 🟦 | 60 🟧 | 251 ✅ |
 | **WASM Coverage** | 60/251 | **23.9%** | - | - | - |
 | **Test Coverage** | 415 tests | **100%** | - | - | - |
 
