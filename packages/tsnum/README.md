@@ -151,7 +151,7 @@ Complete tracking table for all operations with backend implementation status.
 | `round`, `floor`, `ceil`, `trunc` | 🟦 | 🟧 | ✅ | Rounding |
 | `maximum`, `minimum`, `clip` | 🟦 | 🟧 | ✅ | Comparisons |
 | `mod`, `fmod` | 🟦 | 🟧 | ✅ | Modulo |
-| `deg2rad`, `rad2deg`, `hypot`, `sinc`, `heaviside`, `gcd`, `lcm`, `reciprocal` | 🟦 | ⬜ | ✅ | Utilities |
+| `deg2rad`, `rad2deg`, `hypot`, `sinc`, `heaviside`, `gcd`, `lcm`, `reciprocal` | 🟦 | 🟧 | ✅ | Utilities |
 
 #### 5. FFT (16)
 | Operation | TS | WASM | Tested | Notes |
@@ -217,7 +217,7 @@ Complete tracking table for all operations with backend implementation status.
 | Category | Total | Implemented | TS Backend | WASM Backend | Tested |
 |----------|:-----:|:-----------:|:----------:|:------------:|:------:|
 | **Core Ops** | 251 | 251 ✅ | 251 🟦 | 52 🟧 | 251 ✅ |
-| **WASM Coverage** | 52/251 | **20.7%** | - | - | - |
+| **WASM Coverage** | 56/251 | **22.3%** | - | - | - |
 | **Test Coverage** | 415 tests | **100%** | - | - | - |
 
 ### WASM Implementation Priority

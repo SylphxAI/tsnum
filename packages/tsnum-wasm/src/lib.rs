@@ -374,6 +374,26 @@ pub fn arctan2_arrays(y: &[f64], x: &[f64]) -> Vec<f64> {
     y.iter().zip(x.iter()).map(|(y_val, x_val)| y_val.atan2(*x_val)).collect()
 }
 
+#[wasm_bindgen]
+pub fn deg2rad_array(a: &[f64]) -> Vec<f64> {
+    a.iter().map(|x| x * std::f64::consts::PI / 180.0).collect()
+}
+
+#[wasm_bindgen]
+pub fn rad2deg_array(a: &[f64]) -> Vec<f64> {
+    a.iter().map(|x| x * 180.0 / std::f64::consts::PI).collect()
+}
+
+#[wasm_bindgen]
+pub fn hypot_arrays(a: &[f64], b: &[f64]) -> Vec<f64> {
+    a.iter().zip(b.iter()).map(|(x, y)| x.hypot(*y)).collect()
+}
+
+#[wasm_bindgen]
+pub fn reciprocal_array(a: &[f64]) -> Vec<f64> {
+    a.iter().map(|x| 1.0 / x).collect()
+}
+
 // ===== Linear Algebra (Advanced) =====
 
 /// Matrix inverse for 2x2 and 3x3 matrices

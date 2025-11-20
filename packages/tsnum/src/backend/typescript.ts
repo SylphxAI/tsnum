@@ -636,6 +636,98 @@ export class TypeScriptBackend implements Backend {
     }
   }
 
+  deg2rad(a: NDArrayData): NDArrayData {
+    const newBuffer = createTypedArray(a.buffer.length, 'float64')
+
+    for (let i = 0; i < a.buffer.length; i++) {
+      newBuffer[i] = (a.buffer[i] * Math.PI) / 180
+    }
+
+    // Calculate strides for result shape
+    const strides = new Array(a.shape.length)
+    strides[a.shape.length - 1] = 1
+    for (let i = a.shape.length - 2; i >= 0; i--) {
+      strides[i] = strides[i + 1] * a.shape[i + 1]
+    }
+
+    return {
+      buffer: newBuffer,
+      shape: [...a.shape],
+      strides,
+      dtype: 'float64',
+    }
+  }
+
+  rad2deg(a: NDArrayData): NDArrayData {
+    const newBuffer = createTypedArray(a.buffer.length, 'float64')
+
+    for (let i = 0; i < a.buffer.length; i++) {
+      newBuffer[i] = (a.buffer[i] * 180) / Math.PI
+    }
+
+    // Calculate strides for result shape
+    const strides = new Array(a.shape.length)
+    strides[a.shape.length - 1] = 1
+    for (let i = a.shape.length - 2; i >= 0; i--) {
+      strides[i] = strides[i + 1] * a.shape[i + 1]
+    }
+
+    return {
+      buffer: newBuffer,
+      shape: [...a.shape],
+      strides,
+      dtype: 'float64',
+    }
+  }
+
+  hypot(a: NDArrayData, b: NDArrayData): NDArrayData {
+    if (a.buffer.length !== b.buffer.length) {
+      throw new Error('Arrays must have same size for hypot')
+    }
+
+    const newBuffer = createTypedArray(a.buffer.length, 'float64')
+
+    for (let i = 0; i < a.buffer.length; i++) {
+      newBuffer[i] = Math.hypot(a.buffer[i], b.buffer[i])
+    }
+
+    // Calculate strides for result shape
+    const strides = new Array(a.shape.length)
+    strides[a.shape.length - 1] = 1
+    for (let i = a.shape.length - 2; i >= 0; i--) {
+      strides[i] = strides[i + 1] * a.shape[i + 1]
+    }
+
+    return {
+      buffer: newBuffer,
+      shape: [...a.shape],
+      strides,
+      dtype: 'float64',
+    }
+  }
+
+  reciprocal(a: NDArrayData): NDArrayData {
+    const newBuffer = createTypedArray(a.buffer.length, 'float64')
+
+    for (let i = 0; i < a.buffer.length; i++) {
+      newBuffer[i] = 1 / a.buffer[i]
+    }
+
+    // Calculate strides for result shape
+    const strides = new Array(a.shape.length)
+    strides[a.shape.length - 1] = 1
+    for (let i = a.shape.length - 2; i >= 0; i--) {
+      strides[i] = strides[i + 1] * a.shape[i + 1]
+    }
+
+    return {
+      buffer: newBuffer,
+      shape: [...a.shape],
+      strides,
+      dtype: 'float64',
+    }
+  }
+
   sin(a: NDArrayData): NDArrayData {
     const newBuffer = createTypedArray(a.buffer.length, a.dtype)
 

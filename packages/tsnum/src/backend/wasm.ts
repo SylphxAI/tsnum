@@ -457,6 +457,47 @@ export class WASMBackend implements Backend {
     return this.toNDArrayData(result, y.shape, y.dtype)
   }
 
+  deg2rad(a: NDArrayData): NDArrayData {
+    this.ensureReady()
+
+    const buffer = this.toFloat64Array(a.buffer)
+    const result = this.module.deg2rad_array(buffer)
+
+    return this.toNDArrayData(result, a.shape, 'float64')
+  }
+
+  rad2deg(a: NDArrayData): NDArrayData {
+    this.ensureReady()
+
+    const buffer = this.toFloat64Array(a.buffer)
+    const result = this.module.rad2deg_array(buffer)
+
+    return this.toNDArrayData(result, a.shape, 'float64')
+  }
+
+  hypot(a: NDArrayData, b: NDArrayData): NDArrayData {
+    this.ensureReady()
+
+    if (a.buffer.length !== b.buffer.length) {
+      throw new Error('Arrays must have same size for hypot')
+    }
+
+    const bufferA = this.toFloat64Array(a.buffer)
+    const bufferB = this.toFloat64Array(b.buffer)
+    const result = this.module.hypot_arrays(bufferA, bufferB)
+
+    return this.toNDArrayData(result, a.shape, 'float64')
+  }
+
+  reciprocal(a: NDArrayData): NDArrayData {
+    this.ensureReady()
+
+    const buffer = this.toFloat64Array(a.buffer)
+    const result = this.module.reciprocal_array(buffer)
+
+    return this.toNDArrayData(result, a.shape, 'float64')
+  }
+
   sin(a: NDArrayData): NDArrayData {
     this.ensureReady()
 

@@ -11,18 +11,12 @@ import { NDArray } from '../ndarray'
  */
 export function deg2rad<T extends DType>(x: NDArray<T>): NDArray<'float64'> {
   const data = x.getData()
-  const result = createTypedArray(data.buffer.length, 'float64')
 
-  for (let i = 0; i < data.buffer.length; i++) {
-    result[i] = (data.buffer[i] * Math.PI) / 180
-  }
+  // Delegate to backend (WASM if available, TS fallback)
+  const backend = getBackend()
+  const resultData = backend.deg2rad(data)
 
-  return new NDArray({
-    buffer: result,
-    shape: data.shape.slice(),
-    strides: data.strides.slice(),
-    dtype: 'float64',
-  })
+  return new NDArray(resultData)
 }
 
 /**
@@ -31,18 +25,12 @@ export function deg2rad<T extends DType>(x: NDArray<T>): NDArray<'float64'> {
  */
 export function rad2deg<T extends DType>(x: NDArray<T>): NDArray<'float64'> {
   const data = x.getData()
-  const result = createTypedArray(data.buffer.length, 'float64')
 
-  for (let i = 0; i < data.buffer.length; i++) {
-    result[i] = (data.buffer[i] * 180) / Math.PI
-  }
+  // Delegate to backend (WASM if available, TS fallback)
+  const backend = getBackend()
+  const resultData = backend.rad2deg(data)
 
-  return new NDArray({
-    buffer: result,
-    shape: data.shape.slice(),
-    strides: data.strides.slice(),
-    dtype: 'float64',
-  })
+  return new NDArray(resultData)
 }
 
 /**
@@ -54,22 +42,11 @@ export function hypot<T extends DType>(x1: NDArray<T>, x2: NDArray<T>): NDArray<
   const data1 = x1.getData()
   const data2 = x2.getData()
 
-  if (data1.buffer.length !== data2.buffer.length) {
-    throw new Error('Arrays must have same size')
-  }
+  // Delegate to backend (WASM if available, TS fallback)
+  const backend = getBackend()
+  const resultData = backend.hypot(data1, data2)
 
-  const result = createTypedArray(data1.buffer.length, 'float64')
-
-  for (let i = 0; i < data1.buffer.length; i++) {
-    result[i] = Math.hypot(data1.buffer[i], data2.buffer[i])
-  }
-
-  return new NDArray({
-    buffer: result,
-    shape: data1.shape.slice(),
-    strides: data1.strides.slice(),
-    dtype: 'float64',
-  })
+  return new NDArray(resultData)
 }
 
 /**
@@ -133,18 +110,12 @@ export function square<T extends DType>(x: NDArray<T>): NDArray<'float64'> {
  */
 export function reciprocal<T extends DType>(x: NDArray<T>): NDArray<'float64'> {
   const data = x.getData()
-  const result = createTypedArray(data.buffer.length, 'float64')
 
-  for (let i = 0; i < data.buffer.length; i++) {
-    result[i] = 1 / data.buffer[i]
-  }
+  // Delegate to backend (WASM if available, TS fallback)
+  const backend = getBackend()
+  const resultData = backend.reciprocal(data)
 
-  return new NDArray({
-    buffer: result,
-    shape: data.shape.slice(),
-    strides: data.strides.slice(),
-    dtype: 'float64',
-  })
+  return new NDArray(resultData)
 }
 
 /**

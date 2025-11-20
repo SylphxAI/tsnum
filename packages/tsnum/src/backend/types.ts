@@ -56,6 +56,10 @@ export interface Backend {
   mod(a: NDArrayData, b: NDArrayData | number): NDArrayData
   fmod(a: NDArrayData, b: NDArrayData | number): NDArrayData
   arctan2(y: NDArrayData, x: NDArrayData): NDArrayData
+  deg2rad(a: NDArrayData): NDArrayData
+  rad2deg(a: NDArrayData): NDArrayData
+  hypot(a: NDArrayData, b: NDArrayData): NDArrayData
+  reciprocal(a: NDArrayData): NDArrayData
   sin(a: NDArrayData): NDArrayData
   cos(a: NDArrayData): NDArrayData
   tan(a: NDArrayData): NDArrayData
