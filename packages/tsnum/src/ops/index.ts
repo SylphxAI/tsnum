@@ -4,7 +4,7 @@
 export { add, sub, mul, div, pow } from './arithmetic'
 
 // Comparison
-export { equal, less, greater, lessEqual, greaterEqual } from './comparison'
+export { equal, less, greater, lessEqual, greaterEqual, not_equal, array_equal, array_equiv } from './comparison'
 
 // Reductions
 export { sum, mean, max, min, std, variance } from './reductions'
@@ -116,3 +116,12 @@ export { ascontiguousarray, copy, view } from './copy'
 
 // Broadcasting utilities
 export { atleast_1d, atleast_2d, atleast_3d, broadcast_arrays, broadcast_to } from './broadcasting'
+
+// Bitwise operations
+export { bitwise_and, bitwise_or, bitwise_xor, bitwise_not, left_shift, right_shift, invert } from './bitwise'
+
+// Element selection
+export { extract, place, compress, choose } from './selection'
+
+// Numerical integration
+export { trapz, cumtrapz } from './integration'

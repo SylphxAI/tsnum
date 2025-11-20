@@ -37,6 +37,9 @@ export {
   greater,
   lessEqual,
   greaterEqual,
+  not_equal,
+  array_equal,
+  array_equiv,
   // Reductions
   sum,
   mean,
@@ -164,6 +167,22 @@ export {
   atleast_3d,
   broadcast_to,
   broadcast_arrays,
+  // Bitwise
+  bitwise_and,
+  bitwise_or,
+  bitwise_xor,
+  bitwise_not,
+  left_shift,
+  right_shift,
+  invert,
+  // Element selection
+  extract,
+  place,
+  compress,
+  choose,
+  // Integration
+  trapz,
+  cumtrapz,
 } from './ops'
 
 // 2b. Linear Algebra
