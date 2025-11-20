@@ -28,6 +28,10 @@ export {
   reshape,
   transpose,
   flatten,
+  // Indexing
+  at,
+  slice,
+  take,
 } from './ops'
 
 // 3. NDArray (data container)
@@ -35,6 +39,7 @@ export { NDArray } from './ndarray'
 
 // 4. Types
 export type { DType, TypedArray, NDArrayData, ArrayOptions, AxisOptions } from './core/types'
+export type { SliceRange } from './ops'
 
 // 5. Utilities
 export { pipe, compose, partial } from './functional'

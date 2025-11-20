@@ -86,3 +86,79 @@ export function canBroadcast(shape1: readonly number[], shape2: readonly number[
     return false
   }
 }
+
+// Broadcast array data to a target shape
+export function broadcastTo(data: NDArrayData, targetShape: readonly number[]): NDArrayData {
+  const { shape: sourceShape, buffer, dtype, strides: sourceStrides } = data
+
+  // Check if broadcasting is valid
+  const broadcastedShape = broadcastShapes(sourceShape, targetShape)
+  if (broadcastedShape.join(',') !== targetShape.join(',')) {
+    throw new Error(`Cannot broadcast shape ${sourceShape} to ${targetShape}`)
+  }
+
+  // If shapes are the same, no broadcasting needed
+  if (
+    sourceShape.length === targetShape.length &&
+    sourceShape.every((dim, i) => dim === targetShape[i])
+  ) {
+    return data
+  }
+
+  // Create new buffer with broadcasted data
+  const targetSize = computeSize(targetShape)
+  const newBuffer = createTypedArray(targetSize, dtype)
+
+  // Compute new strides for broadcasting
+  // Dimensions with size 1 get stride 0 (repeat values)
+  const newStrides = new Array(targetShape.length)
+  const sourceDims = sourceShape.length
+  const targetDims = targetShape.length
+
+  for (let i = 0; i < targetDims; i++) {
+    const targetIdx = targetDims - 1 - i
+    const sourceIdx = sourceDims - 1 - i
+
+    if (sourceIdx < 0) {
+      // Source doesn't have this dimension, stride is 0
+      newStrides[targetIdx] = 0
+    } else if (sourceShape[sourceIdx] === 1) {
+      // Source dim is 1, repeat the value, stride is 0
+      newStrides[targetIdx] = 0
+    } else {
+      // Normal stride
+      newStrides[targetIdx] = sourceStrides[sourceIdx]
+    }
+  }
+
+  // Fill the broadcasted array (not used - using iterative approach below)
+
+  // Iteratively fill the buffer
+  let destIdx = 0
+  const iterate = (axis: number, sourceOffset: number) => {
+    if (axis === targetDims) {
+      newBuffer[destIdx++] = buffer[sourceOffset]
+      return
+    }
+
+    const sourceAxis = axis - (targetDims - sourceDims)
+    for (let i = 0; i < targetShape[axis]; i++) {
+      if (sourceAxis < 0 || sourceShape[sourceAxis] === 1) {
+        // Broadcast this dimension (repeat the same slice)
+        iterate(axis + 1, sourceOffset)
+      } else {
+        // Normal indexing
+        iterate(axis + 1, sourceOffset + i * sourceStrides[sourceAxis])
+      }
+    }
+  }
+
+  iterate(0, 0)
+
+  return {
+    buffer: newBuffer,
+    shape: targetShape,
+    strides: computeStrides(targetShape),
+    dtype,
+  }
+}

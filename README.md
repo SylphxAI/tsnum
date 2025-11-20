@@ -5,9 +5,11 @@ High-performance TypeScript NumPy alternative with **functional-first** API.
 **Features:**
 - 🎯 **Functional-first design** - Pure functions, composable operations
 - 🚀 NumPy-compatible API for TypeScript
+- 📊 **Broadcasting** - NumPy-style array broadcasting
+- 🔍 **Indexing & Slicing** - Element access, slicing, fancy indexing
 - ⚡ High-performance TypedArray backend
 - 🌳 Tree-shakeable - import only what you need
-- 📦 Lightweight core (<20KB gzipped)
+- 📦 Lightweight core (~7KB gzipped)
 - 🔒 Full TypeScript type safety
 - 💨 Zero runtime dependencies
 - 🎨 Elegant `pipe` composition
@@ -118,6 +120,51 @@ const a = array([1, 2, 3])
 equal(a, 2)                       // [0, 1, 0]
 less(a, 3)                        // [1, 1, 0]
 greater(a, 1)                     // [0, 1, 1]
+```
+
+### Indexing & Slicing
+```typescript
+import { array, at, slice, take } from 'tsnum'
+
+// Element access with at()
+const arr = array([[1, 2, 3], [4, 5, 6]])
+at(arr, 0, 2)                     // 3
+at(arr, -1, -1)                   // 6 (negative indexing)
+
+// Slicing
+const a = array([0, 1, 2, 3, 4, 5])
+slice(a, [1, 4])                  // [1, 2, 3]
+slice(a, [0, 6, 2])               // [0, 2, 4] (with step)
+
+// 2D slicing
+const b = array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+slice(b, [0, 2], [1, 3])          // [[2, 3], [5, 6]]
+
+// Fancy indexing
+const c = array([10, 20, 30, 40, 50])
+take(c, [0, 2, 4])                // [10, 30, 50]
+```
+
+### Broadcasting
+```typescript
+import { array, add, mul } from 'tsnum'
+
+// Scalar broadcasting
+const a = array([1, 2, 3])
+add(a, 10)                        // [11, 12, 13]
+
+// 1D to 2D broadcasting
+const b = array([[1, 2, 3], [4, 5, 6]])  // (2, 3)
+const c = array([10, 20, 30])            // (3,)
+add(b, c)                         // [[11, 22, 33], [14, 25, 36]]
+
+// Broadcasting with size-1 dimensions
+const d = array([[1], [2], [3]])  // (3, 1)
+const e = array([[10, 20, 30, 40]])  // (1, 4)
+add(d, e)                         // (3, 4) result
+// [[11, 21, 31, 41],
+//  [12, 22, 32, 42],
+//  [13, 23, 33, 43]]
 ```
 
 ### Properties (Read-only)
@@ -269,7 +316,7 @@ bun run lint
 ## Roadmap
 
 - [x] v0.1: Core functional API (creation, arithmetic, reductions, shapes)
-- [ ] v0.2: Broadcasting, advanced indexing, slicing
+- [x] v0.2: Broadcasting, indexing, slicing
 - [ ] v0.3: WASM acceleration for large arrays
 - [ ] v0.4: Linear algebra (matmul, inv, solve, svd)
 - [ ] v0.5: Random number generation, advanced statistics

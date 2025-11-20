@@ -1,5 +1,5 @@
 import type { DType, NDArrayData } from '../core/types'
-import { createTypedArray } from '../core/utils'
+import { broadcastShapes, broadcastTo, createTypedArray } from '../core/utils'
 import { NDArray } from '../ndarray'
 
 // ===== Pure Function Implementations =====
@@ -28,27 +28,25 @@ function elementwiseOp(
   b: NDArrayData,
   op: (a: number, b: number) => number,
 ): NDArrayData {
-  // ASSUMPTION: Same shape (broadcasting not yet implemented)
-  if (a.shape.length !== b.shape.length) {
-    throw new Error('Shape mismatch: broadcasting not yet implemented')
-  }
+  // Determine broadcast shape
+  const resultShape = broadcastShapes(a.shape, b.shape)
 
-  for (let i = 0; i < a.shape.length; i++) {
-    if (a.shape[i] !== b.shape[i]) {
-      throw new Error('Shape mismatch: broadcasting not yet implemented')
-    }
-  }
+  // Broadcast arrays to result shape if needed
+  const aBroadcast = broadcastTo(a, resultShape)
+  const bBroadcast = broadcastTo(b, resultShape)
 
-  const newBuffer = createTypedArray(a.buffer.length, a.dtype)
+  // Perform element-wise operation
+  const resultSize = aBroadcast.buffer.length
+  const newBuffer = createTypedArray(resultSize, a.dtype)
 
-  for (let i = 0; i < a.buffer.length; i++) {
-    newBuffer[i] = op(a.buffer[i], b.buffer[i])
+  for (let i = 0; i < resultSize; i++) {
+    newBuffer[i] = op(aBroadcast.buffer[i], bBroadcast.buffer[i])
   }
 
   return {
     buffer: newBuffer,
-    shape: a.shape,
-    strides: a.strides,
+    shape: resultShape,
+    strides: aBroadcast.strides,
     dtype: a.dtype,
   }
 }
