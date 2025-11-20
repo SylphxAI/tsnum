@@ -29,6 +29,10 @@ export interface Backend {
   matmul(a: NDArrayData, b: NDArrayData): NDArrayData
   dot(a: NDArrayData, b: NDArrayData): number
 
+  // FFT operations (complex numbers as [real, imag] interleaved)
+  fft(a: NDArrayData): NDArrayData
+  ifft(a: NDArrayData): NDArrayData
+
   // Shape operations (pure TS - no WASM benefit)
   // reshape, transpose, etc. stay in TS
 }

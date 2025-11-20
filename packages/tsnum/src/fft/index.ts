@@ -1,5 +1,6 @@
 // ===== FFT Operations =====
 
+import { getBackend } from '../backend'
 import type { DType } from '../core/types'
 import { createTypedArray } from '../core/utils'
 import type { NDArray } from '../ndarray'
@@ -16,39 +17,11 @@ export function fft<T extends DType>(a: NDArray<T>): NDArray<'float64'> {
     throw new Error('fft only supports 1D arrays')
   }
 
-  const n = data.buffer.length
+  // Delegate to backend (WASM if available, TS fallback)
+  const backend = getBackend()
+  const resultData = backend.fft(data)
 
-  // Check if n is power of 2
-  if (n === 0 || (n & (n - 1)) !== 0) {
-    throw new Error('fft requires array length to be power of 2')
-  }
-
-  // Real and imaginary parts
-  const real = new Float64Array(n)
-  const imag = new Float64Array(n)
-
-  // Copy input to real part
-  for (let i = 0; i < n; i++) {
-    real[i] = data.buffer[i]
-    imag[i] = 0
-  }
-
-  // Cooley-Tukey FFT
-  fftRecursive(real, imag, n)
-
-  // Interleave real and imaginary parts
-  const result = createTypedArray(n * 2, 'float64')
-  for (let i = 0; i < n; i++) {
-    result[i * 2] = real[i]
-    result[i * 2 + 1] = imag[i]
-  }
-
-  return new NDArray({
-    buffer: result,
-    shape: [n, 2],
-    strides: [2, 1],
-    dtype: 'float64',
-  })
+  return new NDArray(resultData)
 }
 
 /**
@@ -61,43 +34,11 @@ export function ifft<T extends DType>(a: NDArray<T>): NDArray<'float64'> {
     throw new Error('ifft requires [n, 2] array (real, imag pairs)')
   }
 
-  const n = data.shape[0]
+  // Delegate to backend (WASM if available, TS fallback)
+  const backend = getBackend()
+  const resultData = backend.ifft(data)
 
-  // Check if n is power of 2
-  if (n === 0 || (n & (n - 1)) !== 0) {
-    throw new Error('ifft requires array length to be power of 2')
-  }
-
-  // Extract real and imaginary parts
-  const real = new Float64Array(n)
-  const imag = new Float64Array(n)
-
-  for (let i = 0; i < n; i++) {
-    real[i] = data.buffer[i * 2]
-    imag[i] = data.buffer[i * 2 + 1]
-  }
-
-  // Conjugate
-  for (let i = 0; i < n; i++) {
-    imag[i] = -imag[i]
-  }
-
-  // FFT
-  fftRecursive(real, imag, n)
-
-  // Conjugate and scale
-  const result = createTypedArray(n * 2, 'float64')
-  for (let i = 0; i < n; i++) {
-    result[i * 2] = real[i] / n
-    result[i * 2 + 1] = -imag[i] / n
-  }
-
-  return new NDArray({
-    buffer: result,
-    shape: [n, 2],
-    strides: [2, 1],
-    dtype: 'float64',
-  })
+  return new NDArray(resultData)
 }
 
 /**

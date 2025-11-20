@@ -115,6 +115,22 @@ export function pow_scalar(a, exponent) {
 }
 
 /**
+ * Fast Fourier Transform (Cooley-Tukey algorithm)
+ * Input: real-valued array of length n (must be power of 2)
+ * Output: interleaved [real, imag] pairs (length 2n)
+ * @param {Float64Array} input
+ * @returns {Float64Array}
+ */
+export function fft(input) {
+    const ptr0 = passArrayF64ToWasm0(input, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.fft(ptr0, len0);
+    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+    return v2;
+}
+
+/**
  * Divide array by scalar
  * @param {Float64Array} a
  * @param {number} scalar
@@ -253,6 +269,23 @@ export function variance(a) {
     const len0 = WASM_VECTOR_LEN;
     const ret = wasm.variance(ptr0, len0);
     return ret;
+}
+
+/**
+ * Inverse Fast Fourier Transform
+ * Input: interleaved [real, imag] pairs (length 2n)
+ * Output: interleaved [real, imag] pairs (length 2n)
+ * @param {Float64Array} input
+ * @param {number} n
+ * @returns {Float64Array}
+ */
+export function ifft(input, n) {
+    const ptr0 = passArrayF64ToWasm0(input, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.ifft(ptr0, len0, n);
+    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+    return v2;
 }
 
 /**

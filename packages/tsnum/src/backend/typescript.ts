@@ -148,7 +148,128 @@ export class TypeScriptBackend implements Backend {
     throw new Error('dot backend method only supports 1D arrays')
   }
 
+  // ===== FFT Operations =====
+
+  fft(a: NDArrayData): NDArrayData {
+    const n = a.buffer.length
+
+    // Check if n is power of 2
+    if (n === 0 || (n & (n - 1)) !== 0) {
+      throw new Error('FFT requires array length to be power of 2')
+    }
+
+    // Initialize real and imaginary parts
+    const real = new Float64Array(n)
+    const imag = new Float64Array(n)
+
+    // Copy input to real part
+    for (let i = 0; i < n; i++) {
+      real[i] = a.buffer[i]
+      imag[i] = 0
+    }
+
+    // Cooley-Tukey FFT
+    this.fftRecursive(real, imag, n)
+
+    // Interleave real and imaginary parts
+    const result = createTypedArray(n * 2, a.dtype)
+    for (let i = 0; i < n; i++) {
+      result[i * 2] = real[i]
+      result[i * 2 + 1] = imag[i]
+    }
+
+    return {
+      buffer: result,
+      shape: [n, 2],
+      strides: [2, 1],
+      dtype: 'float64',
+    }
+  }
+
+  ifft(a: NDArrayData): NDArrayData {
+    if (a.shape.length !== 2 || a.shape[1] !== 2) {
+      throw new Error('IFFT requires [n, 2] array (real, imag pairs)')
+    }
+
+    const n = a.shape[0]
+
+    // Check if n is power of 2
+    if (n === 0 || (n & (n - 1)) !== 0) {
+      throw new Error('IFFT requires array length to be power of 2')
+    }
+
+    // Extract real and imaginary parts
+    const real = new Float64Array(n)
+    const imag = new Float64Array(n)
+
+    for (let i = 0; i < n; i++) {
+      real[i] = a.buffer[i * 2]
+      imag[i] = a.buffer[i * 2 + 1]
+    }
+
+    // Conjugate
+    for (let i = 0; i < n; i++) {
+      imag[i] = -imag[i]
+    }
+
+    // FFT
+    this.fftRecursive(real, imag, n)
+
+    // Conjugate and scale
+    const result = createTypedArray(n * 2, a.dtype)
+    for (let i = 0; i < n; i++) {
+      result[i * 2] = real[i] / n
+      result[i * 2 + 1] = -imag[i] / n
+    }
+
+    return {
+      buffer: result,
+      shape: [n, 2],
+      strides: [2, 1],
+      dtype: 'float64',
+    }
+  }
+
   // ===== Helper Methods =====
+
+  private fftRecursive(real: Float64Array, imag: Float64Array, n: number): void {
+    if (n <= 1) return
+
+    // Divide
+    const halfN = n / 2
+    const evenReal = new Float64Array(halfN)
+    const evenImag = new Float64Array(halfN)
+    const oddReal = new Float64Array(halfN)
+    const oddImag = new Float64Array(halfN)
+
+    for (let i = 0; i < halfN; i++) {
+      evenReal[i] = real[i * 2]
+      evenImag[i] = imag[i * 2]
+      oddReal[i] = real[i * 2 + 1]
+      oddImag[i] = imag[i * 2 + 1]
+    }
+
+    // Conquer
+    this.fftRecursive(evenReal, evenImag, halfN)
+    this.fftRecursive(oddReal, oddImag, halfN)
+
+    // Combine
+    for (let k = 0; k < halfN; k++) {
+      const angle = (-2 * Math.PI * k) / n
+      const cos = Math.cos(angle)
+      const sin = Math.sin(angle)
+
+      // Complex multiplication: twiddle * odd[k]
+      const tReal = cos * oddReal[k] - sin * oddImag[k]
+      const tImag = cos * oddImag[k] + sin * oddReal[k]
+
+      // Butterfly operation
+      real[k] = evenReal[k] + tReal
+      imag[k] = evenImag[k] + tImag
+      real[k + halfN] = evenReal[k] - tReal
+      imag[k + halfN] = evenImag[k] - tImag
+    }
+  }
 
   private scalarOp(
     a: NDArrayData,

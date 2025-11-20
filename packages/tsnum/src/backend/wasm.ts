@@ -174,11 +174,55 @@ export class WASMBackend implements Backend {
       const bufA = this.toFloat64Array(a.buffer)
       const bufB = this.toFloat64Array(b.buffer)
 
-      // Call WASM dot (we'll add this to WASM module)
+      // Call WASM dot
       return this.module.dot(bufA, bufB)
     }
 
     throw new Error('dot backend method only supports 1D arrays')
+  }
+
+  // ===== FFT Operations =====
+
+  fft(a: NDArrayData): NDArrayData {
+    this.ensureReady()
+
+    const n = a.buffer.length
+
+    // Check if n is power of 2
+    if (n === 0 || (n & (n - 1)) !== 0) {
+      throw new Error('FFT requires array length to be power of 2')
+    }
+
+    const buffer = this.toFloat64Array(a.buffer)
+
+    // Call WASM fft (returns interleaved [real, imag])
+    const result = this.module.fft(buffer)
+
+    // Always return float64 for FFT
+    return this.toNDArrayData(result, [n, 2], 'float64')
+  }
+
+  ifft(a: NDArrayData): NDArrayData {
+    this.ensureReady()
+
+    if (a.shape.length !== 2 || a.shape[1] !== 2) {
+      throw new Error('IFFT requires [n, 2] array (real, imag pairs)')
+    }
+
+    const n = a.shape[0]
+
+    // Check if n is power of 2
+    if (n === 0 || (n & (n - 1)) !== 0) {
+      throw new Error('IFFT requires array length to be power of 2')
+    }
+
+    const buffer = this.toFloat64Array(a.buffer)
+
+    // Call WASM ifft (returns interleaved [real, imag])
+    const result = this.module.ifft(buffer, n)
+
+    // Always return float64 for IFFT
+    return this.toNDArrayData(result, [n, 2], 'float64')
   }
 
   // ===== Helper Methods =====

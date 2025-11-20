@@ -29,6 +29,12 @@ export function mul_scalar(a: Float64Array, scalar: number): Float64Array;
  */
 export function pow_scalar(a: Float64Array, exponent: number): Float64Array;
 /**
+ * Fast Fourier Transform (Cooley-Tukey algorithm)
+ * Input: real-valued array of length n (must be power of 2)
+ * Output: interleaved [real, imag] pairs (length 2n)
+ */
+export function fft(input: Float64Array): Float64Array;
+/**
  * Divide array by scalar
  */
 export function div_scalar(a: Float64Array, scalar: number): Float64Array;
@@ -66,6 +72,12 @@ export function mul_arrays(a: Float64Array, b: Float64Array): Float64Array;
  */
 export function variance(a: Float64Array): number;
 /**
+ * Inverse Fast Fourier Transform
+ * Input: interleaved [real, imag] pairs (length 2n)
+ * Output: interleaved [real, imag] pairs (length 2n)
+ */
+export function ifft(input: Float64Array, n: number): Float64Array;
+/**
  * Divide two arrays element-wise
  */
 export function div_arrays(a: Float64Array, b: Float64Array): Float64Array;
@@ -79,6 +91,8 @@ export interface InitOutput {
   readonly div_arrays: (a: number, b: number, c: number, d: number) => [number, number];
   readonly div_scalar: (a: number, b: number, c: number) => [number, number];
   readonly dot: (a: number, b: number, c: number, d: number) => number;
+  readonly fft: (a: number, b: number) => [number, number];
+  readonly ifft: (a: number, b: number, c: number) => [number, number];
   readonly matmul: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => [number, number];
   readonly max: (a: number, b: number) => number;
   readonly mean: (a: number, b: number) => number;
