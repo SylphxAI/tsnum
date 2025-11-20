@@ -47,6 +47,9 @@ export {
   min,
   std,
   variance,
+  prod,
+  nanprod,
+  count_nonzero,
   // Shape
   reshape,
   transpose,
@@ -120,6 +123,11 @@ export {
   rot90,
   pad,
   moveaxis,
+  deleteArr,
+  insert,
+  append,
+  resize,
+  roll,
   // Statistics
   median,
   percentile,
@@ -229,6 +237,12 @@ export { fft, ifft, rfft, irfft, fft2, ifft2, rfft2, irfft2 } from './fft'
 
 // 2e. Polynomial
 export { polyfit, polyval, roots } from './polynomial'
+
+// 2f. Window functions
+export { hamming, hanning, blackman, bartlett, kaiser } from './window'
+
+// 2g. Signal processing
+export { convolve, correlate } from './signal'
 
 // 3. NDArray (data container)
 export { NDArray } from './ndarray'

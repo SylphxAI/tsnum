@@ -521,3 +521,298 @@ export function moveaxis<T extends DType>(a: NDArray<T>, source: number, destina
     dtype: data.dtype,
   })
 }
+
+/**
+ * Delete elements from array along axis
+ */
+export function deleteArr<T extends DType>(
+  arr: NDArray<T>,
+  indices: number | number[],
+  axis?: number,
+): NDArray<T> {
+  const data = arr.getData()
+
+  if (axis !== undefined && axis !== 0) {
+    throw new Error('delete only supports axis=0 or no axis')
+  }
+
+  const indicesArray = Array.isArray(indices) ? indices : [indices]
+
+  if (axis === undefined) {
+    // Flatten and delete
+    const deleteSet = new Set(
+      indicesArray.map((idx) => (idx < 0 ? data.buffer.length + idx : idx)),
+    )
+
+    const newLength = data.buffer.length - deleteSet.size
+    const result = createTypedArray(newLength, data.dtype)
+    let destIdx = 0
+
+    for (let i = 0; i < data.buffer.length; i++) {
+      if (!deleteSet.has(i)) {
+        result[destIdx++] = data.buffer[i]
+      }
+    }
+
+    return new NDArrayImpl({
+      buffer: result,
+      shape: [newLength],
+      strides: [1],
+      dtype: data.dtype,
+    })
+  }
+
+  // Delete along axis 0
+  if (data.shape.length === 0) {
+    throw new Error('Cannot delete from 0-dimensional array')
+  }
+
+  const rows = data.shape[0]
+  const deleteSet = new Set(indicesArray.map((idx) => (idx < 0 ? rows + idx : idx)))
+
+  const newRows = rows - deleteSet.size
+
+  if (data.shape.length === 1) {
+    // 1D case
+    const result = createTypedArray(newRows, data.dtype)
+    let destIdx = 0
+
+    for (let i = 0; i < rows; i++) {
+      if (!deleteSet.has(i)) {
+        result[destIdx++] = data.buffer[i]
+      }
+    }
+
+    return new NDArrayImpl({
+      buffer: result,
+      shape: [newRows],
+      strides: [1],
+      dtype: data.dtype,
+    })
+  }
+
+  // Multi-dimensional case
+  const rowSize = data.buffer.length / rows
+  const result = createTypedArray(newRows * rowSize, data.dtype)
+  let destIdx = 0
+
+  for (let i = 0; i < rows; i++) {
+    if (!deleteSet.has(i)) {
+      for (let j = 0; j < rowSize; j++) {
+        result[destIdx++] = data.buffer[i * rowSize + j]
+      }
+    }
+  }
+
+  const newShape = [newRows, ...data.shape.slice(1)]
+
+  return new NDArrayImpl({
+    buffer: result,
+    shape: newShape,
+    strides: newShape.map((_, i) => newShape.slice(i + 1).reduce((a, b) => a * b, 1)),
+    dtype: data.dtype,
+  })
+}
+
+/**
+ * Insert values along axis before indices
+ */
+export function insert<T extends DType>(
+  arr: NDArray<T>,
+  index: number | number[],
+  values: number | number[] | NDArray<T>,
+  axis?: number,
+): NDArray<T> {
+  const data = arr.getData()
+
+  if (axis !== undefined && axis !== 0) {
+    throw new Error('insert only supports axis=0 or no axis')
+  }
+
+  let valuesArray: number[]
+  if (typeof values === 'number') {
+    valuesArray = [values]
+  } else if (Array.isArray(values)) {
+    valuesArray = values
+  } else {
+    valuesArray = Array.from(values.getData().buffer)
+  }
+
+  const indicesArray = Array.isArray(index) ? index : [index]
+
+  if (axis === undefined) {
+    // Flatten and insert
+    const newLength = data.buffer.length + valuesArray.length * indicesArray.length
+    const result = createTypedArray(newLength, data.dtype)
+
+    // Create insertion map
+    const insertMap = new Map<number, number[]>()
+    for (const idx of indicesArray) {
+      const normalizedIdx = idx < 0 ? data.buffer.length + idx : idx
+      if (!insertMap.has(normalizedIdx)) {
+        insertMap.set(normalizedIdx, [])
+      }
+      insertMap.get(normalizedIdx)!.push(...valuesArray)
+    }
+
+    let destIdx = 0
+    for (let i = 0; i <= data.buffer.length; i++) {
+      if (insertMap.has(i)) {
+        for (const val of insertMap.get(i)!) {
+          result[destIdx++] = val
+        }
+      }
+      if (i < data.buffer.length) {
+        result[destIdx++] = data.buffer[i]
+      }
+    }
+
+    return new NDArrayImpl({
+      buffer: result,
+      shape: [newLength],
+      strides: [1],
+      dtype: data.dtype,
+    })
+  }
+
+  throw new Error('insert with axis not yet implemented')
+}
+
+/**
+ * Append values to the end of array
+ */
+export function append<T extends DType>(
+  arr: NDArray<T>,
+  values: number | number[] | NDArray<T>,
+  axis?: number,
+): NDArray<T> {
+  const data = arr.getData()
+
+  let valuesArray: number[]
+  if (typeof values === 'number') {
+    valuesArray = [values]
+  } else if (Array.isArray(values)) {
+    valuesArray = values
+  } else {
+    valuesArray = Array.from(values.getData().buffer)
+  }
+
+  if (axis !== undefined) {
+    throw new Error('append with axis not yet implemented')
+  }
+
+  // Flatten and append
+  const newLength = data.buffer.length + valuesArray.length
+  const result = createTypedArray(newLength, data.dtype)
+
+  for (let i = 0; i < data.buffer.length; i++) {
+    result[i] = data.buffer[i]
+  }
+
+  for (let i = 0; i < valuesArray.length; i++) {
+    result[data.buffer.length + i] = valuesArray[i]
+  }
+
+  return new NDArrayImpl({
+    buffer: result,
+    shape: [newLength],
+    strides: [1],
+    dtype: data.dtype,
+  })
+}
+
+/**
+ * Return new array with new shape
+ * If new size is larger, pad with zeros
+ */
+export function resize<T extends DType>(arr: NDArray<T>, newShape: number[]): NDArray<T> {
+  const data = arr.getData()
+  const newSize = newShape.reduce((a, b) => a * b, 1)
+  const result = createTypedArray(newSize, data.dtype)
+
+  // Copy existing data, cycling if necessary
+  for (let i = 0; i < newSize; i++) {
+    result[i] = data.buffer[i % data.buffer.length]
+  }
+
+  return new NDArrayImpl({
+    buffer: result,
+    shape: newShape,
+    strides: newShape.map((_, i) => newShape.slice(i + 1).reduce((a, b) => a * b, 1)),
+    dtype: data.dtype,
+  })
+}
+
+/**
+ * Roll array elements along axis
+ */
+export function roll<T extends DType>(arr: NDArray<T>, shift: number, axis?: number): NDArray<T> {
+  const data = arr.getData()
+
+  if (axis !== undefined && axis !== 0) {
+    throw new Error('roll only supports axis=0 or no axis')
+  }
+
+  if (axis === undefined) {
+    // Roll flattened array
+    const n = data.buffer.length
+    if (n === 0) {
+      return arr
+    }
+
+    const normalizedShift = ((shift % n) + n) % n
+    const result = createTypedArray(n, data.dtype)
+
+    for (let i = 0; i < n; i++) {
+      result[(i + normalizedShift) % n] = data.buffer[i]
+    }
+
+    return new NDArrayImpl({
+      buffer: result,
+      shape: [...data.shape],
+      strides: [...data.strides],
+      dtype: data.dtype,
+    })
+  }
+
+  // Roll along axis 0
+  if (data.shape.length === 0) {
+    return arr
+  }
+
+  const rows = data.shape[0]
+  const normalizedShift = ((shift % rows) + rows) % rows
+
+  if (data.shape.length === 1) {
+    // 1D case
+    const result = createTypedArray(rows, data.dtype)
+    for (let i = 0; i < rows; i++) {
+      result[(i + normalizedShift) % rows] = data.buffer[i]
+    }
+
+    return new NDArrayImpl({
+      buffer: result,
+      shape: [...data.shape],
+      strides: [...data.strides],
+      dtype: data.dtype,
+    })
+  }
+
+  // Multi-dimensional case
+  const rowSize = data.buffer.length / rows
+  const result = createTypedArray(data.buffer.length, data.dtype)
+
+  for (let i = 0; i < rows; i++) {
+    const destRow = (i + normalizedShift) % rows
+    for (let j = 0; j < rowSize; j++) {
+      result[destRow * rowSize + j] = data.buffer[i * rowSize + j]
+    }
+  }
+
+  return new NDArrayImpl({
+    buffer: result,
+    shape: [...data.shape],
+    strides: [...data.strides],
+    dtype: data.dtype,
+  })
+}

@@ -52,3 +52,62 @@ export function variance(a: NDArray, options?: AxisOptions): number | NDArray {
   }
   throw new Error('Axis reduction not yet implemented')
 }
+
+/**
+ * Return the product of array elements
+ */
+export function prod(a: NDArray, options?: AxisOptions): number | NDArray {
+  if (options?.axis !== undefined) {
+    throw new Error('Axis reduction not yet implemented')
+  }
+
+  const data = a.getData()
+  let product = 1
+
+  for (let i = 0; i < data.buffer.length; i++) {
+    product *= data.buffer[i]
+  }
+
+  return product
+}
+
+/**
+ * Return the product of array elements, ignoring NaN values
+ */
+export function nanprod(a: NDArray, options?: AxisOptions): number | NDArray {
+  if (options?.axis !== undefined) {
+    throw new Error('Axis reduction not yet implemented')
+  }
+
+  const data = a.getData()
+  let product = 1
+
+  for (let i = 0; i < data.buffer.length; i++) {
+    const val = Number(data.buffer[i])
+    if (!Number.isNaN(val)) {
+      product *= val
+    }
+  }
+
+  return product
+}
+
+/**
+ * Count the number of non-zero elements
+ */
+export function count_nonzero(a: NDArray, options?: AxisOptions): number | NDArray {
+  if (options?.axis !== undefined) {
+    throw new Error('Axis reduction not yet implemented')
+  }
+
+  const data = a.getData()
+  let count = 0
+
+  for (let i = 0; i < data.buffer.length; i++) {
+    if (data.buffer[i] !== 0) {
+      count++
+    }
+  }
+
+  return count
+}

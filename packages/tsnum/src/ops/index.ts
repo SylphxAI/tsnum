@@ -7,7 +7,7 @@ export { add, sub, mul, div, pow } from './arithmetic'
 export { equal, less, greater, lessEqual, greaterEqual, not_equal, array_equal, array_equiv } from './comparison'
 
 // Reductions
-export { sum, mean, max, min, std, variance } from './reductions'
+export { sum, mean, max, min, std, variance, prod, nanprod, count_nonzero } from './reductions'
 
 // Shape
 export { expandDims, flatten, reshape, squeeze, swapaxes, transpose } from './shape'
@@ -72,6 +72,11 @@ export {
   rot90,
   pad,
   moveaxis,
+  deleteArr,
+  insert,
+  append,
+  resize,
+  roll,
 } from './manipulation'
 
 // Statistics
