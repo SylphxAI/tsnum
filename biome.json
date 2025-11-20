@@ -7,7 +7,15 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "ignore": ["node_modules", "dist", ".turbo", ".changeset"]
+    "ignore": [
+      "node_modules",
+      "dist",
+      ".turbo",
+      ".changeset",
+      "packages/tsnum/wasm",
+      "packages/tsnum-wasm/target",
+      "**/*.wasm"
+    ]
   },
   "formatter": {
     "enabled": true,

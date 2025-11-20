@@ -20,8 +20,11 @@ describe('Backend System', () => {
   })
 
   test('Broadcasting works with TypeScript backend', () => {
-    const a = array([[1, 2, 3], [4, 5, 6]])  // (2, 3)
-    const b = array([10, 20, 30])  // (3,)
+    const a = array([
+      [1, 2, 3],
+      [4, 5, 6],
+    ]) // (2, 3)
+    const b = array([10, 20, 30]) // (3,)
     const result = add(a, b)
 
     expect(result.shape).toEqual([2, 3])

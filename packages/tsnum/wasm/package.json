@@ -1,0 +1,12 @@
+{
+  "name": "tsnum-wasm",
+  "type": "module",
+  "collaborators": ["SylphxAI"],
+  "description": "High-performance WASM backend for tsnum",
+  "version": "0.3.0",
+  "license": "MIT",
+  "files": ["tsnum_wasm_bg.wasm", "tsnum_wasm.js", "tsnum_wasm.d.ts"],
+  "main": "tsnum_wasm.js",
+  "types": "tsnum_wasm.d.ts",
+  "sideEffects": ["./snippets/*"]
+}
