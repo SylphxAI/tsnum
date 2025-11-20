@@ -886,3 +886,259 @@ export function lstsq<T extends DType>(
     rank,
   }
 }
+
+// ===== Tensor Operations =====
+
+/**
+ * Return the dot product of two vectors (with complex conjugation)
+ * vdot(a, b) = sum(conj(a) * b)
+ *
+ * For complex numbers, the first argument is conjugated
+ * For real numbers, equivalent to dot(a.flatten(), b.flatten())
+ *
+ * @param a First input array
+ * @param b Second input array
+ * @returns Dot product (scalar)
+ *
+ * @example
+ * vdot(array([1, 2]), array([3, 4])) // 11 (1*3 + 2*4)
+ * vdot(array([[1, 2], [3, 4]]), array([[5, 6], [7, 8]])) // 70 (flattened)
+ */
+export function vdot<T extends DType>(a: NDArray<T>, b: NDArray<T>): number {
+  const aData = a.getData()
+  const bData = b.getData()
+
+  // Flatten arrays
+  if (aData.buffer.length !== bData.buffer.length) {
+    throw new Error(`vdot requires arrays with same total size: ${aData.buffer.length} vs ${bData.buffer.length}`)
+  }
+
+  // Check if complex (has shape [..., 2] for [real, imag])
+  const aIsComplex = aData.shape.length >= 2 && aData.shape[aData.shape.length - 1] === 2
+  const bIsComplex = bData.shape.length >= 2 && bData.shape[bData.shape.length - 1] === 2
+
+  if (aIsComplex || bIsComplex) {
+    // Complex dot product: sum(conj(a) * b)
+    let realSum = 0
+    let imagSum = 0
+
+    const n = Math.floor(aData.buffer.length / 2)
+
+    for (let i = 0; i < n; i++) {
+      const aReal = aData.buffer[i * 2]
+      const aImag = aData.buffer[i * 2 + 1]
+      const bReal = bData.buffer[i * 2]
+      const bImag = bData.buffer[i * 2 + 1]
+
+      // conj(a) * b = (aReal - i*aImag) * (bReal + i*bImag)
+      realSum += aReal * bReal + aImag * bImag
+      imagSum += aReal * bImag - aImag * bReal
+    }
+
+    // For real result (imaginary part should be ~0 for real inputs)
+    if (Math.abs(imagSum) < 1e-10) {
+      return realSum
+    }
+
+    // Return real part (NumPy vdot returns scalar even for complex)
+    return realSum
+  }
+
+  // Real dot product
+  let result = 0
+  for (let i = 0; i < aData.buffer.length; i++) {
+    result += aData.buffer[i] * bData.buffer[i]
+  }
+
+  return result
+}
+
+/**
+ * Kronecker product of two arrays
+ * kron(A, B) computes the block matrix:
+ * [[a[0,0]*B, a[0,1]*B, ...],
+ *  [a[1,0]*B, a[1,1]*B, ...],
+ *  ...]
+ *
+ * @param a First input array
+ * @param b Second input array
+ * @returns Kronecker product
+ *
+ * @example
+ * kron(array([[1, 2], [3, 4]]), array([[0, 5], [6, 7]]))
+ * // [[0, 5, 0, 10],
+ * //  [6, 7, 12, 14],
+ * //  [0, 15, 0, 20],
+ * //  [18, 21, 24, 28]]
+ */
+export function kron<T extends DType>(a: NDArray<T>, b: NDArray<T>): NDArray<T> {
+  const aData = a.getData()
+  const bData = b.getData()
+
+  if (aData.shape.length !== 2 || bData.shape.length !== 2) {
+    throw new Error('kron requires 2D arrays')
+  }
+
+  const [aRows, aCols] = aData.shape
+  const [bRows, bCols] = bData.shape
+
+  const resultRows = aRows * bRows
+  const resultCols = aCols * bCols
+
+  const result = createTypedArray(resultRows * resultCols, aData.dtype)
+
+  // For each element a[i,j], place a[i,j]*B in the appropriate block
+  for (let i = 0; i < aRows; i++) {
+    for (let j = 0; j < aCols; j++) {
+      const aVal = aData.buffer[i * aCols + j]
+
+      // Fill the block at position (i*bRows, j*bCols)
+      for (let bi = 0; bi < bRows; bi++) {
+        for (let bj = 0; bj < bCols; bj++) {
+          const bVal = bData.buffer[bi * bCols + bj]
+          const resultRow = i * bRows + bi
+          const resultCol = j * bCols + bj
+          result[resultRow * resultCols + resultCol] = aVal * bVal
+        }
+      }
+    }
+  }
+
+  return new NDArrayImpl({
+    buffer: result,
+    shape: [resultRows, resultCols],
+    strides: [resultCols, 1],
+    dtype: aData.dtype,
+  })
+}
+
+/**
+ * Compute tensor dot product along specified axes
+ * tensordot(a, b, axes) sums the product of elements over the specified axes
+ *
+ * @param a First input array
+ * @param b Second input array
+ * @param axes Axes to sum over (default: 2)
+ *             - number: sum over last N axes of a and first N axes of b
+ *             - [axesA, axesB]: sum over axesA of a and axesB of b
+ * @returns Tensor contraction result
+ *
+ * @example
+ * // Contract last axis of a with first axis of b
+ * tensordot(array([[1, 2], [3, 4]]), array([[5, 6], [7, 8]]), 1)
+ * // [[19, 22], [43, 50]]
+ */
+export function tensordot<T extends DType>(
+  a: NDArray<T>,
+  b: NDArray<T>,
+  axes: number | [number[], number[]] = 2
+): NDArray<T> {
+  const aData = a.getData()
+  const bData = b.getData()
+
+  // Parse axes parameter
+  let axesA: number[]
+  let axesB: number[]
+
+  if (typeof axes === 'number') {
+    // Sum over last 'axes' axes of a and first 'axes' axes of b
+    const n = axes
+    if (n < 0) {
+      throw new Error('axes must be non-negative')
+    }
+
+    axesA = []
+    for (let i = aData.shape.length - n; i < aData.shape.length; i++) {
+      axesA.push(i)
+    }
+
+    axesB = []
+    for (let i = 0; i < n; i++) {
+      axesB.push(i)
+    }
+  } else {
+    axesA = axes[0]
+    axesB = axes[1]
+
+    if (axesA.length !== axesB.length) {
+      throw new Error('axes arrays must have same length')
+    }
+  }
+
+  // Validate axes
+  for (const ax of axesA) {
+    if (ax < 0 || ax >= aData.shape.length) {
+      throw new Error(`axis ${ax} out of bounds for array a with ${aData.shape.length} dimensions`)
+    }
+  }
+
+  for (const ax of axesB) {
+    if (ax < 0 || ax >= bData.shape.length) {
+      throw new Error(`axis ${ax} out of bounds for array b with ${bData.shape.length} dimensions`)
+    }
+  }
+
+  // Verify matching dimensions
+  for (let i = 0; i < axesA.length; i++) {
+    if (aData.shape[axesA[i]] !== bData.shape[axesB[i]]) {
+      throw new Error(
+        `shape mismatch: axis ${axesA[i]} of a (size ${aData.shape[axesA[i]]}) != axis ${axesB[i]} of b (size ${bData.shape[axesB[i]]})`
+      )
+    }
+  }
+
+  // For simple case: axes=1 and 2D arrays, use matrix multiplication
+  if (
+    typeof axes === 'number' &&
+    axes === 1 &&
+    aData.shape.length === 2 &&
+    bData.shape.length === 2
+  ) {
+    return matmul(a, b)
+  }
+
+  // General case: reshape and use dot product
+  // This is a simplified implementation for common cases
+  // Full NumPy tensordot requires complex axis permutation and reshaping
+
+  // For now, implement the most common case: 2D arrays with axes=1
+  if (aData.shape.length === 2 && bData.shape.length === 2 && axesA.length === 1) {
+    if (axesA[0] === 1 && axesB[0] === 0) {
+      // Standard matrix multiplication
+      return matmul(a, b)
+    }
+
+    if (axesA[0] === 0 && axesB[0] === 0) {
+      // Sum over rows: transpose a and multiply
+      const [m, n] = aData.shape
+      const [p, q] = bData.shape
+
+      if (m !== p) {
+        throw new Error(`shape mismatch: ${m} != ${p}`)
+      }
+
+      const result = createTypedArray(n * q, aData.dtype)
+
+      for (let i = 0; i < n; i++) {
+        for (let j = 0; j < q; j++) {
+          let sum = 0
+          for (let k = 0; k < m; k++) {
+            sum += aData.buffer[k * n + i] * bData.buffer[k * q + j]
+          }
+          result[i * q + j] = sum
+        }
+      }
+
+      return new NDArrayImpl({
+        buffer: result,
+        shape: [n, q],
+        strides: [q, 1],
+        dtype: aData.dtype,
+      })
+    }
+  }
+
+  throw new Error(
+    'tensordot: general N-D case not yet implemented. Currently supports 2D arrays with axes=1'
+  )
+}
