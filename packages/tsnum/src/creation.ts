@@ -225,6 +225,58 @@ export function linspace<T extends DType = 'float64'>(
   return new NDArray<T>(arrayData)
 }
 
+/**
+ * Return a new array of given shape and type, filled with zeros, matching the shape of a given array
+ */
+export function zerosLike<T extends DType>(a: NDArray, options?: ArrayOptions): NDArray<T> {
+  const data = a.getData()
+  const dtype = (options?.dtype ?? data.dtype) as T
+  return zeros<T>([...data.shape], { dtype })
+}
+
+/**
+ * Return a new array of given shape and type, filled with ones, matching the shape of a given array
+ */
+export function onesLike<T extends DType>(a: NDArray, options?: ArrayOptions): NDArray<T> {
+  const data = a.getData()
+  const dtype = (options?.dtype ?? data.dtype) as T
+  return ones<T>([...data.shape], { dtype })
+}
+
+/**
+ * Return a full array with the same shape and type as a given array
+ */
+export function fullLike<T extends DType>(
+  a: NDArray,
+  fillValue: number,
+  options?: ArrayOptions,
+): NDArray<T> {
+  const data = a.getData()
+  const dtype = (options?.dtype ?? data.dtype) as T
+  return full<T>([...data.shape], fillValue, { dtype })
+}
+
+/**
+ * Return a new uninitialized array (filled with zeros for safety)
+ */
+export function empty<T extends DType = 'float64'>(
+  shape: number | number[],
+  options?: ArrayOptions,
+): NDArray<T> {
+  // For safety, we initialize to zeros (true "empty" would be uninitialized memory)
+  const normalizedShape = typeof shape === 'number' ? [shape] : shape
+  return zeros<T>(normalizedShape, options)
+}
+
+/**
+ * Return a new uninitialized array with the same shape and type as a given array
+ */
+export function emptyLike<T extends DType>(a: NDArray, options?: ArrayOptions): NDArray<T> {
+  const data = a.getData()
+  const dtype = (options?.dtype ?? data.dtype) as T
+  return empty<T>([...data.shape], { dtype })
+}
+
 // ===== Helper functions =====
 function inferShapeAndFlatten(data: number | number[] | number[][] | number[][][]): {
   shape: number[]

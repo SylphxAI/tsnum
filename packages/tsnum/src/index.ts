@@ -1,7 +1,22 @@
 // ===== tsnum - TypeScript NumPy Alternative (Functional-First) =====
 
 // 1. Creation functions (most common)
-export { array, asarray, zeros, ones, full, eye, arange, linspace } from './creation'
+export {
+  array,
+  asarray,
+  zeros,
+  ones,
+  full,
+  eye,
+  arange,
+  linspace,
+  // Like functions
+  zerosLike,
+  onesLike,
+  fullLike,
+  empty,
+  emptyLike,
+} from './creation'
 
 // 2. Operations (functional API - primary)
 export {
@@ -28,6 +43,9 @@ export {
   reshape,
   transpose,
   flatten,
+  squeeze,
+  expandDims,
+  swapaxes,
   // Indexing
   at,
   slice,
@@ -71,6 +89,10 @@ export {
   vstack,
   hstack,
   repeat,
+  split,
+  hsplit,
+  vsplit,
+  tile,
   // Statistics
   median,
   percentile,
@@ -78,6 +100,26 @@ export {
   corrcoef,
   cov,
   histogram,
+  // Cumulative
+  cumsum,
+  cumprod,
+  diff,
+  gradient,
+  // Set operations
+  unique,
+  isin,
+  intersect1d,
+  union1d,
+  setdiff1d,
+  setxor1d,
+  // Validation
+  isnan,
+  isinf,
+  isfinite,
+  isclose,
+  allclose,
+  nonzero,
+  searchsorted,
 } from './ops'
 
 // 2b. Linear Algebra

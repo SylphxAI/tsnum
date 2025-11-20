@@ -171,3 +171,125 @@ export function repeat<T extends DType>(a: NDArray<T>, repeats: number): NDArray
     dtype: data.dtype,
   })
 }
+
+/**
+ * Split an array into multiple sub-arrays
+ */
+export function split<T extends DType>(
+  a: NDArray<T>,
+  indicesOrSections: number | number[],
+): NDArray<T>[] {
+  const data = a.getData()
+
+  if (data.shape.length !== 1) {
+    throw new Error('split only supports 1D arrays for now')
+  }
+
+  const n = data.buffer.length
+  let splitPoints: number[]
+
+  if (typeof indicesOrSections === 'number') {
+    // Split into N equal parts
+    const sections = indicesOrSections
+    if (n % sections !== 0) {
+      throw new Error(`Array of length ${n} cannot be split into ${sections} equal sections`)
+    }
+
+    const sectionSize = n / sections
+    splitPoints = Array.from({ length: sections - 1 }, (_, i) => (i + 1) * sectionSize)
+  } else {
+    // Split at given indices
+    splitPoints = indicesOrSections
+  }
+
+  // Add start and end points
+  const points = [0, ...splitPoints, n]
+  const results: NDArray<T>[] = []
+
+  for (let i = 0; i < points.length - 1; i++) {
+    const start = points[i]
+    const end = points[i + 1]
+    const length = end - start
+
+    const buffer = createTypedArray(length, data.dtype)
+    for (let j = 0; j < length; j++) {
+      buffer[j] = data.buffer[start + j]
+    }
+
+    results.push(
+      new NDArrayImpl({
+        buffer,
+        shape: [length],
+        strides: [1],
+        dtype: data.dtype,
+      }),
+    )
+  }
+
+  return results
+}
+
+/**
+ * Split array horizontally (column-wise)
+ */
+export function hsplit<T extends DType>(
+  a: NDArray<T>,
+  indicesOrSections: number | number[],
+): NDArray<T>[] {
+  const data = a.getData()
+
+  if (data.shape.length === 1) {
+    return split(a, indicesOrSections)
+  }
+
+  throw new Error('hsplit for 2D arrays not yet implemented')
+}
+
+/**
+ * Split array vertically (row-wise)
+ */
+export function vsplit<T extends DType>(
+  a: NDArray<T>,
+  indicesOrSections: number | number[],
+): NDArray<T>[] {
+  const data = a.getData()
+
+  if (data.shape.length < 2) {
+    throw new Error('vsplit requires at least 2D array')
+  }
+
+  throw new Error('vsplit not yet implemented')
+}
+
+/**
+ * Repeat array by tiling
+ */
+export function tile<T extends DType>(a: NDArray<T>, reps: number | number[]): NDArray<T> {
+  const data = a.getData()
+  const repArray = typeof reps === 'number' ? [reps] : reps
+
+  if (data.shape.length !== 1) {
+    throw new Error('tile only supports 1D arrays for now')
+  }
+
+  if (repArray.length !== 1) {
+    throw new Error('tile only supports 1D reps for now')
+  }
+
+  const numReps = repArray[0]
+  const newLength = data.buffer.length * numReps
+  const newBuffer = createTypedArray(newLength, data.dtype)
+
+  for (let r = 0; r < numReps; r++) {
+    for (let i = 0; i < data.buffer.length; i++) {
+      newBuffer[r * data.buffer.length + i] = data.buffer[i]
+    }
+  }
+
+  return new NDArrayImpl({
+    buffer: newBuffer,
+    shape: [newLength],
+    strides: [1],
+    dtype: data.dtype,
+  })
+}

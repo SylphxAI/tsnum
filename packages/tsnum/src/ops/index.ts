@@ -10,7 +10,7 @@ export { equal, less, greater, lessEqual, greaterEqual } from './comparison'
 export { sum, mean, max, min, std, variance } from './reductions'
 
 // Shape
-export { reshape, transpose, flatten } from './shape'
+export { expandDims, flatten, reshape, squeeze, swapaxes, transpose } from './shape'
 
 // Indexing
 export { at, slice, take } from './indexing'
@@ -46,7 +46,24 @@ export { all, any, logicalAnd, logicalNot, logicalOr, logicalXor, where } from '
 export { argmax, argmin, argsort, sort } from './sorting'
 
 // Array manipulation
-export { concat, hstack, repeat, stack, vstack } from './manipulation'
+export { concat, hstack, hsplit, repeat, split, stack, tile, vstack, vsplit } from './manipulation'
 
 // Statistics
 export { corrcoef, cov, histogram, median, percentile, quantile } from './statistics'
+
+// Set operations
+export { intersect1d, isin, setdiff1d, setxor1d, union1d, unique } from './set'
+
+// Cumulative operations
+export { cumprod, cumsum, diff, gradient } from './cumulative'
+
+// Validation and comparison
+export {
+  allclose,
+  isclose,
+  isfinite,
+  isinf,
+  isnan,
+  nonzero,
+  searchsorted,
+} from './validation'
