@@ -22,28 +22,34 @@ functional.js:     234 bytes
 
 ## Runtime Performance
 
-Run benchmarks: `bun run bench`
+Run benchmarks: `bun run src/benchmark.ts`
+
+**Latest Results** (Apple M4, Bun 1.3.2):
 
 ### Array Creation
-- **1D array (n=1000)**: ~5.4 µs/iter
-- **2D array (100×100)**: ~73.5 µs/iter
+- **1D array (n=1000)**: ~7.0 µs/iter
+- **2D array (100×100)**: ~103.7 µs/iter
 
 ### Arithmetic Operations (n=10,000)
-- **Scalar addition**: ~5.3 µs/iter
-- **Scalar multiplication**: ~6.0 µs/iter
-- **Array addition**: ~6.5 µs/iter
+| Operation | Time | Throughput |
+|-----------|------|------------|
+| **Scalar addition** | ~6.8 µs | ~1.47 billion ops/s |
+| **Scalar multiplication** | ~7.6 µs | ~1.32 billion ops/s |
+| **Array addition** | ~8.3 µs | ~1.20 billion ops/s |
 
 ### Reductions (n=10,000)
-- **sum()**: ~3.2 µs/iter ⚡
-- **mean()**: ~3.2 µs/iter ⚡
+| Operation | Time | Throughput |
+|-----------|------|------------|
+| **sum()** | ~3.8 µs ⚡ | ~2.63 billion ops/s |
+| **mean()** | ~3.7 µs ⚡ | ~2.70 billion ops/s |
 
-### Shape Operations
-- **reshape()**: ~28 ns/iter ⚡⚡ (metadata-only operation)
-- **transpose() (100×100)**: ~63.7 µs/iter
+### Shape Operations (Zero-Copy!)
+- **reshape()**: ~32 ns/iter ⚡⚡⚡ (metadata-only, shares buffer)
+- **transpose() (100×100)**: ~79.0 µs/iter (stride adjustment only)
 
 ### Composition
-- **pipe() with 4 operations**: ~25 µs/iter
-- **Complex pipeline** (reshape → transpose → arithmetic → sum): ~80 µs/iter
+- **pipe() with 4 operations**: ~79.3 µs/iter
+- **Complex pipeline** (reshape → transpose → arithmetic → sum): ~102.3 µs/iter
 
 ## Performance Notes
 

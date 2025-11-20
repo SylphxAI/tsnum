@@ -191,3 +191,82 @@ export function putmask<T extends DType>(
     }
   }
 }
+
+/**
+ * Boolean indexing - extract elements where mask is true
+ * @example
+ * const a = array([1, 2, 3, 4, 5])
+ * const mask = array([1, 0, 1, 0, 1])  // or boolean-like
+ * booleanIndex(a, mask)  // [1, 3, 5]
+ */
+export function booleanIndex<T extends DType>(a: NDArray<T>, mask: NDArray<T>): NDArray<T> {
+  const aData = a.getData()
+  const maskData = mask.getData()
+
+  if (aData.buffer.length !== maskData.buffer.length) {
+    throw new Error('a and mask must have same size')
+  }
+
+  // Count true values
+  let count = 0
+  for (let i = 0; i < maskData.buffer.length; i++) {
+    if (maskData.buffer[i] !== 0) {
+      count++
+    }
+  }
+
+  // Extract values
+  const result = createTypedArray(count, aData.dtype)
+  let idx = 0
+  for (let i = 0; i < aData.buffer.length; i++) {
+    if (maskData.buffer[i] !== 0) {
+      result[idx++] = aData.buffer[i]
+    }
+  }
+
+  return new NDArray({
+    buffer: result,
+    shape: [count],
+    strides: [1],
+    dtype: aData.dtype,
+  })
+}
+
+/**
+ * Integer array indexing - extract elements at specified indices
+ * @example
+ * const a = array([10, 20, 30, 40, 50])
+ * const indices = array([0, 2, 4])
+ * integerArrayIndex(a, indices)  // [10, 30, 50]
+ */
+export function integerArrayIndex<T extends DType>(
+  a: NDArray<T>,
+  indices: NDArray<'int32'>,
+): NDArray<T> {
+  const aData = a.getData()
+  const indicesData = indices.getData()
+
+  const result = createTypedArray(indicesData.buffer.length, aData.dtype)
+
+  for (let i = 0; i < indicesData.buffer.length; i++) {
+    let idx = indicesData.buffer[i]
+
+    // Handle negative indices
+    if (idx < 0) {
+      idx = aData.buffer.length + idx
+    }
+
+    if (idx < 0 || idx >= aData.buffer.length) {
+      throw new Error(`Index ${indicesData.buffer[i]} out of bounds`)
+    }
+
+    result[i] = aData.buffer[idx]
+  }
+
+  return new NDArray({
+    buffer: result,
+    shape: indicesData.shape.slice(),
+    strides: indicesData.strides.slice(),
+    dtype: aData.dtype,
+  })
+}

@@ -17,7 +17,7 @@ export { at, slice, take, flatnonzero } from './indexing'
 export type { SliceRange } from './indexing'
 
 // Advanced indexing
-export { ix_, ravel_multi_index, unravel_index, put, putmask } from './advanced-indexing'
+export { ix_, ravel_multi_index, unravel_index, put, putmask, booleanIndex, integerArrayIndex } from './advanced-indexing'
 
 // Math functions
 export {

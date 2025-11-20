@@ -75,6 +75,8 @@ export {
   ix_,
   ravel_multi_index,
   unravel_index,
+  booleanIndex,
+  integerArrayIndex,
   // Math
   abs,
   sign,

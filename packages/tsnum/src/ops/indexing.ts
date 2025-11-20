@@ -1,8 +1,7 @@
 // ===== Indexing and Slicing Operations =====
 
 import type { DType, NDArrayData } from '../core/types'
-import { indexToOffset } from '../core/utils'
-import { NDArray } from '../ndarray'
+import { computeStrides, createTypedArray, indexToOffset } from '../core/utils'
 import { NDArray } from '../ndarray'
 
 // ===== Types =====
