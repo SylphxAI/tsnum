@@ -230,6 +230,128 @@ export class TypeScriptBackend implements Backend {
     }
   }
 
+  // ===== Math Functions =====
+
+  abs(a: NDArrayData): NDArrayData {
+    const newBuffer = createTypedArray(a.buffer.length, a.dtype)
+
+    for (let i = 0; i < a.buffer.length; i++) {
+      newBuffer[i] = Math.abs(a.buffer[i])
+    }
+
+    return {
+      buffer: newBuffer,
+      shape: a.shape,
+      strides: a.strides,
+      dtype: a.dtype,
+    }
+  }
+
+  sqrt(a: NDArrayData): NDArrayData {
+    const newBuffer = createTypedArray(a.buffer.length, a.dtype)
+
+    for (let i = 0; i < a.buffer.length; i++) {
+      newBuffer[i] = Math.sqrt(a.buffer[i])
+    }
+
+    return {
+      buffer: newBuffer,
+      shape: a.shape,
+      strides: a.strides,
+      dtype: a.dtype,
+    }
+  }
+
+  exp(a: NDArrayData): NDArrayData {
+    const newBuffer = createTypedArray(a.buffer.length, a.dtype)
+
+    for (let i = 0; i < a.buffer.length; i++) {
+      newBuffer[i] = Math.exp(a.buffer[i])
+    }
+
+    return {
+      buffer: newBuffer,
+      shape: a.shape,
+      strides: a.strides,
+      dtype: a.dtype,
+    }
+  }
+
+  log(a: NDArrayData): NDArrayData {
+    const newBuffer = createTypedArray(a.buffer.length, a.dtype)
+
+    for (let i = 0; i < a.buffer.length; i++) {
+      newBuffer[i] = Math.log(a.buffer[i])
+    }
+
+    return {
+      buffer: newBuffer,
+      shape: a.shape,
+      strides: a.strides,
+      dtype: a.dtype,
+    }
+  }
+
+  log10(a: NDArrayData): NDArrayData {
+    const newBuffer = createTypedArray(a.buffer.length, a.dtype)
+
+    for (let i = 0; i < a.buffer.length; i++) {
+      newBuffer[i] = Math.log10(a.buffer[i])
+    }
+
+    return {
+      buffer: newBuffer,
+      shape: a.shape,
+      strides: a.strides,
+      dtype: a.dtype,
+    }
+  }
+
+  sin(a: NDArrayData): NDArrayData {
+    const newBuffer = createTypedArray(a.buffer.length, a.dtype)
+
+    for (let i = 0; i < a.buffer.length; i++) {
+      newBuffer[i] = Math.sin(a.buffer[i])
+    }
+
+    return {
+      buffer: newBuffer,
+      shape: a.shape,
+      strides: a.strides,
+      dtype: a.dtype,
+    }
+  }
+
+  cos(a: NDArrayData): NDArrayData {
+    const newBuffer = createTypedArray(a.buffer.length, a.dtype)
+
+    for (let i = 0; i < a.buffer.length; i++) {
+      newBuffer[i] = Math.cos(a.buffer[i])
+    }
+
+    return {
+      buffer: newBuffer,
+      shape: a.shape,
+      strides: a.strides,
+      dtype: a.dtype,
+    }
+  }
+
+  tan(a: NDArrayData): NDArrayData {
+    const newBuffer = createTypedArray(a.buffer.length, a.dtype)
+
+    for (let i = 0; i < a.buffer.length; i++) {
+      newBuffer[i] = Math.tan(a.buffer[i])
+    }
+
+    return {
+      buffer: newBuffer,
+      shape: a.shape,
+      strides: a.strides,
+      dtype: a.dtype,
+    }
+  }
+
   // ===== Helper Methods =====
 
   private fftRecursive(real: Float64Array, imag: Float64Array, n: number): void {

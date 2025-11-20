@@ -85,6 +85,36 @@ export function sum(a) {
 }
 
 /**
+ * Fast Fourier Transform (Cooley-Tukey algorithm)
+ * Input: real-valued array of length n (must be power of 2)
+ * Output: interleaved [real, imag] pairs (length 2n)
+ * @param {Float64Array} input
+ * @returns {Float64Array}
+ */
+export function fft(input) {
+    const ptr0 = passArrayF64ToWasm0(input, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.fft(ptr0, len0);
+    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+    return v2;
+}
+
+/**
+ * Element-wise tangent
+ * @param {Float64Array} a
+ * @returns {Float64Array}
+ */
+export function tan_array(a) {
+    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.tan_array(ptr0, len0);
+    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+    return v2;
+}
+
+/**
  * Multiply array by scalar
  * @param {Float64Array} a
  * @param {number} scalar
@@ -115,16 +145,14 @@ export function pow_scalar(a, exponent) {
 }
 
 /**
- * Fast Fourier Transform (Cooley-Tukey algorithm)
- * Input: real-valued array of length n (must be power of 2)
- * Output: interleaved [real, imag] pairs (length 2n)
- * @param {Float64Array} input
+ * Element-wise absolute value
+ * @param {Float64Array} a
  * @returns {Float64Array}
  */
-export function fft(input) {
-    const ptr0 = passArrayF64ToWasm0(input, wasm.__wbindgen_malloc);
+export function abs_array(a) {
+    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.fft(ptr0, len0);
+    const ret = wasm.abs_array(ptr0, len0);
     var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
     wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
     return v2;
@@ -140,6 +168,34 @@ export function div_scalar(a, scalar) {
     const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
     const ret = wasm.div_scalar(ptr0, len0, scalar);
+    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+    return v2;
+}
+
+/**
+ * Element-wise base-10 logarithm
+ * @param {Float64Array} a
+ * @returns {Float64Array}
+ */
+export function log10_array(a) {
+    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.log10_array(ptr0, len0);
+    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+    return v2;
+}
+
+/**
+ * Element-wise exponential (e^x)
+ * @param {Float64Array} a
+ * @returns {Float64Array}
+ */
+export function exp_array(a) {
+    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.exp_array(ptr0, len0);
     var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
     wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
     return v2;
@@ -193,6 +249,34 @@ export function sub_arrays(a, b) {
 }
 
 /**
+ * Element-wise cosine
+ * @param {Float64Array} a
+ * @returns {Float64Array}
+ */
+export function cos_array(a) {
+    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.cos_array(ptr0, len0);
+    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+    return v2;
+}
+
+/**
+ * Element-wise sine
+ * @param {Float64Array} a
+ * @returns {Float64Array}
+ */
+export function sin_array(a) {
+    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.sin_array(ptr0, len0);
+    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+    return v2;
+}
+
+/**
  * Matrix multiplication: C = A @ B
  * A is m×k, B is k×n, result is m×n
  * @param {Float64Array} a
@@ -223,6 +307,23 @@ export function max(a) {
     const len0 = WASM_VECTOR_LEN;
     const ret = wasm.max(ptr0, len0);
     return ret;
+}
+
+/**
+ * Inverse Fast Fourier Transform
+ * Input: interleaved [real, imag] pairs (length 2n)
+ * Output: interleaved [real, imag] pairs (length 2n)
+ * @param {Float64Array} input
+ * @param {number} n
+ * @returns {Float64Array}
+ */
+export function ifft(input, n) {
+    const ptr0 = passArrayF64ToWasm0(input, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.ifft(ptr0, len0, n);
+    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+    return v2;
 }
 
 /**
@@ -260,6 +361,20 @@ export function mul_arrays(a, b) {
 }
 
 /**
+ * Element-wise natural logarithm
+ * @param {Float64Array} a
+ * @returns {Float64Array}
+ */
+export function log_array(a) {
+    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.log_array(ptr0, len0);
+    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+    return v2;
+}
+
+/**
  * Variance
  * @param {Float64Array} a
  * @returns {number}
@@ -272,17 +387,14 @@ export function variance(a) {
 }
 
 /**
- * Inverse Fast Fourier Transform
- * Input: interleaved [real, imag] pairs (length 2n)
- * Output: interleaved [real, imag] pairs (length 2n)
- * @param {Float64Array} input
- * @param {number} n
+ * Element-wise square root
+ * @param {Float64Array} a
  * @returns {Float64Array}
  */
-export function ifft(input, n) {
-    const ptr0 = passArrayF64ToWasm0(input, wasm.__wbindgen_malloc);
+export function sqrt_array(a) {
+    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.ifft(ptr0, len0, n);
+    const ret = wasm.sqrt_array(ptr0, len0);
     var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
     wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
     return v2;

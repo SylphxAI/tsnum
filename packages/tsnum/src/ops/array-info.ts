@@ -1,7 +1,6 @@
 // ===== Array Information Utilities =====
 
 import type { DType } from '../core/types'
-import type { NDArray } from '../ndarray'
 
 /**
  * Return the number of dimensions of array

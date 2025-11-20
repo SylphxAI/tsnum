@@ -1,7 +1,6 @@
 // ===== Type Testing Utilities =====
 
 import type { DType } from '../core/types'
-import type { NDArray } from '../ndarray'
 
 /**
  * Check if input is a scalar value

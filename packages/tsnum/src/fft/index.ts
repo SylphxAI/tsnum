@@ -3,7 +3,6 @@
 import { getBackend } from '../backend'
 import type { DType } from '../core/types'
 import { createTypedArray } from '../core/utils'
-import type { NDArray } from '../ndarray'
 import { NDArray } from '../ndarray'
 
 /**

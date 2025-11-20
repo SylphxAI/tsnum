@@ -170,6 +170,56 @@ pub fn dot(a: &[f64], b: &[f64]) -> f64 {
         .sum()
 }
 
+// ===== Math Functions =====
+
+/// Element-wise absolute value
+#[wasm_bindgen]
+pub fn abs_array(a: &[f64]) -> Vec<f64> {
+    a.iter().map(|x| x.abs()).collect()
+}
+
+/// Element-wise square root
+#[wasm_bindgen]
+pub fn sqrt_array(a: &[f64]) -> Vec<f64> {
+    a.iter().map(|x| x.sqrt()).collect()
+}
+
+/// Element-wise exponential (e^x)
+#[wasm_bindgen]
+pub fn exp_array(a: &[f64]) -> Vec<f64> {
+    a.iter().map(|x| x.exp()).collect()
+}
+
+/// Element-wise natural logarithm
+#[wasm_bindgen]
+pub fn log_array(a: &[f64]) -> Vec<f64> {
+    a.iter().map(|x| x.ln()).collect()
+}
+
+/// Element-wise base-10 logarithm
+#[wasm_bindgen]
+pub fn log10_array(a: &[f64]) -> Vec<f64> {
+    a.iter().map(|x| x.log10()).collect()
+}
+
+/// Element-wise sine
+#[wasm_bindgen]
+pub fn sin_array(a: &[f64]) -> Vec<f64> {
+    a.iter().map(|x| x.sin()).collect()
+}
+
+/// Element-wise cosine
+#[wasm_bindgen]
+pub fn cos_array(a: &[f64]) -> Vec<f64> {
+    a.iter().map(|x| x.cos()).collect()
+}
+
+/// Element-wise tangent
+#[wasm_bindgen]
+pub fn tan_array(a: &[f64]) -> Vec<f64> {
+    a.iter().map(|x| x.tan()).collect()
+}
+
 // ===== FFT Operations =====
 
 /// Fast Fourier Transform (Cooley-Tukey algorithm)

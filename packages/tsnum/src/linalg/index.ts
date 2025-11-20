@@ -4,7 +4,6 @@ import { getBackend } from '../backend'
 import type { DType } from '../core/types'
 import { computeStrides, createTypedArray } from '../core/utils'
 import { eye } from '../creation'
-import type { NDArray } from '../ndarray'
 import { NDArray } from '../ndarray'
 
 // Export numerical stability functions

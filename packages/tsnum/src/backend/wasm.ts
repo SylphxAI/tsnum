@@ -225,6 +225,80 @@ export class WASMBackend implements Backend {
     return this.toNDArrayData(result, [n, 2], 'float64')
   }
 
+  // ===== Math Functions =====
+
+  abs(a: NDArrayData): NDArrayData {
+    this.ensureReady()
+
+    const buffer = this.toFloat64Array(a.buffer)
+    const result = this.module.abs_array(buffer)
+
+    return this.toNDArrayData(result, a.shape, a.dtype)
+  }
+
+  sqrt(a: NDArrayData): NDArrayData {
+    this.ensureReady()
+
+    const buffer = this.toFloat64Array(a.buffer)
+    const result = this.module.sqrt_array(buffer)
+
+    return this.toNDArrayData(result, a.shape, a.dtype)
+  }
+
+  exp(a: NDArrayData): NDArrayData {
+    this.ensureReady()
+
+    const buffer = this.toFloat64Array(a.buffer)
+    const result = this.module.exp_array(buffer)
+
+    return this.toNDArrayData(result, a.shape, a.dtype)
+  }
+
+  log(a: NDArrayData): NDArrayData {
+    this.ensureReady()
+
+    const buffer = this.toFloat64Array(a.buffer)
+    const result = this.module.log_array(buffer)
+
+    return this.toNDArrayData(result, a.shape, a.dtype)
+  }
+
+  log10(a: NDArrayData): NDArrayData {
+    this.ensureReady()
+
+    const buffer = this.toFloat64Array(a.buffer)
+    const result = this.module.log10_array(buffer)
+
+    return this.toNDArrayData(result, a.shape, a.dtype)
+  }
+
+  sin(a: NDArrayData): NDArrayData {
+    this.ensureReady()
+
+    const buffer = this.toFloat64Array(a.buffer)
+    const result = this.module.sin_array(buffer)
+
+    return this.toNDArrayData(result, a.shape, a.dtype)
+  }
+
+  cos(a: NDArrayData): NDArrayData {
+    this.ensureReady()
+
+    const buffer = this.toFloat64Array(a.buffer)
+    const result = this.module.cos_array(buffer)
+
+    return this.toNDArrayData(result, a.shape, a.dtype)
+  }
+
+  tan(a: NDArrayData): NDArrayData {
+    this.ensureReady()
+
+    const buffer = this.toFloat64Array(a.buffer)
+    const result = this.module.tan_array(buffer)
+
+    return this.toNDArrayData(result, a.shape, a.dtype)
+  }
+
   // ===== Helper Methods =====
 
   private ensureReady(): void {

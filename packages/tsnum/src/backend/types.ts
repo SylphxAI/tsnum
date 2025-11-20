@@ -33,6 +33,16 @@ export interface Backend {
   fft(a: NDArrayData): NDArrayData
   ifft(a: NDArrayData): NDArrayData
 
+  // Math functions (element-wise)
+  abs(a: NDArrayData): NDArrayData
+  sqrt(a: NDArrayData): NDArrayData
+  exp(a: NDArrayData): NDArrayData
+  log(a: NDArrayData): NDArrayData
+  log10(a: NDArrayData): NDArrayData
+  sin(a: NDArrayData): NDArrayData
+  cos(a: NDArrayData): NDArrayData
+  tan(a: NDArrayData): NDArrayData
+
   // Shape operations (pure TS - no WASM benefit)
   // reshape, transpose, etc. stay in TS
 }

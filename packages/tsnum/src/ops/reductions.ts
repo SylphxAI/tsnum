@@ -1,6 +1,5 @@
 import { getBackend } from '../backend/manager'
 import type { AxisOptions } from '../core/types'
-import type { NDArray } from '../ndarray'
 
 // ===== Reduction Operations (Pure Functions) =====
 // Delegated to backend (WASM or TypeScript)

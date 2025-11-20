@@ -1,9 +1,9 @@
 // ===== Math Functions =====
 // Element-wise mathematical operations
 
+import { getBackend } from '../backend'
 import type { DType } from '../core/types'
 import { createTypedArray } from '../core/utils'
-import type { NDArray } from '../ndarray'
 import { NDArray } from '../ndarray'
 
 /**
@@ -11,18 +11,12 @@ import { NDArray } from '../ndarray'
  */
 export function abs<T extends DType>(a: NDArray<T>): NDArray<T> {
   const data = a.getData()
-  const newBuffer = createTypedArray(data.buffer.length, data.dtype)
 
-  for (let i = 0; i < data.buffer.length; i++) {
-    newBuffer[i] = Math.abs(data.buffer[i])
-  }
+  // Delegate to backend (WASM if available, TS fallback)
+  const backend = getBackend()
+  const resultData = backend.abs(data)
 
-  return new NDArray({
-    buffer: newBuffer,
-    shape: data.shape,
-    strides: data.strides,
-    dtype: data.dtype,
-  })
+  return new NDArray(resultData)
 }
 
 /**
@@ -50,18 +44,12 @@ export function sign<T extends DType>(a: NDArray<T>): NDArray<T> {
  */
 export function sqrt<T extends DType>(a: NDArray<T>): NDArray<T> {
   const data = a.getData()
-  const newBuffer = createTypedArray(data.buffer.length, data.dtype)
 
-  for (let i = 0; i < data.buffer.length; i++) {
-    newBuffer[i] = Math.sqrt(data.buffer[i])
-  }
+  // Delegate to backend (WASM if available, TS fallback)
+  const backend = getBackend()
+  const resultData = backend.sqrt(data)
 
-  return new NDArray({
-    buffer: newBuffer,
-    shape: data.shape,
-    strides: data.strides,
-    dtype: data.dtype,
-  })
+  return new NDArray(resultData)
 }
 
 /**
@@ -69,18 +57,12 @@ export function sqrt<T extends DType>(a: NDArray<T>): NDArray<T> {
  */
 export function exp<T extends DType>(a: NDArray<T>): NDArray<T> {
   const data = a.getData()
-  const newBuffer = createTypedArray(data.buffer.length, data.dtype)
 
-  for (let i = 0; i < data.buffer.length; i++) {
-    newBuffer[i] = Math.exp(data.buffer[i])
-  }
+  // Delegate to backend (WASM if available, TS fallback)
+  const backend = getBackend()
+  const resultData = backend.exp(data)
 
-  return new NDArray({
-    buffer: newBuffer,
-    shape: data.shape,
-    strides: data.strides,
-    dtype: data.dtype,
-  })
+  return new NDArray(resultData)
 }
 
 /**
@@ -88,18 +70,12 @@ export function exp<T extends DType>(a: NDArray<T>): NDArray<T> {
  */
 export function log<T extends DType>(a: NDArray<T>): NDArray<T> {
   const data = a.getData()
-  const newBuffer = createTypedArray(data.buffer.length, data.dtype)
 
-  for (let i = 0; i < data.buffer.length; i++) {
-    newBuffer[i] = Math.log(data.buffer[i])
-  }
+  // Delegate to backend (WASM if available, TS fallback)
+  const backend = getBackend()
+  const resultData = backend.log(data)
 
-  return new NDArray({
-    buffer: newBuffer,
-    shape: data.shape,
-    strides: data.strides,
-    dtype: data.dtype,
-  })
+  return new NDArray(resultData)
 }
 
 /**
@@ -107,18 +83,12 @@ export function log<T extends DType>(a: NDArray<T>): NDArray<T> {
  */
 export function log10<T extends DType>(a: NDArray<T>): NDArray<T> {
   const data = a.getData()
-  const newBuffer = createTypedArray(data.buffer.length, data.dtype)
 
-  for (let i = 0; i < data.buffer.length; i++) {
-    newBuffer[i] = Math.log10(data.buffer[i])
-  }
+  // Delegate to backend (WASM if available, TS fallback)
+  const backend = getBackend()
+  const resultData = backend.log10(data)
 
-  return new NDArray({
-    buffer: newBuffer,
-    shape: data.shape,
-    strides: data.strides,
-    dtype: data.dtype,
-  })
+  return new NDArray(resultData)
 }
 
 /**
@@ -126,18 +96,12 @@ export function log10<T extends DType>(a: NDArray<T>): NDArray<T> {
  */
 export function sin<T extends DType>(a: NDArray<T>): NDArray<T> {
   const data = a.getData()
-  const newBuffer = createTypedArray(data.buffer.length, data.dtype)
 
-  for (let i = 0; i < data.buffer.length; i++) {
-    newBuffer[i] = Math.sin(data.buffer[i])
-  }
+  // Delegate to backend (WASM if available, TS fallback)
+  const backend = getBackend()
+  const resultData = backend.sin(data)
 
-  return new NDArray({
-    buffer: newBuffer,
-    shape: data.shape,
-    strides: data.strides,
-    dtype: data.dtype,
-  })
+  return new NDArray(resultData)
 }
 
 /**
@@ -145,18 +109,12 @@ export function sin<T extends DType>(a: NDArray<T>): NDArray<T> {
  */
 export function cos<T extends DType>(a: NDArray<T>): NDArray<T> {
   const data = a.getData()
-  const newBuffer = createTypedArray(data.buffer.length, data.dtype)
 
-  for (let i = 0; i < data.buffer.length; i++) {
-    newBuffer[i] = Math.cos(data.buffer[i])
-  }
+  // Delegate to backend (WASM if available, TS fallback)
+  const backend = getBackend()
+  const resultData = backend.cos(data)
 
-  return new NDArray({
-    buffer: newBuffer,
-    shape: data.shape,
-    strides: data.strides,
-    dtype: data.dtype,
-  })
+  return new NDArray(resultData)
 }
 
 /**
@@ -164,18 +122,12 @@ export function cos<T extends DType>(a: NDArray<T>): NDArray<T> {
  */
 export function tan<T extends DType>(a: NDArray<T>): NDArray<T> {
   const data = a.getData()
-  const newBuffer = createTypedArray(data.buffer.length, data.dtype)
 
-  for (let i = 0; i < data.buffer.length; i++) {
-    newBuffer[i] = Math.tan(data.buffer[i])
-  }
+  // Delegate to backend (WASM if available, TS fallback)
+  const backend = getBackend()
+  const resultData = backend.tan(data)
 
-  return new NDArray({
-    buffer: newBuffer,
-    shape: data.shape,
-    strides: data.strides,
-    dtype: data.dtype,
-  })
+  return new NDArray(resultData)
 }
 
 /**
