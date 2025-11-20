@@ -3,6 +3,7 @@
 import type { DType, NDArrayData } from '../core/types'
 import { indexToOffset } from '../core/utils'
 import { NDArray } from '../ndarray'
+import { NDArray as NDArrayImpl } from '../ndarray'
 
 // ===== Types =====
 export type SliceRange = number | [number, number] | [number, number, number] // value | [start, stop] | [start, stop, step]
@@ -169,4 +170,27 @@ export function take<T extends DType>(arr: NDArray<T>, indices: number[], axis =
 
   // For nD arrays, take along specific axis
   throw new Error('take() for multidimensional arrays not yet implemented')
+}
+
+/**
+ * Return indices of non-zero elements in flattened array
+ */
+export function flatnonzero<T extends DType>(a: NDArray<T>): NDArray<'int32'> {
+  const data = a.getData()
+  const indices: number[] = []
+
+  for (let i = 0; i < data.buffer.length; i++) {
+    if (data.buffer[i] !== 0) {
+      indices.push(i)
+    }
+  }
+
+  const result = new Int32Array(indices)
+
+  return new NDArrayImpl({
+    buffer: result,
+    shape: [indices.length],
+    strides: [1],
+    dtype: 'int32',
+  })
 }

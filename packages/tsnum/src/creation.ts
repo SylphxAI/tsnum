@@ -437,6 +437,74 @@ export function diag<T extends DType = 'float64'>(
 }
 
 /**
+ * Create a 2D array with flattened input on the diagonal
+ */
+export function diagflat<T extends DType = 'float64'>(
+  v: NDArray<T> | number[],
+  k = 0,
+  options?: ArrayOptions,
+): NDArray<T> {
+  // Convert to NDArray if needed
+  let vData: NDArrayData
+  if (Array.isArray(v)) {
+    const dtype = (options?.dtype ?? 'float64') as T
+    const buffer = createTypedArray(v.length, dtype)
+    for (let i = 0; i < v.length; i++) {
+      buffer[i] = v[i]
+    }
+    vData = {
+      buffer,
+      shape: [v.length],
+      strides: [1],
+      dtype,
+    }
+  } else {
+    vData = v.getData()
+  }
+
+  const dtype = vData.dtype
+
+  // Flatten the input
+  const flatLength = vData.buffer.length
+
+  // Calculate matrix size
+  const size = flatLength + Math.abs(k)
+  const buffer = createTypedArray(size * size, dtype)
+
+  // Fill diagonal
+  for (let i = 0; i < flatLength; i++) {
+    const row = k >= 0 ? i : i - k
+    const col = k >= 0 ? i + k : i
+    buffer[row * size + col] = vData.buffer[i]
+  }
+
+  return new NDArray<T>({
+    buffer,
+    shape: [size, size],
+    strides: computeStrides([size, size]),
+    dtype,
+  })
+}
+
+/**
+ * Fill the main diagonal of a 2D array (in-place)
+ */
+export function fill_diagonal<T extends DType>(arr: NDArray<T>, val: number): void {
+  const data = arr.getData()
+
+  if (data.shape.length !== 2) {
+    throw new Error('fill_diagonal requires 2D array')
+  }
+
+  const [rows, cols] = data.shape
+  const diagLength = Math.min(rows, cols)
+
+  for (let i = 0; i < diagLength; i++) {
+    data.buffer[i * cols + i] = val
+  }
+}
+
+/**
  * Create a lower triangular matrix
  */
 export function tri<T extends DType = 'float64'>(

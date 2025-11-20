@@ -13,6 +13,8 @@ export {
   logspace,
   geomspace,
   diag,
+  diagflat,
+  fill_diagonal,
   tri,
   meshgrid,
   fromfunction,
@@ -63,6 +65,7 @@ export {
   at,
   slice,
   take,
+  flatnonzero,
   put,
   putmask,
   // Advanced indexing
@@ -167,6 +170,7 @@ export {
   allclose,
   nonzero,
   searchsorted,
+  nan_to_num,
   // Copy and view
   copy,
   view,
@@ -256,7 +260,7 @@ export {
 export { fft, ifft, rfft, irfft, fft2, ifft2, rfft2, irfft2 } from './fft'
 
 // 2e. Polynomial
-export { polyfit, polyval, roots } from './polynomial'
+export { polyfit, polyval, roots, polyder, polyint } from './polynomial'
 
 // 2f. Window functions
 export { hamming, hanning, blackman, bartlett, kaiser } from './window'

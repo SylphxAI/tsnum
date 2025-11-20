@@ -184,3 +184,40 @@ export function searchsorted<T extends DType>(
 
   return typeof v === 'number' ? results[0] : results
 }
+
+/**
+ * Replace NaN with zero and Inf with large finite numbers
+ */
+export function nan_to_num<T extends DType>(
+  x: NDArray<T>,
+  nan = 0.0,
+  posinf?: number,
+  neginf?: number,
+): NDArray<T> {
+  const data = x.getData()
+  const result = createTypedArray(data.buffer.length, data.dtype)
+
+  const posInfValue = posinf !== undefined ? posinf : Number.MAX_VALUE
+  const negInfValue = neginf !== undefined ? neginf : -Number.MAX_VALUE
+
+  for (let i = 0; i < data.buffer.length; i++) {
+    const val = Number(data.buffer[i])
+
+    if (Number.isNaN(val)) {
+      result[i] = nan
+    } else if (val === Number.POSITIVE_INFINITY) {
+      result[i] = posInfValue
+    } else if (val === Number.NEGATIVE_INFINITY) {
+      result[i] = negInfValue
+    } else {
+      result[i] = val
+    }
+  }
+
+  return new NDArrayImpl({
+    buffer: result,
+    shape: [...data.shape],
+    strides: [...data.strides],
+    dtype: data.dtype,
+  })
+}

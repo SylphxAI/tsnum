@@ -13,7 +13,7 @@ export { sum, mean, max, min, std, variance, prod, nanprod, count_nonzero } from
 export { expandDims, flatten, reshape, squeeze, swapaxes, transpose } from './shape'
 
 // Indexing
-export { at, slice, take } from './indexing'
+export { at, slice, take, flatnonzero } from './indexing'
 export type { SliceRange } from './indexing'
 
 // Advanced indexing
@@ -114,6 +114,7 @@ export {
   isnan,
   nonzero,
   searchsorted,
+  nan_to_num,
 } from './validation'
 
 // Copy and view operations

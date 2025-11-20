@@ -164,3 +164,133 @@ export function roots<T extends DType>(p: NDArray<T>): NDArray<'float64'> {
   // For now, throw error for degrees > 2
   throw new Error('roots() only supports polynomials up to degree 2. Use NumPy for higher degrees.')
 }
+
+/**
+ * Return the derivative of a polynomial
+ * For p(x) = p[0] * x^n + p[1] * x^(n-1) + ... + p[n]
+ * Returns p'(x) = n*p[0] * x^(n-1) + (n-1)*p[1] * x^(n-2) + ...
+ */
+export function polyder<T extends DType>(p: NDArray<T>, m = 1): NDArray<T> {
+  const pData = p.getData()
+
+  if (pData.shape.length !== 1) {
+    throw new Error('polyder requires 1D coefficient array')
+  }
+
+  if (m < 0) {
+    throw new Error('Derivative order must be non-negative')
+  }
+
+  if (m === 0) {
+    // Return copy
+    const buffer = createTypedArray(pData.buffer.length, pData.dtype)
+    for (let i = 0; i < pData.buffer.length; i++) {
+      buffer[i] = pData.buffer[i]
+    }
+    return new NDArrayImpl({
+      buffer,
+      shape: [...pData.shape],
+      strides: [...pData.strides],
+      dtype: pData.dtype,
+    })
+  }
+
+  let coeffs = Array.from(pData.buffer)
+  const n = coeffs.length
+
+  if (n === 0) {
+    return p
+  }
+
+  // Take m derivatives
+  for (let deriv = 0; deriv < m; deriv++) {
+    if (coeffs.length <= 1) {
+      // Derivative of constant is zero
+      coeffs = [0]
+      break
+    }
+
+    const newCoeffs: number[] = []
+    for (let i = 0; i < coeffs.length - 1; i++) {
+      const power = coeffs.length - 1 - i
+      newCoeffs.push(coeffs[i] * power)
+    }
+    coeffs = newCoeffs
+  }
+
+  const buffer = createTypedArray(coeffs.length, pData.dtype)
+  for (let i = 0; i < coeffs.length; i++) {
+    buffer[i] = coeffs[i]
+  }
+
+  return new NDArrayImpl({
+    buffer,
+    shape: [coeffs.length],
+    strides: [1],
+    dtype: pData.dtype,
+  })
+}
+
+/**
+ * Return the antiderivative (integral) of a polynomial
+ * For p(x) = p[0] * x^n + p[1] * x^(n-1) + ... + p[n]
+ * Returns ∫p(x)dx = p[0]/(n+1) * x^(n+1) + p[1]/n * x^n + ... + k
+ */
+export function polyint<T extends DType>(p: NDArray<T>, m = 1, k: number | number[] = 0): NDArray<T> {
+  const pData = p.getData()
+
+  if (pData.shape.length !== 1) {
+    throw new Error('polyint requires 1D coefficient array')
+  }
+
+  if (m < 0) {
+    throw new Error('Integration order must be non-negative')
+  }
+
+  if (m === 0) {
+    // Return copy
+    const buffer = createTypedArray(pData.buffer.length, pData.dtype)
+    for (let i = 0; i < pData.buffer.length; i++) {
+      buffer[i] = pData.buffer[i]
+    }
+    return new NDArrayImpl({
+      buffer,
+      shape: [...pData.shape],
+      strides: [...pData.strides],
+      dtype: pData.dtype,
+    })
+  }
+
+  let coeffs = Array.from(pData.buffer)
+  const constants = Array.isArray(k) ? k : [k]
+
+  // Take m integrals
+  for (let integ = 0; integ < m; integ++) {
+    const newCoeffs: number[] = []
+    const n = coeffs.length
+
+    // Integrate: divide each coefficient by its new power
+    for (let i = 0; i < n; i++) {
+      const newPower = n - i
+      newCoeffs.push(coeffs[i] / newPower)
+    }
+
+    // Add constant of integration
+    const constant = integ < constants.length ? constants[integ] : 0
+    newCoeffs.push(constant)
+
+    coeffs = newCoeffs
+  }
+
+  const buffer = createTypedArray(coeffs.length, pData.dtype)
+  for (let i = 0; i < coeffs.length; i++) {
+    buffer[i] = coeffs[i]
+  }
+
+  return new NDArrayImpl({
+    buffer,
+    shape: [coeffs.length],
+    strides: [1],
+    dtype: pData.dtype,
+  })
+}
