@@ -105,6 +105,10 @@ export {
   hsplit,
   vsplit,
   tile,
+  flip,
+  rot90,
+  pad,
+  moveaxis,
   // Statistics
   median,
   percentile,
@@ -185,7 +189,7 @@ export {
 } from './random'
 
 // 2d. FFT
-export { fft, ifft, rfft, irfft } from './fft'
+export { fft, ifft, rfft, irfft, fft2, ifft2, rfft2, irfft2 } from './fft'
 
 // 3. NDArray (data container)
 export { NDArray } from './ndarray'

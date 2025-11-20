@@ -55,7 +55,21 @@ export { all, any, logicalAnd, logicalNot, logicalOr, logicalXor, where } from '
 export { argmax, argmin, argsort, sort } from './sorting'
 
 // Array manipulation
-export { concat, hstack, hsplit, repeat, split, stack, tile, vstack, vsplit } from './manipulation'
+export {
+  concat,
+  hstack,
+  hsplit,
+  repeat,
+  split,
+  stack,
+  tile,
+  vstack,
+  vsplit,
+  flip,
+  rot90,
+  pad,
+  moveaxis,
+} from './manipulation'
 
 // Statistics
 export {

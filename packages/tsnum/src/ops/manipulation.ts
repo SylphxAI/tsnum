@@ -293,3 +293,231 @@ export function tile<T extends DType>(a: NDArray<T>, reps: number | number[]): N
     dtype: data.dtype,
   })
 }
+
+/**
+ * Reverse the order of elements along given axis
+ */
+export function flip<T extends DType>(a: NDArray<T>, axis?: number): NDArray<T> {
+  const data = a.getData()
+
+  if (data.shape.length === 1) {
+    // 1D flip
+    const newBuffer = createTypedArray(data.buffer.length, data.dtype)
+    for (let i = 0; i < data.buffer.length; i++) {
+      newBuffer[i] = data.buffer[data.buffer.length - 1 - i]
+    }
+
+    return new NDArrayImpl({
+      buffer: newBuffer,
+      shape: data.shape,
+      strides: data.strides,
+      dtype: data.dtype,
+    })
+  }
+
+  if (data.shape.length === 2) {
+    const [rows, cols] = data.shape
+    const flipAxis = axis ?? 0
+
+    if (flipAxis < 0 || flipAxis >= 2) {
+      throw new Error(`axis ${axis} out of bounds for 2D array`)
+    }
+
+    const newBuffer = createTypedArray(data.buffer.length, data.dtype)
+
+    if (flipAxis === 0) {
+      // Flip rows
+      for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+          newBuffer[i * cols + j] = data.buffer[(rows - 1 - i) * cols + j]
+        }
+      }
+    } else {
+      // Flip columns
+      for (let i = 0; i < rows; i++) {
+        for (let j = 0; j < cols; j++) {
+          newBuffer[i * cols + j] = data.buffer[i * cols + (cols - 1 - j)]
+        }
+      }
+    }
+
+    return new NDArrayImpl({
+      buffer: newBuffer,
+      shape: data.shape,
+      strides: data.strides,
+      dtype: data.dtype,
+    })
+  }
+
+  throw new Error('flip only supports 1D and 2D arrays')
+}
+
+/**
+ * Rotate array by 90 degrees in the plane
+ */
+export function rot90<T extends DType>(a: NDArray<T>, k = 1): NDArray<T> {
+  const data = a.getData()
+
+  if (data.shape.length !== 2) {
+    throw new Error('rot90 only supports 2D arrays')
+  }
+
+  const [rows, cols] = data.shape
+
+  // Normalize k to [0, 3]
+  const normalizedK = ((k % 4) + 4) % 4
+
+  if (normalizedK === 0) {
+    // No rotation
+    const newBuffer = createTypedArray(data.buffer.length, data.dtype)
+    for (let i = 0; i < data.buffer.length; i++) {
+      newBuffer[i] = data.buffer[i]
+    }
+    return new NDArrayImpl({
+      buffer: newBuffer,
+      shape: data.shape,
+      strides: data.strides,
+      dtype: data.dtype,
+    })
+  }
+
+  if (normalizedK === 1) {
+    // 90 degrees counter-clockwise
+    const newBuffer = createTypedArray(data.buffer.length, data.dtype)
+    for (let i = 0; i < rows; i++) {
+      for (let j = 0; j < cols; j++) {
+        newBuffer[(cols - 1 - j) * rows + i] = data.buffer[i * cols + j]
+      }
+    }
+    return new NDArrayImpl({
+      buffer: newBuffer,
+      shape: [cols, rows],
+      strides: [rows, 1],
+      dtype: data.dtype,
+    })
+  }
+
+  if (normalizedK === 2) {
+    // 180 degrees
+    const newBuffer = createTypedArray(data.buffer.length, data.dtype)
+    for (let i = 0; i < data.buffer.length; i++) {
+      newBuffer[i] = data.buffer[data.buffer.length - 1 - i]
+    }
+    return new NDArrayImpl({
+      buffer: newBuffer,
+      shape: data.shape,
+      strides: data.strides,
+      dtype: data.dtype,
+    })
+  }
+
+  // k === 3: 270 degrees counter-clockwise (90 clockwise)
+  const newBuffer = createTypedArray(data.buffer.length, data.dtype)
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      newBuffer[j * rows + (rows - 1 - i)] = data.buffer[i * cols + j]
+    }
+  }
+  return new NDArrayImpl({
+    buffer: newBuffer,
+    shape: [cols, rows],
+    strides: [rows, 1],
+    dtype: data.dtype,
+  })
+}
+
+/**
+ * Pad array with values
+ */
+export function pad<T extends DType>(
+  a: NDArray<T>,
+  padWidth: number | [number, number],
+  mode: 'constant' | 'edge' = 'constant',
+  constantValue = 0,
+): NDArray<T> {
+  const data = a.getData()
+
+  if (data.shape.length === 1) {
+    const n = data.buffer.length
+    const [padBefore, padAfter] =
+      typeof padWidth === 'number' ? [padWidth, padWidth] : padWidth
+
+    const newLength = n + padBefore + padAfter
+    const newBuffer = createTypedArray(newLength, data.dtype)
+
+    if (mode === 'constant') {
+      // Fill padding with constant
+      for (let i = 0; i < padBefore; i++) {
+        newBuffer[i] = constantValue
+      }
+      for (let i = 0; i < n; i++) {
+        newBuffer[padBefore + i] = data.buffer[i]
+      }
+      for (let i = 0; i < padAfter; i++) {
+        newBuffer[padBefore + n + i] = constantValue
+      }
+    } else {
+      // Edge mode: repeat edge values
+      for (let i = 0; i < padBefore; i++) {
+        newBuffer[i] = data.buffer[0]
+      }
+      for (let i = 0; i < n; i++) {
+        newBuffer[padBefore + i] = data.buffer[i]
+      }
+      for (let i = 0; i < padAfter; i++) {
+        newBuffer[padBefore + n + i] = data.buffer[n - 1]
+      }
+    }
+
+    return new NDArrayImpl({
+      buffer: newBuffer,
+      shape: [newLength],
+      strides: [1],
+      dtype: data.dtype,
+    })
+  }
+
+  throw new Error('pad only supports 1D arrays for now')
+}
+
+/**
+ * Move axis to new position
+ */
+export function moveaxis<T extends DType>(a: NDArray<T>, source: number, destination: number): NDArray<T> {
+  const data = a.getData()
+
+  if (data.shape.length !== 2) {
+    throw new Error('moveaxis only supports 2D arrays for now')
+  }
+
+  // For 2D, moveaxis is same as transpose when source != destination
+  if (source === destination) {
+    const newBuffer = createTypedArray(data.buffer.length, data.dtype)
+    for (let i = 0; i < data.buffer.length; i++) {
+      newBuffer[i] = data.buffer[i]
+    }
+    return new NDArrayImpl({
+      buffer: newBuffer,
+      shape: data.shape,
+      strides: data.strides,
+      dtype: data.dtype,
+    })
+  }
+
+  // Transpose
+  const [rows, cols] = data.shape
+  const newBuffer = createTypedArray(data.buffer.length, data.dtype)
+
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      newBuffer[j * rows + i] = data.buffer[i * cols + j]
+    }
+  }
+
+  return new NDArrayImpl({
+    buffer: newBuffer,
+    shape: [cols, rows],
+    strides: [rows, 1],
+    dtype: data.dtype,
+  })
+}
