@@ -25,6 +25,8 @@ export interface Backend {
   std(a: NDArrayData): number
   variance(a: NDArrayData): number
   prod(a: NDArrayData): number
+  argmax(a: NDArrayData): number
+  argmin(a: NDArrayData): number
 
   // Linear algebra operations
   matmul(a: NDArrayData, b: NDArrayData): NDArrayData

@@ -140,6 +140,36 @@ pub fn prod(a: &[f64]) -> f64 {
     a.iter().product()
 }
 
+/// Index of maximum element
+#[wasm_bindgen]
+pub fn argmax(a: &[f64]) -> usize {
+    let mut max_idx = 0;
+    let mut max_val = a[0];
+
+    for (i, &val) in a.iter().enumerate().skip(1) {
+        if val > max_val {
+            max_val = val;
+            max_idx = i;
+        }
+    }
+    max_idx
+}
+
+/// Index of minimum element
+#[wasm_bindgen]
+pub fn argmin(a: &[f64]) -> usize {
+    let mut min_idx = 0;
+    let mut min_val = a[0];
+
+    for (i, &val) in a.iter().enumerate().skip(1) {
+        if val < min_val {
+            min_val = val;
+            min_idx = i;
+        }
+    }
+    min_idx
+}
+
 // ===== Linear Algebra =====
 
 /// Matrix multiplication: C = A @ B

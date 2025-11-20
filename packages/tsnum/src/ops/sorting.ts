@@ -1,5 +1,6 @@
 // ===== Sorting Operations =====
 
+import { getBackend } from '../backend/manager'
 import type { DType } from '../core/types'
 import { createTypedArray } from '../core/utils'
 import { NDArray } from '../ndarray'
@@ -60,39 +61,17 @@ export function sort<T extends DType>(a: NDArray<T>): NDArray<T> {
 }
 
 /**
- * Return index of maximum value
+ * Return index of maximum value (delegates to backend)
  */
 export function argmax<T extends DType>(a: NDArray<T>): number {
-  const data = a.getData()
-
-  let maxIdx = 0
-  let maxVal = data.buffer[0]
-
-  for (let i = 1; i < data.buffer.length; i++) {
-    if (data.buffer[i] > maxVal) {
-      maxVal = data.buffer[i]
-      maxIdx = i
-    }
-  }
-
-  return maxIdx
+  const backend = getBackend()
+  return backend.argmax(a.getData())
 }
 
 /**
- * Return index of minimum value
+ * Return index of minimum value (delegates to backend)
  */
 export function argmin<T extends DType>(a: NDArray<T>): number {
-  const data = a.getData()
-
-  let minIdx = 0
-  let minVal = data.buffer[0]
-
-  for (let i = 1; i < data.buffer.length; i++) {
-    if (data.buffer[i] < minVal) {
-      minVal = data.buffer[i]
-      minIdx = i
-    }
-  }
-
-  return minIdx
+  const backend = getBackend()
+  return backend.argmin(a.getData())
 }

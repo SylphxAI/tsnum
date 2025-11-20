@@ -103,6 +103,32 @@ export class TypeScriptBackend implements Backend {
     return product
   }
 
+  argmax(a: NDArrayData): number {
+    let maxIdx = 0
+    let maxVal = a.buffer[0]
+
+    for (let i = 1; i < a.buffer.length; i++) {
+      if (a.buffer[i] > maxVal) {
+        maxVal = a.buffer[i]
+        maxIdx = i
+      }
+    }
+    return maxIdx
+  }
+
+  argmin(a: NDArrayData): number {
+    let minIdx = 0
+    let minVal = a.buffer[0]
+
+    for (let i = 1; i < a.buffer.length; i++) {
+      if (a.buffer[i] < minVal) {
+        minVal = a.buffer[i]
+        minIdx = i
+      }
+    }
+    return minIdx
+  }
+
   // ===== Linear Algebra Operations =====
 
   matmul(a: NDArrayData, b: NDArrayData): NDArrayData {

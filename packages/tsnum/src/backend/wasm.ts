@@ -137,6 +137,18 @@ export class WASMBackend implements Backend {
     return this.module.prod(buffer)
   }
 
+  argmax(a: NDArrayData): number {
+    this.ensureReady()
+    const buffer = this.toFloat64Array(a.buffer)
+    return this.module.argmax(buffer)
+  }
+
+  argmin(a: NDArrayData): number {
+    this.ensureReady()
+    const buffer = this.toFloat64Array(a.buffer)
+    return this.module.argmin(buffer)
+  }
+
   // ===== Linear Algebra Operations =====
 
   matmul(a: NDArrayData, b: NDArrayData): NDArrayData {
