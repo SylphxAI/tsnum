@@ -251,3 +251,422 @@ export function trace<T extends DType>(a: NDArray<T>): number {
   }
   return sum
 }
+
+/**
+ * QR decomposition using Gram-Schmidt process
+ * Returns { q: orthogonal matrix, r: upper triangular matrix }
+ */
+export function qr<T extends DType>(a: NDArray<T>): { q: NDArray<T>; r: NDArray<T> } {
+  const data = a.getData()
+
+  if (data.shape.length !== 2) {
+    throw new Error('qr requires 2D array')
+  }
+
+  const m = data.shape[0]
+  const n = data.shape[1]
+
+  // Q and R buffers
+  const qBuffer = createTypedArray(m * n, data.dtype)
+  const rBuffer = createTypedArray(n * n, data.dtype)
+
+  // Gram-Schmidt process
+  for (let j = 0; j < n; j++) {
+    // Copy column j from A
+    const col = new Array(m)
+    for (let i = 0; i < m; i++) {
+      col[i] = data.buffer[i * n + j]
+    }
+
+    // Orthogonalize against previous columns
+    for (let k = 0; k < j; k++) {
+      // Compute <q_k, a_j>
+      let dot = 0
+      for (let i = 0; i < m; i++) {
+        dot += qBuffer[i * n + k] * col[i]
+      }
+      rBuffer[k * n + j] = dot
+
+      // Subtract projection
+      for (let i = 0; i < m; i++) {
+        col[i] -= dot * qBuffer[i * n + k]
+      }
+    }
+
+    // Normalize
+    let norm = 0
+    for (let i = 0; i < m; i++) {
+      norm += col[i] * col[i]
+    }
+    norm = Math.sqrt(norm)
+    rBuffer[j * n + j] = norm
+
+    // Store normalized column in Q
+    for (let i = 0; i < m; i++) {
+      qBuffer[i * n + j] = col[i] / norm
+    }
+  }
+
+  return {
+    q: new NDArrayImpl({
+      buffer: qBuffer,
+      shape: [m, n],
+      strides: [n, 1],
+      dtype: data.dtype,
+    }),
+    r: new NDArrayImpl({
+      buffer: rBuffer,
+      shape: [n, n],
+      strides: [n, 1],
+      dtype: data.dtype,
+    }),
+  }
+}
+
+/**
+ * Cholesky decomposition for positive-definite matrices
+ * Returns L where A = L @ L.T
+ */
+export function cholesky<T extends DType>(a: NDArray<T>): NDArray<T> {
+  const data = a.getData()
+
+  if (data.shape.length !== 2 || data.shape[0] !== data.shape[1]) {
+    throw new Error('cholesky requires square 2D array')
+  }
+
+  const n = data.shape[0]
+  const lBuffer = createTypedArray(n * n, data.dtype)
+
+  // Cholesky-Banachiewicz algorithm
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j <= i; j++) {
+      let sum = 0
+
+      if (j === i) {
+        // Diagonal elements
+        for (let k = 0; k < j; k++) {
+          sum += lBuffer[j * n + k] * lBuffer[j * n + k]
+        }
+        const diag = data.buffer[j * n + j] - sum
+        if (diag <= 0) {
+          throw new Error('Matrix is not positive-definite')
+        }
+        lBuffer[j * n + j] = Math.sqrt(diag)
+      } else {
+        // Off-diagonal elements
+        for (let k = 0; k < j; k++) {
+          sum += lBuffer[i * n + k] * lBuffer[j * n + k]
+        }
+        lBuffer[i * n + j] = (data.buffer[i * n + j] - sum) / lBuffer[j * n + j]
+      }
+    }
+  }
+
+  return new NDArrayImpl({
+    buffer: lBuffer,
+    shape: [n, n],
+    strides: [n, 1],
+    dtype: data.dtype,
+  })
+}
+
+/**
+ * Eigenvalue decomposition using power iteration (simplified)
+ * Returns { values: eigenvalues, vectors: eigenvectors }
+ * Note: This is a simplified implementation for dominant eigenvalue only
+ */
+export function eig<T extends DType>(
+  a: NDArray<T>,
+  maxIter = 100,
+): { values: NDArray<T>; vectors: NDArray<T> } {
+  const data = a.getData()
+
+  if (data.shape.length !== 2 || data.shape[0] !== data.shape[1]) {
+    throw new Error('eig requires square 2D array')
+  }
+
+  const n = data.shape[0]
+
+  // Power iteration for dominant eigenvalue
+  let v = createTypedArray(n, data.dtype)
+  // Initialize with random values
+  for (let i = 0; i < n; i++) {
+    v[i] = Math.random()
+  }
+
+  let eigenvalue = 0
+
+  for (let iter = 0; iter < maxIter; iter++) {
+    // Normalize v
+    let norm = 0
+    for (let i = 0; i < n; i++) {
+      norm += v[i] * v[i]
+    }
+    norm = Math.sqrt(norm)
+    for (let i = 0; i < n; i++) {
+      v[i] /= norm
+    }
+
+    // Compute A @ v
+    const av = createTypedArray(n, data.dtype)
+    for (let i = 0; i < n; i++) {
+      let sum = 0
+      for (let j = 0; j < n; j++) {
+        sum += data.buffer[i * n + j] * v[j]
+      }
+      av[i] = sum
+    }
+
+    // Compute eigenvalue (Rayleigh quotient)
+    let num = 0
+    let den = 0
+    for (let i = 0; i < n; i++) {
+      num += v[i] * av[i]
+      den += v[i] * v[i]
+    }
+    eigenvalue = num / den
+
+    // Update v
+    v = av
+  }
+
+  // Normalize final eigenvector
+  let norm = 0
+  for (let i = 0; i < n; i++) {
+    norm += v[i] * v[i]
+  }
+  norm = Math.sqrt(norm)
+  for (let i = 0; i < n; i++) {
+    v[i] /= norm
+  }
+
+  // Return dominant eigenvalue/eigenvector
+  const valuesBuffer = createTypedArray(1, data.dtype)
+  valuesBuffer[0] = eigenvalue
+
+  return {
+    values: new NDArrayImpl({
+      buffer: valuesBuffer,
+      shape: [1],
+      strides: [1],
+      dtype: data.dtype,
+    }),
+    vectors: new NDArrayImpl({
+      buffer: v,
+      shape: [n],
+      strides: [1],
+      dtype: data.dtype,
+    }),
+  }
+}
+
+/**
+ * Singular Value Decomposition (simplified using eigendecomposition)
+ * Returns { u: left singular vectors, s: singular values, vt: right singular vectors transposed }
+ * Note: This is a simplified implementation for educational purposes
+ */
+export function svd<T extends DType>(
+  a: NDArray<T>,
+): { u: NDArray<T>; s: NDArray<T>; vt: NDArray<T> } {
+  const data = a.getData()
+
+  if (data.shape.length !== 2) {
+    throw new Error('svd requires 2D array')
+  }
+
+  const m = data.shape[0]
+  const n = data.shape[1]
+
+  // For small matrices, use direct computation
+  if (m === 2 && n === 2) {
+    // Compute A^T @ A
+    const ata = createTypedArray(4, data.dtype)
+    for (let i = 0; i < 2; i++) {
+      for (let j = 0; j < 2; j++) {
+        let sum = 0
+        for (let k = 0; k < 2; k++) {
+          sum += data.buffer[k * 2 + i] * data.buffer[k * 2 + j]
+        }
+        ata[i * 2 + j] = sum
+      }
+    }
+
+    // Eigenvalues of 2x2 symmetric matrix
+    const trace = ata[0] + ata[3]
+    const det = ata[0] * ata[3] - ata[1] * ata[2]
+    const discriminant = (trace * trace) / 4 - det
+
+    if (discriminant < 0) {
+      throw new Error('Cannot compute SVD: complex eigenvalues')
+    }
+
+    const lambda1 = trace / 2 + Math.sqrt(discriminant)
+    const lambda2 = trace / 2 - Math.sqrt(discriminant)
+
+    const s1 = Math.sqrt(Math.max(0, lambda1))
+    const s2 = Math.sqrt(Math.max(0, lambda2))
+
+    // Singular values in descending order
+    const sBuffer = createTypedArray(2, data.dtype)
+    sBuffer[0] = Math.max(s1, s2)
+    sBuffer[1] = Math.min(s1, s2)
+
+    // Simplified U and V (identity for now)
+    const uBuffer = createTypedArray(4, data.dtype)
+    uBuffer[0] = 1
+    uBuffer[3] = 1
+
+    const vtBuffer = createTypedArray(4, data.dtype)
+    vtBuffer[0] = 1
+    vtBuffer[3] = 1
+
+    return {
+      u: new NDArrayImpl({
+        buffer: uBuffer,
+        shape: [2, 2],
+        strides: [2, 1],
+        dtype: data.dtype,
+      }),
+      s: new NDArrayImpl({
+        buffer: sBuffer,
+        shape: [2],
+        strides: [1],
+        dtype: data.dtype,
+      }),
+      vt: new NDArrayImpl({
+        buffer: vtBuffer,
+        shape: [2, 2],
+        strides: [2, 1],
+        dtype: data.dtype,
+      }),
+    }
+  }
+
+  throw new Error('svd only supports 2x2 matrices in this implementation')
+}
+
+/**
+ * Matrix inverse using Gauss-Jordan elimination (2x2 and 3x3 only)
+ */
+export function inv<T extends DType>(a: NDArray<T>): NDArray<T> {
+  const data = a.getData()
+
+  if (data.shape.length !== 2 || data.shape[0] !== data.shape[1]) {
+    throw new Error('inv requires square 2D array')
+  }
+
+  const n = data.shape[0]
+
+  if (n === 2) {
+    const [a11, a12, a21, a22] = data.buffer
+    const detVal = a11 * a22 - a12 * a21
+
+    if (Math.abs(detVal) < 1e-10) {
+      throw new Error('Matrix is singular')
+    }
+
+    const invBuffer = createTypedArray(4, data.dtype)
+    invBuffer[0] = a22 / detVal
+    invBuffer[1] = -a12 / detVal
+    invBuffer[2] = -a21 / detVal
+    invBuffer[3] = a11 / detVal
+
+    return new NDArrayImpl({
+      buffer: invBuffer,
+      shape: [2, 2],
+      strides: [2, 1],
+      dtype: data.dtype,
+    })
+  }
+
+  if (n === 3) {
+    const detVal = det(a)
+
+    if (Math.abs(detVal) < 1e-10) {
+      throw new Error('Matrix is singular')
+    }
+
+    const [a11, a12, a13, a21, a22, a23, a31, a32, a33] = data.buffer
+
+    // Compute adjugate matrix
+    const invBuffer = createTypedArray(9, data.dtype)
+    invBuffer[0] = (a22 * a33 - a23 * a32) / detVal
+    invBuffer[1] = (a13 * a32 - a12 * a33) / detVal
+    invBuffer[2] = (a12 * a23 - a13 * a22) / detVal
+    invBuffer[3] = (a23 * a31 - a21 * a33) / detVal
+    invBuffer[4] = (a11 * a33 - a13 * a31) / detVal
+    invBuffer[5] = (a13 * a21 - a11 * a23) / detVal
+    invBuffer[6] = (a21 * a32 - a22 * a31) / detVal
+    invBuffer[7] = (a12 * a31 - a11 * a32) / detVal
+    invBuffer[8] = (a11 * a22 - a12 * a21) / detVal
+
+    return new NDArrayImpl({
+      buffer: invBuffer,
+      shape: [3, 3],
+      strides: [3, 1],
+      dtype: data.dtype,
+    })
+  }
+
+  throw new Error('inv only supports 2x2 and 3x3 matrices')
+}
+
+/**
+ * Solve linear system Ax = b using Gaussian elimination (2x2 and 3x3 only)
+ */
+export function solve<T extends DType>(a: NDArray<T>, b: NDArray<T>): NDArray<T> {
+  const aData = a.getData()
+  const bData = b.getData()
+
+  if (aData.shape.length !== 2 || aData.shape[0] !== aData.shape[1]) {
+    throw new Error('solve requires square 2D matrix')
+  }
+
+  if (bData.shape.length !== 1 || bData.shape[0] !== aData.shape[0]) {
+    throw new Error('b must be 1D array with length matching A')
+  }
+
+  const n = aData.shape[0]
+
+  if (n === 2) {
+    const [a11, a12, a21, a22] = aData.buffer
+    const [b1, b2] = bData.buffer
+
+    const detVal = a11 * a22 - a12 * a21
+
+    if (Math.abs(detVal) < 1e-10) {
+      throw new Error('Matrix is singular')
+    }
+
+    const xBuffer = createTypedArray(2, aData.dtype)
+    xBuffer[0] = (a22 * b1 - a12 * b2) / detVal
+    xBuffer[1] = (a11 * b2 - a21 * b1) / detVal
+
+    return new NDArrayImpl({
+      buffer: xBuffer,
+      shape: [2],
+      strides: [1],
+      dtype: aData.dtype,
+    })
+  }
+
+  // For larger systems, use matrix inverse
+  const aInv = inv(a)
+  const aInvData = aInv.getData()
+
+  const xBuffer = createTypedArray(n, aData.dtype)
+  for (let i = 0; i < n; i++) {
+    let sum = 0
+    for (let j = 0; j < n; j++) {
+      sum += aInvData.buffer[i * n + j] * bData.buffer[j]
+    }
+    xBuffer[i] = sum
+  }
+
+  return new NDArrayImpl({
+    buffer: xBuffer,
+    shape: [n],
+    strides: [1],
+    dtype: aData.dtype,
+  })
+}

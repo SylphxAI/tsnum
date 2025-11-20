@@ -81,10 +81,27 @@ export {
 } from './ops'
 
 // 2b. Linear Algebra
-export { dot, matmul, outer, inner, norm, det, trace } from './linalg'
+export {
+  dot,
+  matmul,
+  outer,
+  inner,
+  norm,
+  det,
+  trace,
+  qr,
+  cholesky,
+  eig,
+  svd,
+  inv,
+  solve,
+} from './linalg'
 
 // 2c. Random
 export { random, randint, randn, shuffle, choice, setSeed, getSeed } from './random'
+
+// 2d. FFT
+export { fft, ifft, rfft, irfft } from './fft'
 
 // 3. NDArray (data container)
 export { NDArray } from './ndarray'
