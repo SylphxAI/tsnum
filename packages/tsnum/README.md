@@ -227,12 +227,12 @@ Complete tracking table for all operations with backend implementation status.
 2. **2D/ND FFT** (fft2, fftn, rfft2, rfftn) - 5-20x speedup
 3. **Real FFT** (rfft, irfft) - 3-5x speedup
 
-**✅ Dual Backend** (52 operations):
+**✅ Dual Backend** (56 operations):
 - Arithmetic: add, sub, mul, div, pow (5)
 - Reductions: sum, mean, max, min, std, variance (6)
 - Linear Algebra: matmul, dot, inv, det, transpose (5)
 - FFT: fft, ifft (2)
-- Math: abs, sign, sqrt, cbrt, square, exp, exp2, expm1, log, log2, log10, log1p, round, floor, ceil, trunc, maximum, minimum, clip, mod, fmod, sin, cos, tan, sinh, cosh, tanh, arcsin, arccos, arctan, arctan2, asinh, acosh, atanh (34)
+- Math: abs, sign, sqrt, cbrt, square, reciprocal, exp, exp2, expm1, log, log2, log10, log1p, round, floor, ceil, trunc, maximum, minimum, clip, mod, fmod, deg2rad, rad2deg, hypot, sin, cos, tan, sinh, cosh, tanh, arcsin, arccos, arctan, arctan2, asinh, acosh, atanh (38)
 
 ### ✅ Implemented Functions (251)
 
