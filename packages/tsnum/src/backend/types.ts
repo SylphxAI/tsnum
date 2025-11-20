@@ -28,6 +28,14 @@ export interface Backend {
   argmax(a: NDArrayData): number
   argmin(a: NDArrayData): number
 
+  // NaN-aware reductions
+  nansum(a: NDArrayData): number
+  nanmean(a: NDArrayData): number
+  nanmax(a: NDArrayData): number
+  nanmin(a: NDArrayData): number
+  nanstd(a: NDArrayData): number
+  nanvar(a: NDArrayData): number
+
   // Linear algebra operations
   matmul(a: NDArrayData, b: NDArrayData): NDArrayData
   dot(a: NDArrayData, b: NDArrayData): number

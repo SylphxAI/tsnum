@@ -198,6 +198,75 @@ pub fn norm(a: &[f64], ord: f64) -> Result<f64, String> {
     }
 }
 
+// ===== NaN-aware Reductions =====
+
+/// Sum ignoring NaN values
+#[wasm_bindgen]
+pub fn nansum(a: &[f64]) -> f64 {
+    a.iter().filter(|x| !x.is_nan()).sum()
+}
+
+/// Mean ignoring NaN values
+#[wasm_bindgen]
+pub fn nanmean(a: &[f64]) -> f64 {
+    let sum: f64 = a.iter().filter(|x| !x.is_nan()).sum();
+    let count = a.iter().filter(|x| !x.is_nan()).count();
+    if count > 0 {
+        sum / count as f64
+    } else {
+        f64::NAN
+    }
+}
+
+/// Maximum ignoring NaN values
+#[wasm_bindgen]
+pub fn nanmax(a: &[f64]) -> f64 {
+    a.iter()
+        .copied()
+        .filter(|x| !x.is_nan())
+        .fold(f64::NEG_INFINITY, f64::max)
+}
+
+/// Minimum ignoring NaN values
+#[wasm_bindgen]
+pub fn nanmin(a: &[f64]) -> f64 {
+    a.iter()
+        .copied()
+        .filter(|x| !x.is_nan())
+        .fold(f64::INFINITY, f64::min)
+}
+
+/// Standard deviation ignoring NaN values
+#[wasm_bindgen]
+pub fn nanstd(a: &[f64]) -> f64 {
+    nanvar(a).sqrt()
+}
+
+/// Variance ignoring NaN values
+#[wasm_bindgen]
+pub fn nanvar(a: &[f64]) -> f64 {
+    let mean_val = nanmean(a);
+    if mean_val.is_nan() {
+        return f64::NAN;
+    }
+
+    let sum_squared_diff: f64 = a
+        .iter()
+        .filter(|x| !x.is_nan())
+        .map(|x| {
+            let diff = x - mean_val;
+            diff * diff
+        })
+        .sum();
+
+    let count = a.iter().filter(|x| !x.is_nan()).count();
+    if count > 0 {
+        sum_squared_diff / count as f64
+    } else {
+        f64::NAN
+    }
+}
+
 // ===== Linear Algebra =====
 
 /// Matrix multiplication: C = A @ B

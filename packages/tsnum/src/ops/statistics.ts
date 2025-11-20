@@ -1,5 +1,6 @@
 // ===== Advanced Statistics =====
 
+import { getBackend } from '../backend/manager'
 import type { DType } from '../core/types'
 import { createTypedArray } from '../core/utils'
 import { NDArray } from '../ndarray'
@@ -247,99 +248,43 @@ export function histogram<T extends DType>(
 // ===== NaN-Aware Statistics =====
 
 /**
- * Compute mean ignoring NaN values
+ * Compute mean ignoring NaN values (delegates to backend)
  */
 export function nanmean<T extends DType>(a: NDArray<T>): number {
-  const data = a.getData()
-  let sum = 0
-  let count = 0
-
-  for (let i = 0; i < data.buffer.length; i++) {
-    const val = Number(data.buffer[i])
-    if (!Number.isNaN(val)) {
-      sum += val
-      count++
-    }
-  }
-
-  return count > 0 ? sum / count : Number.NaN
+  const backend = getBackend()
+  return backend.nanmean(a.getData())
 }
 
 /**
- * Compute sum ignoring NaN values
+ * Compute sum ignoring NaN values (delegates to backend)
  */
 export function nansum<T extends DType>(a: NDArray<T>): number {
-  const data = a.getData()
-  let sum = 0
-
-  for (let i = 0; i < data.buffer.length; i++) {
-    const val = Number(data.buffer[i])
-    if (!Number.isNaN(val)) {
-      sum += val
-    }
-  }
-
-  return sum
+  const backend = getBackend()
+  return backend.nansum(a.getData())
 }
 
 /**
- * Compute minimum ignoring NaN values
+ * Compute minimum ignoring NaN values (delegates to backend)
  */
 export function nanmin<T extends DType>(a: NDArray<T>): number {
-  const data = a.getData()
-  let min = Number.POSITIVE_INFINITY
-
-  for (let i = 0; i < data.buffer.length; i++) {
-    const val = Number(data.buffer[i])
-    if (!Number.isNaN(val) && val < min) {
-      min = val
-    }
-  }
-
-  return min === Number.POSITIVE_INFINITY ? Number.NaN : min
+  const backend = getBackend()
+  return backend.nanmin(a.getData())
 }
 
 /**
- * Compute maximum ignoring NaN values
+ * Compute maximum ignoring NaN values (delegates to backend)
  */
 export function nanmax<T extends DType>(a: NDArray<T>): number {
-  const data = a.getData()
-  let max = Number.NEGATIVE_INFINITY
-
-  for (let i = 0; i < data.buffer.length; i++) {
-    const val = Number(data.buffer[i])
-    if (!Number.isNaN(val) && val > max) {
-      max = val
-    }
-  }
-
-  return max === Number.NEGATIVE_INFINITY ? Number.NaN : max
+  const backend = getBackend()
+  return backend.nanmax(a.getData())
 }
 
 /**
- * Compute standard deviation ignoring NaN values
+ * Compute standard deviation ignoring NaN values (delegates to backend)
  */
 export function nanstd<T extends DType>(a: NDArray<T>): number {
-  const data = a.getData()
-  const avg = nanmean(a)
-
-  if (Number.isNaN(avg)) {
-    return Number.NaN
-  }
-
-  let sumSq = 0
-  let count = 0
-
-  for (let i = 0; i < data.buffer.length; i++) {
-    const val = Number(data.buffer[i])
-    if (!Number.isNaN(val)) {
-      const diff = val - avg
-      sumSq += diff * diff
-      count++
-    }
-  }
-
-  return count > 0 ? Math.sqrt(sumSq / count) : Number.NaN
+  const backend = getBackend()
+  return backend.nanstd(a.getData())
 }
 
 /**
@@ -376,26 +321,8 @@ export function nanmedian<T extends DType>(a: NDArray<T>): number {
  * Compute variance ignoring NaN values
  */
 export function nanvar<T extends DType>(a: NDArray<T>): number {
-  const data = a.getData()
-  const avg = nanmean(a)
-
-  if (Number.isNaN(avg)) {
-    return Number.NaN
-  }
-
-  let sumSq = 0
-  let count = 0
-
-  for (let i = 0; i < data.buffer.length; i++) {
-    const val = Number(data.buffer[i])
-    if (!Number.isNaN(val)) {
-      const diff = val - avg
-      sumSq += diff * diff
-      count++
-    }
-  }
-
-  return count > 0 ? sumSq / count : Number.NaN
+  const backend = getBackend()
+  return backend.nanvar(a.getData())
 }
 
 // ===== Additional Statistics =====

@@ -51,12 +51,12 @@ function getArrayF64FromWasm0(ptr, len) {
  * @param {Float64Array} b
  * @returns {Float64Array}
  */
-exports.fmod_arrays = function(a, b) {
+exports.minimum_arrays = function(a, b) {
     const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
     const ptr1 = passArrayF64ToWasm0(b, wasm.__wbindgen_malloc);
     const len1 = WASM_VECTOR_LEN;
-    const ret = wasm.fmod_arrays(ptr0, len0, ptr1, len1);
+    const ret = wasm.minimum_arrays(ptr0, len0, ptr1, len1);
     var v3 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
     wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
     return v3;
@@ -78,10 +78,47 @@ exports.mean = function(a) {
  * @param {Float64Array} a
  * @returns {Float64Array}
  */
-exports.deg2rad_array = function(a) {
+exports.sign_array = function(a) {
     const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.deg2rad_array(ptr0, len0);
+    const ret = wasm.sign_array(ptr0, len0);
+    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+    return v2;
+};
+
+function takeFromExternrefTable0(idx) {
+    const value = wasm.__wbindgen_externrefs.get(idx);
+    wasm.__externref_table_dealloc(idx);
+    return value;
+}
+/**
+ * Determinant for 2x2 and 3x3 matrices
+ * @param {Float64Array} a
+ * @param {number} n
+ * @returns {number}
+ */
+exports.det_matrix = function(a, n) {
+    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.det_matrix(ptr0, len0, n);
+    if (ret[2]) {
+        throw takeFromExternrefTable0(ret[1]);
+    }
+    return ret[0];
+};
+
+/**
+ * Matrix transpose
+ * @param {Float64Array} a
+ * @param {number} rows
+ * @param {number} cols
+ * @returns {Float64Array}
+ */
+exports.transpose_matrix = function(a, rows, cols) {
+    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.transpose_matrix(ptr0, len0, rows, cols);
     var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
     wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
     return v2;
@@ -103,10 +140,10 @@ exports.min = function(a) {
  * @param {Float64Array} a
  * @returns {Float64Array}
  */
-exports.floor_array = function(a) {
+exports.arccos_array = function(a) {
     const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.floor_array(ptr0, len0);
+    const ret = wasm.arccos_array(ptr0, len0);
     var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
     wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
     return v2;
@@ -114,18 +151,15 @@ exports.floor_array = function(a) {
 
 /**
  * @param {Float64Array} a
- * @param {Float64Array} b
  * @returns {Float64Array}
  */
-exports.minimum_arrays = function(a, b) {
+exports.atanh_array = function(a) {
     const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
-    const ptr1 = passArrayF64ToWasm0(b, wasm.__wbindgen_malloc);
-    const len1 = WASM_VECTOR_LEN;
-    const ret = wasm.minimum_arrays(ptr0, len0, ptr1, len1);
-    var v3 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    const ret = wasm.atanh_array(ptr0, len0);
+    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
     wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
-    return v3;
+    return v2;
 };
 
 /**
@@ -171,10 +205,229 @@ exports.sum = function(a) {
  * @param {Float64Array} a
  * @returns {Float64Array}
  */
-exports.acosh_array = function(a) {
+exports.cosh_array = function(a) {
     const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.acosh_array(ptr0, len0);
+    const ret = wasm.cosh_array(ptr0, len0);
+    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+    return v2;
+};
+
+/**
+ * Matrix multiplication: C = A @ B
+ * A is m×k, B is k×n, result is m×n
+ * @param {Float64Array} a
+ * @param {Float64Array} b
+ * @param {number} m
+ * @param {number} k
+ * @param {number} n
+ * @returns {Float64Array}
+ */
+exports.matmul = function(a, b, m, k, n) {
+    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ptr1 = passArrayF64ToWasm0(b, wasm.__wbindgen_malloc);
+    const len1 = WASM_VECTOR_LEN;
+    const ret = wasm.matmul(ptr0, len0, ptr1, len1, m, k, n);
+    var v3 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+    return v3;
+};
+
+/**
+ * Variance ignoring NaN values
+ * @param {Float64Array} a
+ * @returns {number}
+ */
+exports.nanvar = function(a) {
+    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.nanvar(ptr0, len0);
+    return ret;
+};
+
+/**
+ * @param {Float64Array} a
+ * @returns {Float64Array}
+ */
+exports.ceil_array = function(a) {
+    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.ceil_array(ptr0, len0);
+    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+    return v2;
+};
+
+/**
+ * Multiply array by scalar
+ * @param {Float64Array} a
+ * @param {number} scalar
+ * @returns {Float64Array}
+ */
+exports.mul_scalar = function(a, scalar) {
+    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.mul_scalar(ptr0, len0, scalar);
+    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+    return v2;
+};
+
+/**
+ * @param {Float64Array} a
+ * @returns {Float64Array}
+ */
+exports.rad2deg_array = function(a) {
+    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.rad2deg_array(ptr0, len0);
+    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+    return v2;
+};
+
+/**
+ * Element-wise sine
+ * @param {Float64Array} a
+ * @returns {Float64Array}
+ */
+exports.sin_array = function(a) {
+    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.sin_array(ptr0, len0);
+    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+    return v2;
+};
+
+/**
+ * @param {Float64Array} a
+ * @param {Float64Array} b
+ * @returns {Float64Array}
+ */
+exports.fmod_arrays = function(a, b) {
+    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ptr1 = passArrayF64ToWasm0(b, wasm.__wbindgen_malloc);
+    const len1 = WASM_VECTOR_LEN;
+    const ret = wasm.fmod_arrays(ptr0, len0, ptr1, len1);
+    var v3 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+    return v3;
+};
+
+/**
+ * @param {Float64Array} y
+ * @param {Float64Array} x
+ * @returns {Float64Array}
+ */
+exports.arctan2_arrays = function(y, x) {
+    const ptr0 = passArrayF64ToWasm0(y, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ptr1 = passArrayF64ToWasm0(x, wasm.__wbindgen_malloc);
+    const len1 = WASM_VECTOR_LEN;
+    const ret = wasm.arctan2_arrays(ptr0, len0, ptr1, len1);
+    var v3 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+    return v3;
+};
+
+/**
+ * @param {Float64Array} a
+ * @returns {Float64Array}
+ */
+exports.arcsin_array = function(a) {
+    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.arcsin_array(ptr0, len0);
+    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+    return v2;
+};
+
+/**
+ * @param {Float64Array} a
+ * @returns {Float64Array}
+ */
+exports.log2_array = function(a) {
+    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.log2_array(ptr0, len0);
+    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+    return v2;
+};
+
+/**
+ * @param {Float64Array} a
+ * @returns {Float64Array}
+ */
+exports.arctan_array = function(a) {
+    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.arctan_array(ptr0, len0);
+    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+    return v2;
+};
+
+/**
+ * @param {Float64Array} a
+ * @returns {Float64Array}
+ */
+exports.round_array = function(a) {
+    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.round_array(ptr0, len0);
+    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+    return v2;
+};
+
+/**
+ * Power: raise array elements to exponent
+ * @param {Float64Array} a
+ * @param {number} exponent
+ * @returns {Float64Array}
+ */
+exports.pow_scalar = function(a, exponent) {
+    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.pow_scalar(ptr0, len0, exponent);
+    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+    return v2;
+};
+
+/**
+ * Inverse Fast Fourier Transform
+ * Input: interleaved [real, imag] pairs (length 2n)
+ * Output: interleaved [real, imag] pairs (length 2n)
+ * @param {Float64Array} input
+ * @param {number} n
+ * @returns {Float64Array}
+ */
+exports.ifft = function(input, n) {
+    const ptr0 = passArrayF64ToWasm0(input, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.ifft(ptr0, len0, n);
+    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+    return v2;
+};
+
+/**
+ * @param {Float64Array} a
+ * @param {number} min
+ * @param {number} max
+ * @returns {Float64Array}
+ */
+exports.clip_array = function(a, min, max) {
+    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.clip_array(ptr0, len0, min, max);
     var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
     wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
     return v2;
@@ -198,217 +451,10 @@ exports.exp_array = function(a) {
  * @param {Float64Array} a
  * @returns {Float64Array}
  */
-exports.square_array = function(a) {
+exports.floor_array = function(a) {
     const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.square_array(ptr0, len0);
-    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
-    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
-    return v2;
-};
-
-/**
- * @param {Float64Array} a
- * @param {number} b
- * @returns {Float64Array}
- */
-exports.mod_scalar = function(a, b) {
-    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.mod_scalar(ptr0, len0, b);
-    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
-    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
-    return v2;
-};
-
-/**
- * Multiply array by scalar
- * @param {Float64Array} a
- * @param {number} scalar
- * @returns {Float64Array}
- */
-exports.mul_scalar = function(a, scalar) {
-    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.mul_scalar(ptr0, len0, scalar);
-    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
-    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
-    return v2;
-};
-
-function takeFromExternrefTable0(idx) {
-    const value = wasm.__wbindgen_externrefs.get(idx);
-    wasm.__externref_table_dealloc(idx);
-    return value;
-}
-/**
- * Matrix inverse for 2x2 and 3x3 matrices
- * @param {Float64Array} a
- * @param {number} n
- * @returns {Float64Array}
- */
-exports.inv_matrix = function(a, n) {
-    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.inv_matrix(ptr0, len0, n);
-    if (ret[3]) {
-        throw takeFromExternrefTable0(ret[2]);
-    }
-    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
-    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
-    return v2;
-};
-
-/**
- * @param {Float64Array} a
- * @returns {Float64Array}
- */
-exports.arcsin_array = function(a) {
-    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.arcsin_array(ptr0, len0);
-    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
-    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
-    return v2;
-};
-
-/**
- * Trace of a matrix (sum of diagonal elements)
- * @param {Float64Array} a
- * @param {number} rows
- * @param {number} cols
- * @returns {number}
- */
-exports.trace_matrix = function(a, rows, cols) {
-    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.trace_matrix(ptr0, len0, rows, cols);
-    return ret;
-};
-
-/**
- * Outer product of two vectors
- * @param {Float64Array} a
- * @param {Float64Array} b
- * @returns {Float64Array}
- */
-exports.outer_product = function(a, b) {
-    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ptr1 = passArrayF64ToWasm0(b, wasm.__wbindgen_malloc);
-    const len1 = WASM_VECTOR_LEN;
-    const ret = wasm.outer_product(ptr0, len0, ptr1, len1);
-    var v3 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
-    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
-    return v3;
-};
-
-/**
- * @param {Float64Array} a
- * @returns {Float64Array}
- */
-exports.round_array = function(a) {
-    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.round_array(ptr0, len0);
-    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
-    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
-    return v2;
-};
-
-/**
- * @param {Float64Array} a
- * @returns {Float64Array}
- */
-exports.sinh_array = function(a) {
-    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.sinh_array(ptr0, len0);
-    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
-    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
-    return v2;
-};
-
-/**
- * @param {Float64Array} a
- * @returns {Float64Array}
- */
-exports.ceil_array = function(a) {
-    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.ceil_array(ptr0, len0);
-    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
-    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
-    return v2;
-};
-
-/**
- * @param {Float64Array} a
- * @param {number} min
- * @param {number} max
- * @returns {Float64Array}
- */
-exports.clip_array = function(a, min, max) {
-    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.clip_array(ptr0, len0, min, max);
-    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
-    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
-    return v2;
-};
-
-/**
- * Power: raise array elements to exponent
- * @param {Float64Array} a
- * @param {number} exponent
- * @returns {Float64Array}
- */
-exports.pow_scalar = function(a, exponent) {
-    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.pow_scalar(ptr0, len0, exponent);
-    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
-    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
-    return v2;
-};
-
-/**
- * @param {Float64Array} y
- * @param {Float64Array} x
- * @returns {Float64Array}
- */
-exports.arctan2_arrays = function(y, x) {
-    const ptr0 = passArrayF64ToWasm0(y, wasm.__wbindgen_malloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ptr1 = passArrayF64ToWasm0(x, wasm.__wbindgen_malloc);
-    const len1 = WASM_VECTOR_LEN;
-    const ret = wasm.arctan2_arrays(ptr0, len0, ptr1, len1);
-    var v3 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
-    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
-    return v3;
-};
-
-/**
- * @param {Float64Array} a
- * @returns {Float64Array}
- */
-exports.log1p_array = function(a) {
-    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.log1p_array(ptr0, len0);
-    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
-    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
-    return v2;
-};
-
-/**
- * @param {Float64Array} a
- * @returns {Float64Array}
- */
-exports.sign_array = function(a) {
-    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.sign_array(ptr0, len0);
+    const ret = wasm.floor_array(ptr0, len0);
     var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
     wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
     return v2;
@@ -442,13 +488,14 @@ exports.div_scalar = function(a, scalar) {
 };
 
 /**
+ * Element-wise cosine
  * @param {Float64Array} a
  * @returns {Float64Array}
  */
-exports.arccos_array = function(a) {
+exports.cos_array = function(a) {
     const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.arccos_array(ptr0, len0);
+    const ret = wasm.cos_array(ptr0, len0);
     var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
     wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
     return v2;
@@ -458,54 +505,53 @@ exports.arccos_array = function(a) {
  * @param {Float64Array} a
  * @returns {Float64Array}
  */
-exports.atanh_array = function(a) {
+exports.tanh_array = function(a) {
     const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.atanh_array(ptr0, len0);
+    const ret = wasm.tanh_array(ptr0, len0);
     var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
     wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
     return v2;
 };
 
 /**
- * Inverse Fast Fourier Transform
- * Input: interleaved [real, imag] pairs (length 2n)
- * Output: interleaved [real, imag] pairs (length 2n)
- * @param {Float64Array} input
- * @param {number} n
- * @returns {Float64Array}
- */
-exports.ifft = function(input, n) {
-    const ptr0 = passArrayF64ToWasm0(input, wasm.__wbindgen_malloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.ifft(ptr0, len0, n);
-    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
-    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
-    return v2;
-};
-
-/**
- * Element-wise absolute value
+ * Outer product of two vectors
  * @param {Float64Array} a
+ * @param {Float64Array} b
  * @returns {Float64Array}
  */
-exports.abs_array = function(a) {
+exports.outer_product = function(a, b) {
     const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.abs_array(ptr0, len0);
-    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    const ptr1 = passArrayF64ToWasm0(b, wasm.__wbindgen_malloc);
+    const len1 = WASM_VECTOR_LEN;
+    const ret = wasm.outer_product(ptr0, len0, ptr1, len1);
+    var v3 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
     wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
-    return v2;
+    return v3;
+};
+
+/**
+ * Maximum ignoring NaN values
+ * @param {Float64Array} a
+ * @returns {number}
+ */
+exports.nanmax = function(a) {
+    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.nanmax(ptr0, len0);
+    return ret;
 };
 
 /**
  * @param {Float64Array} a
+ * @param {number} b
  * @returns {Float64Array}
  */
-exports.rad2deg_array = function(a) {
+exports.mod_scalar = function(a, b) {
     const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.rad2deg_array(ptr0, len0);
+    const ret = wasm.mod_scalar(ptr0, len0, b);
     var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
     wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
     return v2;
@@ -515,10 +561,61 @@ exports.rad2deg_array = function(a) {
  * @param {Float64Array} a
  * @returns {Float64Array}
  */
-exports.log2_array = function(a) {
+exports.cbrt_array = function(a) {
     const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.log2_array(ptr0, len0);
+    const ret = wasm.cbrt_array(ptr0, len0);
+    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+    return v2;
+};
+
+/**
+ * @param {Float64Array} a
+ * @returns {Float64Array}
+ */
+exports.sinh_array = function(a) {
+    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.sinh_array(ptr0, len0);
+    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+    return v2;
+};
+
+/**
+ * Sum ignoring NaN values
+ * @param {Float64Array} a
+ * @returns {number}
+ */
+exports.nansum = function(a) {
+    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.nansum(ptr0, len0);
+    return ret;
+};
+
+/**
+ * Index of maximum element
+ * @param {Float64Array} a
+ * @returns {number}
+ */
+exports.argmax = function(a) {
+    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.argmax(ptr0, len0);
+    return ret >>> 0;
+};
+
+/**
+ * Element-wise tangent
+ * @param {Float64Array} a
+ * @returns {Float64Array}
+ */
+exports.tan_array = function(a) {
+    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.tan_array(ptr0, len0);
     var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
     wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
     return v2;
@@ -538,62 +635,18 @@ exports.asinh_array = function(a) {
 };
 
 /**
- * Matrix multiplication: C = A @ B
- * A is m×k, B is k×n, result is m×n
+ * Inner product of two vectors
  * @param {Float64Array} a
  * @param {Float64Array} b
- * @param {number} m
- * @param {number} k
- * @param {number} n
- * @returns {Float64Array}
+ * @returns {number}
  */
-exports.matmul = function(a, b, m, k, n) {
+exports.inner_product = function(a, b) {
     const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
     const ptr1 = passArrayF64ToWasm0(b, wasm.__wbindgen_malloc);
     const len1 = WASM_VECTOR_LEN;
-    const ret = wasm.matmul(ptr0, len0, ptr1, len1, m, k, n);
-    var v3 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
-    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
-    return v3;
-};
-
-/**
- * Index of maximum element
- * @param {Float64Array} a
- * @returns {number}
- */
-exports.argmax = function(a) {
-    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.argmax(ptr0, len0);
-    return ret >>> 0;
-};
-
-/**
- * @param {Float64Array} a
- * @returns {Float64Array}
- */
-exports.arctan_array = function(a) {
-    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.arctan_array(ptr0, len0);
-    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
-    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
-    return v2;
-};
-
-/**
- * @param {Float64Array} a
- * @returns {Float64Array}
- */
-exports.trunc_array = function(a) {
-    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.trunc_array(ptr0, len0);
-    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
-    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
-    return v2;
+    const ret = wasm.inner_product(ptr0, len0, ptr1, len1);
+    return ret;
 };
 
 /**
@@ -613,18 +666,15 @@ exports.sub_scalar = function(a, scalar) {
 
 /**
  * @param {Float64Array} a
- * @param {Float64Array} b
  * @returns {Float64Array}
  */
-exports.maximum_arrays = function(a, b) {
+exports.acosh_array = function(a) {
     const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
-    const ptr1 = passArrayF64ToWasm0(b, wasm.__wbindgen_malloc);
-    const len1 = WASM_VECTOR_LEN;
-    const ret = wasm.maximum_arrays(ptr0, len0, ptr1, len1);
-    var v3 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    const ret = wasm.acosh_array(ptr0, len0);
+    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
     wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
-    return v3;
+    return v2;
 };
 
 /**
@@ -645,46 +695,40 @@ exports.sub_arrays = function(a, b) {
 };
 
 /**
- * Matrix transpose
  * @param {Float64Array} a
- * @param {number} rows
- * @param {number} cols
  * @returns {Float64Array}
  */
-exports.transpose_matrix = function(a, rows, cols) {
+exports.reciprocal_array = function(a) {
     const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.transpose_matrix(ptr0, len0, rows, cols);
+    const ret = wasm.reciprocal_array(ptr0, len0);
     var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
     wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
     return v2;
 };
 
 /**
+ * Standard deviation ignoring NaN values
  * @param {Float64Array} a
- * @returns {Float64Array}
+ * @returns {number}
  */
-exports.cbrt_array = function(a) {
+exports.nanstd = function(a) {
     const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.cbrt_array(ptr0, len0);
-    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
-    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
-    return v2;
+    const ret = wasm.nanstd(ptr0, len0);
+    return ret;
 };
 
 /**
- * Element-wise square root
+ * Minimum ignoring NaN values
  * @param {Float64Array} a
- * @returns {Float64Array}
+ * @returns {number}
  */
-exports.sqrt_array = function(a) {
+exports.nanmin = function(a) {
     const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.sqrt_array(ptr0, len0);
-    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
-    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
-    return v2;
+    const ret = wasm.nanmin(ptr0, len0);
+    return ret;
 };
 
 /**
@@ -712,6 +756,20 @@ exports.max = function(a) {
 };
 
 /**
+ * Element-wise square root
+ * @param {Float64Array} a
+ * @returns {Float64Array}
+ */
+exports.sqrt_array = function(a) {
+    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.sqrt_array(ptr0, len0);
+    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+    return v2;
+};
+
+/**
  * Element-wise natural logarithm
  * @param {Float64Array} a
  * @returns {Float64Array}
@@ -726,84 +784,13 @@ exports.log_array = function(a) {
 };
 
 /**
- * Element-wise tangent
  * @param {Float64Array} a
  * @returns {Float64Array}
  */
-exports.tan_array = function(a) {
+exports.expm1_array = function(a) {
     const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.tan_array(ptr0, len0);
-    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
-    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
-    return v2;
-};
-
-/**
- * Element-wise cosine
- * @param {Float64Array} a
- * @returns {Float64Array}
- */
-exports.cos_array = function(a) {
-    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.cos_array(ptr0, len0);
-    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
-    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
-    return v2;
-};
-
-/**
- * @param {Float64Array} a
- * @returns {Float64Array}
- */
-exports.cosh_array = function(a) {
-    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.cosh_array(ptr0, len0);
-    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
-    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
-    return v2;
-};
-
-/**
- * Determinant for 2x2 and 3x3 matrices
- * @param {Float64Array} a
- * @param {number} n
- * @returns {number}
- */
-exports.det_matrix = function(a, n) {
-    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.det_matrix(ptr0, len0, n);
-    if (ret[2]) {
-        throw takeFromExternrefTable0(ret[1]);
-    }
-    return ret[0];
-};
-
-/**
- * @param {Float64Array} a
- * @returns {Float64Array}
- */
-exports.exp2_array = function(a) {
-    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.exp2_array(ptr0, len0);
-    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
-    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
-    return v2;
-};
-
-/**
- * @param {Float64Array} a
- * @param {number} b
- * @returns {Float64Array}
- */
-exports.fmod_scalar = function(a, b) {
-    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.fmod_scalar(ptr0, len0, b);
+    const ret = wasm.expm1_array(ptr0, len0);
     var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
     wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
     return v2;
@@ -821,6 +808,98 @@ exports.log10_array = function(a) {
     var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
     wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
     return v2;
+};
+
+/**
+ * Matrix inverse for 2x2 and 3x3 matrices
+ * @param {Float64Array} a
+ * @param {number} n
+ * @returns {Float64Array}
+ */
+exports.inv_matrix = function(a, n) {
+    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.inv_matrix(ptr0, len0, n);
+    if (ret[3]) {
+        throw takeFromExternrefTable0(ret[2]);
+    }
+    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+    return v2;
+};
+
+/**
+ * @param {Float64Array} a
+ * @param {Float64Array} b
+ * @returns {Float64Array}
+ */
+exports.hypot_arrays = function(a, b) {
+    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ptr1 = passArrayF64ToWasm0(b, wasm.__wbindgen_malloc);
+    const len1 = WASM_VECTOR_LEN;
+    const ret = wasm.hypot_arrays(ptr0, len0, ptr1, len1);
+    var v3 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+    return v3;
+};
+
+/**
+ * Dot product (inner product) of two 1D arrays
+ * @param {Float64Array} a
+ * @param {Float64Array} b
+ * @returns {number}
+ */
+exports.dot = function(a, b) {
+    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ptr1 = passArrayF64ToWasm0(b, wasm.__wbindgen_malloc);
+    const len1 = WASM_VECTOR_LEN;
+    const ret = wasm.dot(ptr0, len0, ptr1, len1);
+    return ret;
+};
+
+/**
+ * @param {Float64Array} a
+ * @param {Float64Array} b
+ * @returns {Float64Array}
+ */
+exports.maximum_arrays = function(a, b) {
+    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ptr1 = passArrayF64ToWasm0(b, wasm.__wbindgen_malloc);
+    const len1 = WASM_VECTOR_LEN;
+    const ret = wasm.maximum_arrays(ptr0, len0, ptr1, len1);
+    var v3 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+    return v3;
+};
+
+/**
+ * @param {Float64Array} a
+ * @returns {Float64Array}
+ */
+exports.square_array = function(a) {
+    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.square_array(ptr0, len0);
+    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+    return v2;
+};
+
+/**
+ * Trace of a matrix (sum of diagonal elements)
+ * @param {Float64Array} a
+ * @param {number} rows
+ * @param {number} cols
+ * @returns {number}
+ */
+exports.trace_matrix = function(a, rows, cols) {
+    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.trace_matrix(ptr0, len0, rows, cols);
+    return ret;
 };
 
 /**
@@ -861,44 +940,41 @@ exports.add_arrays = function(a, b) {
  * @param {Float64Array} b
  * @returns {Float64Array}
  */
-exports.hypot_arrays = function(a, b) {
+exports.mod_arrays = function(a, b) {
     const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
     const ptr1 = passArrayF64ToWasm0(b, wasm.__wbindgen_malloc);
     const len1 = WASM_VECTOR_LEN;
-    const ret = wasm.hypot_arrays(ptr0, len0, ptr1, len1);
+    const ret = wasm.mod_arrays(ptr0, len0, ptr1, len1);
     var v3 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
     wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
     return v3;
 };
 
 /**
- * Element-wise sine
  * @param {Float64Array} a
  * @returns {Float64Array}
  */
-exports.sin_array = function(a) {
+exports.exp2_array = function(a) {
     const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.sin_array(ptr0, len0);
+    const ret = wasm.exp2_array(ptr0, len0);
     var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
     wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
     return v2;
 };
 
 /**
- * Inner product of two vectors
  * @param {Float64Array} a
- * @param {Float64Array} b
- * @returns {number}
+ * @returns {Float64Array}
  */
-exports.inner_product = function(a, b) {
+exports.deg2rad_array = function(a) {
     const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
-    const ptr1 = passArrayF64ToWasm0(b, wasm.__wbindgen_malloc);
-    const len1 = WASM_VECTOR_LEN;
-    const ret = wasm.inner_product(ptr0, len0, ptr1, len1);
-    return ret;
+    const ret = wasm.deg2rad_array(ptr0, len0);
+    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+    return v2;
 };
 
 /**
@@ -919,17 +995,14 @@ exports.mul_arrays = function(a, b) {
 };
 
 /**
- * Dot product (inner product) of two 1D arrays
+ * Mean ignoring NaN values
  * @param {Float64Array} a
- * @param {Float64Array} b
  * @returns {number}
  */
-exports.dot = function(a, b) {
+exports.nanmean = function(a) {
     const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
-    const ptr1 = passArrayF64ToWasm0(b, wasm.__wbindgen_malloc);
-    const len1 = WASM_VECTOR_LEN;
-    const ret = wasm.dot(ptr0, len0, ptr1, len1);
+    const ret = wasm.nanmean(ptr0, len0);
     return ret;
 };
 
@@ -949,10 +1022,10 @@ exports.variance = function(a) {
  * @param {Float64Array} a
  * @returns {Float64Array}
  */
-exports.tanh_array = function(a) {
+exports.log1p_array = function(a) {
     const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.tanh_array(ptr0, len0);
+    const ret = wasm.log1p_array(ptr0, len0);
     var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
     wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
     return v2;
@@ -960,25 +1033,27 @@ exports.tanh_array = function(a) {
 
 /**
  * @param {Float64Array} a
+ * @param {number} b
  * @returns {Float64Array}
  */
-exports.reciprocal_array = function(a) {
+exports.fmod_scalar = function(a, b) {
     const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.reciprocal_array(ptr0, len0);
+    const ret = wasm.fmod_scalar(ptr0, len0, b);
     var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
     wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
     return v2;
 };
 
 /**
+ * Element-wise absolute value
  * @param {Float64Array} a
  * @returns {Float64Array}
  */
-exports.expm1_array = function(a) {
+exports.abs_array = function(a) {
     const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.expm1_array(ptr0, len0);
+    const ret = wasm.abs_array(ptr0, len0);
     var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
     wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
     return v2;
@@ -1002,18 +1077,15 @@ exports.norm = function(a, ord) {
 
 /**
  * @param {Float64Array} a
- * @param {Float64Array} b
  * @returns {Float64Array}
  */
-exports.mod_arrays = function(a, b) {
+exports.trunc_array = function(a) {
     const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
-    const ptr1 = passArrayF64ToWasm0(b, wasm.__wbindgen_malloc);
-    const len1 = WASM_VECTOR_LEN;
-    const ret = wasm.mod_arrays(ptr0, len0, ptr1, len1);
-    var v3 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    const ret = wasm.trunc_array(ptr0, len0);
+    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
     wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
-    return v3;
+    return v2;
 };
 
 /**

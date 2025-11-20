@@ -163,6 +163,44 @@ export class WASMBackend implements Backend {
     }
   }
 
+  // ===== NaN-aware Reductions =====
+
+  nansum(a: NDArrayData): number {
+    this.ensureReady()
+    const buffer = this.toFloat64Array(a.buffer)
+    return this.module.nansum(buffer)
+  }
+
+  nanmean(a: NDArrayData): number {
+    this.ensureReady()
+    const buffer = this.toFloat64Array(a.buffer)
+    return this.module.nanmean(buffer)
+  }
+
+  nanmax(a: NDArrayData): number {
+    this.ensureReady()
+    const buffer = this.toFloat64Array(a.buffer)
+    return this.module.nanmax(buffer)
+  }
+
+  nanmin(a: NDArrayData): number {
+    this.ensureReady()
+    const buffer = this.toFloat64Array(a.buffer)
+    return this.module.nanmin(buffer)
+  }
+
+  nanstd(a: NDArrayData): number {
+    this.ensureReady()
+    const buffer = this.toFloat64Array(a.buffer)
+    return this.module.nanstd(buffer)
+  }
+
+  nanvar(a: NDArrayData): number {
+    this.ensureReady()
+    const buffer = this.toFloat64Array(a.buffer)
+    return this.module.nanvar(buffer)
+  }
+
   // ===== Linear Algebra Operations =====
 
   matmul(a: NDArrayData, b: NDArrayData): NDArrayData {

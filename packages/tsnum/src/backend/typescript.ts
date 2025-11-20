@@ -170,6 +170,85 @@ export class TypeScriptBackend implements Backend {
     throw new Error(`Unsupported norm order: ${ord}`)
   }
 
+  // ===== NaN-aware Reductions =====
+
+  nansum(a: NDArrayData): number {
+    let sum = 0
+    for (let i = 0; i < a.buffer.length; i++) {
+      const val = Number(a.buffer[i])
+      if (!Number.isNaN(val)) {
+        sum += val
+      }
+    }
+    return sum
+  }
+
+  nanmean(a: NDArrayData): number {
+    let sum = 0
+    let count = 0
+    for (let i = 0; i < a.buffer.length; i++) {
+      const val = Number(a.buffer[i])
+      if (!Number.isNaN(val)) {
+        sum += val
+        count++
+      }
+    }
+    return count > 0 ? sum / count : Number.NaN
+  }
+
+  nanmax(a: NDArrayData): number {
+    let maxVal = Number.NEGATIVE_INFINITY
+    let hasValue = false
+    for (let i = 0; i < a.buffer.length; i++) {
+      const val = Number(a.buffer[i])
+      if (!Number.isNaN(val)) {
+        if (val > maxVal) {
+          maxVal = val
+        }
+        hasValue = true
+      }
+    }
+    return hasValue ? maxVal : Number.NaN
+  }
+
+  nanmin(a: NDArrayData): number {
+    let minVal = Number.POSITIVE_INFINITY
+    let hasValue = false
+    for (let i = 0; i < a.buffer.length; i++) {
+      const val = Number(a.buffer[i])
+      if (!Number.isNaN(val)) {
+        if (val < minVal) {
+          minVal = val
+        }
+        hasValue = true
+      }
+    }
+    return hasValue ? minVal : Number.NaN
+  }
+
+  nanstd(a: NDArrayData): number {
+    return Math.sqrt(this.nanvar(a))
+  }
+
+  nanvar(a: NDArrayData): number {
+    const m = this.nanmean(a)
+    if (Number.isNaN(m)) {
+      return Number.NaN
+    }
+
+    let sumSquares = 0
+    let count = 0
+    for (let i = 0; i < a.buffer.length; i++) {
+      const val = Number(a.buffer[i])
+      if (!Number.isNaN(val)) {
+        const diff = val - m
+        sumSquares += diff * diff
+        count++
+      }
+    }
+    return count > 0 ? sumSquares / count : Number.NaN
+  }
+
   // ===== Linear Algebra Operations =====
 
   matmul(a: NDArrayData, b: NDArrayData): NDArrayData {

@@ -217,7 +217,7 @@ Complete tracking table for all operations with backend implementation status.
 | Category | Total | Implemented | TS Backend | WASM Backend | Tested |
 |----------|:-----:|:-----------:|:----------:|:------------:|:------:|
 | **Core Ops** | 251 | 251 ✅ | 251 🟦 | 63 🟧 | 251 ✅ |
-| **WASM Coverage** | 63/251 | **25.1%** | - | - | - |
+| **WASM Coverage** | 69/251 | **27.5%** | - | - | - |
 | **Test Coverage** | 415 tests | **100%** | - | - | - |
 
 ### WASM Implementation Priority
