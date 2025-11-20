@@ -299,6 +299,33 @@ export class WASMBackend implements Backend {
     return this.toNDArrayData(result, a.shape, a.dtype)
   }
 
+  sinh(a: NDArrayData): NDArrayData {
+    this.ensureReady()
+
+    const buffer = this.toFloat64Array(a.buffer)
+    const result = this.module.sinh_array(buffer)
+
+    return this.toNDArrayData(result, a.shape, a.dtype)
+  }
+
+  cosh(a: NDArrayData): NDArrayData {
+    this.ensureReady()
+
+    const buffer = this.toFloat64Array(a.buffer)
+    const result = this.module.cosh_array(buffer)
+
+    return this.toNDArrayData(result, a.shape, a.dtype)
+  }
+
+  tanh(a: NDArrayData): NDArrayData {
+    this.ensureReady()
+
+    const buffer = this.toFloat64Array(a.buffer)
+    const result = this.module.tanh_array(buffer)
+
+    return this.toNDArrayData(result, a.shape, a.dtype)
+  }
+
   // ===== Linear Algebra (Advanced) =====
 
   inv(a: NDArrayData): NDArrayData {

@@ -142,7 +142,7 @@ Complete tracking table for all operations with backend implementation status.
 |-----------|:--:|:----:|:------:|-------|
 | `sin`, `cos`, `tan` | 🟦 | 🟧 | ✅ | Trigonometric |
 | `arcsin`, `arccos`, `arctan`, `arctan2` | 🟦 | ⬜ | ✅ | Inverse trig |
-| `sinh`, `cosh`, `tanh` | 🟦 | ⬜ | ✅ | Hyperbolic |
+| `sinh`, `cosh`, `tanh` | 🟦 | 🟧 | ✅ | Hyperbolic |
 | `asinh`, `acosh`, `atanh` | 🟦 | ⬜ | ✅ | Inverse hyperbolic |
 | `exp`, `exp2`, `expm1` | 🟦 | 🟧 | ✅ | Exponential |
 | `log`, `log2`, `log10`, `log1p` | 🟦 | 🟧 | ✅ | Logarithmic |
@@ -215,23 +215,23 @@ Complete tracking table for all operations with backend implementation status.
 
 | Category | Total | Implemented | TS Backend | WASM Backend | Tested |
 |----------|:-----:|:-----------:|:----------:|:------------:|:------:|
-| **Core Ops** | 251 | 251 ✅ | 251 🟦 | 26 🟧 | 251 ✅ |
-| **WASM Coverage** | 26/251 | **10.4%** | - | - | - |
+| **Core Ops** | 251 | 251 ✅ | 251 🟦 | 29 🟧 | 251 ✅ |
+| **WASM Coverage** | 29/251 | **11.6%** | - | - | - |
 | **Test Coverage** | 415 tests | **100%** | - | - | - |
 
 ### WASM Implementation Priority
 
 **🎯 Next Priority** (Expected Performance Gains):
 1. **Linear Algebra** (solve, qr, svd, eig) - 10-30x speedup
-2. **Hyperbolic Functions** (sinh, cosh, tanh) - 2-5x speedup (SIMD)
+2. **Inverse Trig/Hyperbolic** (arcsin, arccos, arctan, asinh, acosh, atanh) - 2-5x speedup (SIMD)
 3. **2D/ND FFT** (fft2, fftn, rfft2, rfftn) - 5-20x speedup
 
-**✅ Dual Backend** (26 operations):
+**✅ Dual Backend** (29 operations):
 - Arithmetic: add, sub, mul, div, pow (5)
 - Reductions: sum, mean, max, min, std, variance (6)
 - Linear Algebra: matmul, dot, inv, det, transpose (5)
 - FFT: fft, ifft (2)
-- Math: abs, sqrt, exp, log, log10, sin, cos, tan (8)
+- Math: abs, sqrt, exp, log, log10, sin, cos, tan, sinh, cosh, tanh (11)
 
 ### ✅ Implemented Functions (251)
 
@@ -395,7 +395,7 @@ User Code → NDArray API → Backend Interface → WASM (fast) or TypeScript (f
 - ✅ Reductions (sum, mean, max, min, std, variance)
 - ✅ Linear algebra (matmul, dot, inv, det, transpose)
 - ✅ FFT operations (fft, ifft)
-- ✅ Math functions (sin, cos, tan, exp, log, log10, abs, sqrt)
+- ✅ Math functions (sin, cos, tan, sinh, cosh, tanh, exp, log, log10, abs, sqrt)
 
 ### Benchmarks
 

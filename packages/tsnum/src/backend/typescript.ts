@@ -352,6 +352,51 @@ export class TypeScriptBackend implements Backend {
     }
   }
 
+  sinh(a: NDArrayData): NDArrayData {
+    const newBuffer = createTypedArray(a.buffer.length, a.dtype)
+
+    for (let i = 0; i < a.buffer.length; i++) {
+      newBuffer[i] = Math.sinh(a.buffer[i])
+    }
+
+    return {
+      buffer: newBuffer,
+      shape: a.shape,
+      strides: a.strides,
+      dtype: a.dtype,
+    }
+  }
+
+  cosh(a: NDArrayData): NDArrayData {
+    const newBuffer = createTypedArray(a.buffer.length, a.dtype)
+
+    for (let i = 0; i < a.buffer.length; i++) {
+      newBuffer[i] = Math.cosh(a.buffer[i])
+    }
+
+    return {
+      buffer: newBuffer,
+      shape: a.shape,
+      strides: a.strides,
+      dtype: a.dtype,
+    }
+  }
+
+  tanh(a: NDArrayData): NDArrayData {
+    const newBuffer = createTypedArray(a.buffer.length, a.dtype)
+
+    for (let i = 0; i < a.buffer.length; i++) {
+      newBuffer[i] = Math.tanh(a.buffer[i])
+    }
+
+    return {
+      buffer: newBuffer,
+      shape: a.shape,
+      strides: a.strides,
+      dtype: a.dtype,
+    }
+  }
+
   // ===== Linear Algebra (Advanced) =====
 
   inv(a: NDArrayData): NDArrayData {

@@ -20,10 +20,7 @@ export function std(a: Float64Array): number;
  * Sum all elements
  */
 export function sum(a: Float64Array): number;
-/**
- * Matrix inverse for 2x2 and 3x3 matrices
- */
-export function inv_matrix(a: Float64Array, n: number): Float64Array;
+export function sinh_array(a: Float64Array): Float64Array;
 /**
  * Element-wise tangent
  */
@@ -37,6 +34,12 @@ export function mul_scalar(a: Float64Array, scalar: number): Float64Array;
  */
 export function pow_scalar(a: Float64Array, exponent: number): Float64Array;
 /**
+ * Fast Fourier Transform (Cooley-Tukey algorithm)
+ * Input: real-valued array of length n (must be power of 2)
+ * Output: interleaved [real, imag] pairs (length 2n)
+ */
+export function fft(input: Float64Array): Float64Array;
+/**
  * Element-wise absolute value
  */
 export function abs_array(a: Float64Array): Float64Array;
@@ -49,11 +52,9 @@ export function div_scalar(a: Float64Array, scalar: number): Float64Array;
  */
 export function log10_array(a: Float64Array): Float64Array;
 /**
- * Inverse Fast Fourier Transform
- * Input: interleaved [real, imag] pairs (length 2n)
- * Output: interleaved [real, imag] pairs (length 2n)
+ * Determinant for 2x2 and 3x3 matrices
  */
-export function ifft(input: Float64Array, n: number): Float64Array;
+export function det_matrix(a: Float64Array, n: number): number;
 /**
  * Element-wise exponential (e^x)
  */
@@ -88,19 +89,24 @@ export function matmul(a: Float64Array, b: Float64Array, m: number, k: number, n
  */
 export function max(a: Float64Array): number;
 /**
- * Fast Fourier Transform (Cooley-Tukey algorithm)
- * Input: real-valued array of length n (must be power of 2)
- * Output: interleaved [real, imag] pairs (length 2n)
+ * Matrix inverse for 2x2 and 3x3 matrices
  */
-export function fft(input: Float64Array): Float64Array;
+export function inv_matrix(a: Float64Array, n: number): Float64Array;
+export function cosh_array(a: Float64Array): Float64Array;
 /**
- * Determinant for 2x2 and 3x3 matrices
+ * Matrix transpose
  */
-export function det_matrix(a: Float64Array, n: number): number;
+export function transpose_matrix(a: Float64Array, rows: number, cols: number): Float64Array;
 /**
  * Add two arrays element-wise (with broadcasting)
  */
 export function add_arrays(a: Float64Array, b: Float64Array): Float64Array;
+/**
+ * Inverse Fast Fourier Transform
+ * Input: interleaved [real, imag] pairs (length 2n)
+ * Output: interleaved [real, imag] pairs (length 2n)
+ */
+export function ifft(input: Float64Array, n: number): Float64Array;
 /**
  * Multiply two arrays element-wise
  */
@@ -113,10 +119,7 @@ export function log_array(a: Float64Array): Float64Array;
  * Variance
  */
 export function variance(a: Float64Array): number;
-/**
- * Matrix transpose
- */
-export function transpose_matrix(a: Float64Array, rows: number, cols: number): Float64Array;
+export function tanh_array(a: Float64Array): Float64Array;
 /**
  * Element-wise square root
  */
@@ -134,6 +137,7 @@ export interface InitOutput {
   readonly add_arrays: (a: number, b: number, c: number, d: number) => [number, number];
   readonly add_scalar: (a: number, b: number, c: number) => [number, number];
   readonly cos_array: (a: number, b: number) => [number, number];
+  readonly cosh_array: (a: number, b: number) => [number, number];
   readonly det_matrix: (a: number, b: number, c: number) => [number, number, number];
   readonly div_arrays: (a: number, b: number, c: number, d: number) => [number, number];
   readonly div_scalar: (a: number, b: number, c: number) => [number, number];
@@ -152,12 +156,14 @@ export interface InitOutput {
   readonly mul_scalar: (a: number, b: number, c: number) => [number, number];
   readonly pow_scalar: (a: number, b: number, c: number) => [number, number];
   readonly sin_array: (a: number, b: number) => [number, number];
+  readonly sinh_array: (a: number, b: number) => [number, number];
   readonly sqrt_array: (a: number, b: number) => [number, number];
   readonly std: (a: number, b: number) => number;
   readonly sub_arrays: (a: number, b: number, c: number, d: number) => [number, number];
   readonly sub_scalar: (a: number, b: number, c: number) => [number, number];
   readonly sum: (a: number, b: number) => number;
   readonly tan_array: (a: number, b: number) => [number, number];
+  readonly tanh_array: (a: number, b: number) => [number, number];
   readonly transpose_matrix: (a: number, b: number, c: number, d: number) => [number, number];
   readonly variance: (a: number, b: number) => number;
   readonly __wbindgen_externrefs: WebAssembly.Table;

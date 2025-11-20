@@ -220,6 +220,21 @@ pub fn tan_array(a: &[f64]) -> Vec<f64> {
     a.iter().map(|x| x.tan()).collect()
 }
 
+#[wasm_bindgen]
+pub fn sinh_array(a: &[f64]) -> Vec<f64> {
+    a.iter().map(|x| x.sinh()).collect()
+}
+
+#[wasm_bindgen]
+pub fn cosh_array(a: &[f64]) -> Vec<f64> {
+    a.iter().map(|x| x.cosh()).collect()
+}
+
+#[wasm_bindgen]
+pub fn tanh_array(a: &[f64]) -> Vec<f64> {
+    a.iter().map(|x| x.tanh()).collect()
+}
+
 // ===== Linear Algebra (Advanced) =====
 
 /// Matrix inverse for 2x2 and 3x3 matrices

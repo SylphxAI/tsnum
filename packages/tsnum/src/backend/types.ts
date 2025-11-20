@@ -42,6 +42,9 @@ export interface Backend {
   sin(a: NDArrayData): NDArrayData
   cos(a: NDArrayData): NDArrayData
   tan(a: NDArrayData): NDArrayData
+  sinh(a: NDArrayData): NDArrayData
+  cosh(a: NDArrayData): NDArrayData
+  tanh(a: NDArrayData): NDArrayData
 
   // Linear algebra (advanced) - 2x2 and 3x3 only for now
   inv(a: NDArrayData): NDArrayData

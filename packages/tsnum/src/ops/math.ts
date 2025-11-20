@@ -340,18 +340,12 @@ export function clip<T extends DType>(a: NDArray<T>, min: number, max: number): 
  */
 export function sinh<T extends DType>(a: NDArray<T>): NDArray<T> {
   const data = a.getData()
-  const newBuffer = createTypedArray(data.buffer.length, data.dtype)
 
-  for (let i = 0; i < data.buffer.length; i++) {
-    newBuffer[i] = Math.sinh(data.buffer[i])
-  }
+  // Delegate to backend (WASM if available, TS fallback)
+  const backend = getBackend()
+  const resultData = backend.sinh(data)
 
-  return new NDArray({
-    buffer: newBuffer,
-    shape: data.shape,
-    strides: data.strides,
-    dtype: data.dtype,
-  })
+  return new NDArray(resultData)
 }
 
 /**
@@ -359,18 +353,12 @@ export function sinh<T extends DType>(a: NDArray<T>): NDArray<T> {
  */
 export function cosh<T extends DType>(a: NDArray<T>): NDArray<T> {
   const data = a.getData()
-  const newBuffer = createTypedArray(data.buffer.length, data.dtype)
 
-  for (let i = 0; i < data.buffer.length; i++) {
-    newBuffer[i] = Math.cosh(data.buffer[i])
-  }
+  // Delegate to backend (WASM if available, TS fallback)
+  const backend = getBackend()
+  const resultData = backend.cosh(data)
 
-  return new NDArray({
-    buffer: newBuffer,
-    shape: data.shape,
-    strides: data.strides,
-    dtype: data.dtype,
-  })
+  return new NDArray(resultData)
 }
 
 /**
@@ -378,18 +366,12 @@ export function cosh<T extends DType>(a: NDArray<T>): NDArray<T> {
  */
 export function tanh<T extends DType>(a: NDArray<T>): NDArray<T> {
   const data = a.getData()
-  const newBuffer = createTypedArray(data.buffer.length, data.dtype)
 
-  for (let i = 0; i < data.buffer.length; i++) {
-    newBuffer[i] = Math.tanh(data.buffer[i])
-  }
+  // Delegate to backend (WASM if available, TS fallback)
+  const backend = getBackend()
+  const resultData = backend.tanh(data)
 
-  return new NDArray({
-    buffer: newBuffer,
-    shape: data.shape,
-    strides: data.strides,
-    dtype: data.dtype,
-  })
+  return new NDArray(resultData)
 }
 
 /**
