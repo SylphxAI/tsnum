@@ -25,7 +25,9 @@
   "scripts": {
     "build": "tsc",
     "test": "bun test",
-    "lint": "biome check ."
+    "lint": "biome check .",
+    "bench": "bun run src/benchmark.ts",
+    "format": "biome format --write ."
   },
   "keywords": ["numpy", "ndarray", "matrix", "linear-algebra", "wasm", "typescript"],
   "license": "MIT",
