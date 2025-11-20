@@ -701,3 +701,9 @@ function flattenArray(arr: any): number[] {
   flatten(arr)
   return result
 }
+
+// ===== Triangular Matrix Functions =====
+export { tril, triu } from './creation-triangular'
+
+// ===== Vandermonde Matrix =====
+export { vander } from './creation-vander'
