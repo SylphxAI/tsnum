@@ -73,7 +73,8 @@ export function slogdet<T extends DType>(a: NDArray<T>): { sign: number; logdet:
   // det(U) = product of diagonal elements
   // det(P) = (-1)^(number of row swaps)
 
-  const matrix = data.buffer.slice()
+  // Convert to Float64Array for numerical stability
+  const matrix = new Float64Array(data.buffer)
   let sign = 1
   let logdet = 0
 
@@ -91,7 +92,7 @@ export function slogdet<T extends DType>(a: NDArray<T>): { sign: number; logdet:
       }
     }
 
-    // Check for singular matrix
+    // Check for singular matrix (before swap)
     if (maxVal < 1e-14) {
       return { sign: 0, logdet: Number.NEGATIVE_INFINITY }
     }
@@ -106,8 +107,12 @@ export function slogdet<T extends DType>(a: NDArray<T>): { sign: number; logdet:
       sign *= -1
     }
 
-    // Eliminate below
+    // Eliminate below (check pivot again after swap)
     const pivot = matrix[k * n + k]
+    if (Math.abs(pivot) < 1e-14) {
+      return { sign: 0, logdet: Number.NEGATIVE_INFINITY }
+    }
+
     for (let i = k + 1; i < n; i++) {
       const factor = matrix[i * n + k] / pivot
       for (let j = k; j < n; j++) {
