@@ -499,6 +499,60 @@ export class TypeScriptBackend implements Backend {
     }
   }
 
+  maximum(a: NDArrayData, b: NDArrayData): NDArrayData {
+    if (a.buffer.length !== b.buffer.length) {
+      throw new Error('Arrays must have same length for maximum')
+    }
+
+    const newBuffer = createTypedArray(a.buffer.length, a.dtype)
+
+    for (let i = 0; i < a.buffer.length; i++) {
+      newBuffer[i] = Math.max(a.buffer[i], b.buffer[i])
+    }
+
+    return {
+      buffer: newBuffer,
+      shape: [...a.shape],
+      strides: [...a.strides],
+      dtype: a.dtype,
+    }
+  }
+
+  minimum(a: NDArrayData, b: NDArrayData): NDArrayData {
+    if (a.buffer.length !== b.buffer.length) {
+      throw new Error('Arrays must have same length for minimum')
+    }
+
+    const newBuffer = createTypedArray(a.buffer.length, a.dtype)
+
+    for (let i = 0; i < a.buffer.length; i++) {
+      newBuffer[i] = Math.min(a.buffer[i], b.buffer[i])
+    }
+
+    return {
+      buffer: newBuffer,
+      shape: [...a.shape],
+      strides: [...a.strides],
+      dtype: a.dtype,
+    }
+  }
+
+  clip(a: NDArrayData, min: number, max: number): NDArrayData {
+    const newBuffer = createTypedArray(a.buffer.length, a.dtype)
+
+    for (let i = 0; i < a.buffer.length; i++) {
+      const val = a.buffer[i]
+      newBuffer[i] = val < min ? min : val > max ? max : val
+    }
+
+    return {
+      buffer: newBuffer,
+      shape: [...a.shape],
+      strides: [...a.strides],
+      dtype: a.dtype,
+    }
+  }
+
   sin(a: NDArrayData): NDArrayData {
     const newBuffer = createTypedArray(a.buffer.length, a.dtype)
 

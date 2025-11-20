@@ -357,6 +357,43 @@ export class WASMBackend implements Backend {
     return this.toNDArrayData(result, a.shape, a.dtype)
   }
 
+  maximum(a: NDArrayData, b: NDArrayData): NDArrayData {
+    this.ensureReady()
+
+    if (a.buffer.length !== b.buffer.length) {
+      throw new Error('Arrays must have same length for maximum')
+    }
+
+    const bufferA = this.toFloat64Array(a.buffer)
+    const bufferB = this.toFloat64Array(b.buffer)
+    const result = this.module.maximum_arrays(bufferA, bufferB)
+
+    return this.toNDArrayData(result, a.shape, a.dtype)
+  }
+
+  minimum(a: NDArrayData, b: NDArrayData): NDArrayData {
+    this.ensureReady()
+
+    if (a.buffer.length !== b.buffer.length) {
+      throw new Error('Arrays must have same length for minimum')
+    }
+
+    const bufferA = this.toFloat64Array(a.buffer)
+    const bufferB = this.toFloat64Array(b.buffer)
+    const result = this.module.minimum_arrays(bufferA, bufferB)
+
+    return this.toNDArrayData(result, a.shape, a.dtype)
+  }
+
+  clip(a: NDArrayData, min: number, max: number): NDArrayData {
+    this.ensureReady()
+
+    const buffer = this.toFloat64Array(a.buffer)
+    const result = this.module.clip_array(buffer, min, max)
+
+    return this.toNDArrayData(result, a.shape, a.dtype)
+  }
+
   sin(a: NDArrayData): NDArrayData {
     this.ensureReady()
 

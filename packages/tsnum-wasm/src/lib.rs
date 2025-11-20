@@ -317,6 +317,23 @@ pub fn trunc_array(a: &[f64]) -> Vec<f64> {
     a.iter().map(|x| x.trunc()).collect()
 }
 
+// ===== Comparison Functions =====
+
+#[wasm_bindgen]
+pub fn maximum_arrays(a: &[f64], b: &[f64]) -> Vec<f64> {
+    a.iter().zip(b.iter()).map(|(x, y)| x.max(*y)).collect()
+}
+
+#[wasm_bindgen]
+pub fn minimum_arrays(a: &[f64], b: &[f64]) -> Vec<f64> {
+    a.iter().zip(b.iter()).map(|(x, y)| x.min(*y)).collect()
+}
+
+#[wasm_bindgen]
+pub fn clip_array(a: &[f64], min: f64, max: f64) -> Vec<f64> {
+    a.iter().map(|x| x.clamp(min, max)).collect()
+}
+
 // ===== Linear Algebra (Advanced) =====
 
 /// Matrix inverse for 2x2 and 3x3 matrices

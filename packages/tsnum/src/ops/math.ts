@@ -228,22 +228,11 @@ export function maximum<T extends DType>(a: NDArray<T>, b: NDArray<T>): NDArray<
   const aData = a.getData()
   const bData = b.getData()
 
-  if (aData.buffer.length !== bData.buffer.length) {
-    throw new Error('Arrays must have same length for maximum')
-  }
+  // Delegate to backend (WASM if available, TS fallback)
+  const backend = getBackend()
+  const resultData = backend.maximum(aData, bData)
 
-  const newBuffer = createTypedArray(aData.buffer.length, aData.dtype)
-
-  for (let i = 0; i < aData.buffer.length; i++) {
-    newBuffer[i] = Math.max(aData.buffer[i], bData.buffer[i])
-  }
-
-  return new NDArray({
-    buffer: newBuffer,
-    shape: aData.shape,
-    strides: aData.strides,
-    dtype: aData.dtype,
-  })
+  return new NDArray(resultData)
 }
 
 /**
@@ -253,22 +242,11 @@ export function minimum<T extends DType>(a: NDArray<T>, b: NDArray<T>): NDArray<
   const aData = a.getData()
   const bData = b.getData()
 
-  if (aData.buffer.length !== bData.buffer.length) {
-    throw new Error('Arrays must have same length for minimum')
-  }
+  // Delegate to backend (WASM if available, TS fallback)
+  const backend = getBackend()
+  const resultData = backend.minimum(aData, bData)
 
-  const newBuffer = createTypedArray(aData.buffer.length, aData.dtype)
-
-  for (let i = 0; i < aData.buffer.length; i++) {
-    newBuffer[i] = Math.min(aData.buffer[i], bData.buffer[i])
-  }
-
-  return new NDArray({
-    buffer: newBuffer,
-    shape: aData.shape,
-    strides: aData.strides,
-    dtype: aData.dtype,
-  })
+  return new NDArray(resultData)
 }
 
 /**
@@ -276,19 +254,12 @@ export function minimum<T extends DType>(a: NDArray<T>, b: NDArray<T>): NDArray<
  */
 export function clip<T extends DType>(a: NDArray<T>, min: number, max: number): NDArray<T> {
   const data = a.getData()
-  const newBuffer = createTypedArray(data.buffer.length, data.dtype)
 
-  for (let i = 0; i < data.buffer.length; i++) {
-    const val = data.buffer[i]
-    newBuffer[i] = val < min ? min : val > max ? max : val
-  }
+  // Delegate to backend (WASM if available, TS fallback)
+  const backend = getBackend()
+  const resultData = backend.clip(data, min, max)
 
-  return new NDArray({
-    buffer: newBuffer,
-    shape: data.shape,
-    strides: data.strides,
-    dtype: data.dtype,
-  })
+  return new NDArray(resultData)
 }
 
 // ===== Hyperbolic Functions =====

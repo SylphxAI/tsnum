@@ -49,6 +49,9 @@ export interface Backend {
   floor(a: NDArrayData): NDArrayData
   ceil(a: NDArrayData): NDArrayData
   trunc(a: NDArrayData): NDArrayData
+  maximum(a: NDArrayData, b: NDArrayData): NDArrayData
+  minimum(a: NDArrayData, b: NDArrayData): NDArrayData
+  clip(a: NDArrayData, min: number, max: number): NDArrayData
   sin(a: NDArrayData): NDArrayData
   cos(a: NDArrayData): NDArrayData
   tan(a: NDArrayData): NDArrayData

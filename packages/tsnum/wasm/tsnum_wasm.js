@@ -65,31 +65,42 @@ exports.min = function(a) {
     return ret;
 };
 
-function takeFromExternrefTable0(idx) {
-    const value = wasm.__wbindgen_externrefs.get(idx);
-    wasm.__externref_table_dealloc(idx);
-    return value;
-}
-/**
- * Determinant for 2x2 and 3x3 matrices
- * @param {Float64Array} a
- * @param {number} n
- * @returns {number}
- */
-exports.det_matrix = function(a, n) {
-    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
-    const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.det_matrix(ptr0, len0, n);
-    if (ret[2]) {
-        throw takeFromExternrefTable0(ret[1]);
-    }
-    return ret[0];
-};
-
 function getArrayF64FromWasm0(ptr, len) {
     ptr = ptr >>> 0;
     return getFloat64ArrayMemory0().subarray(ptr / 8, ptr / 8 + len);
 }
+/**
+ * @param {Float64Array} a
+ * @param {Float64Array} b
+ * @returns {Float64Array}
+ */
+exports.minimum_arrays = function(a, b) {
+    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ptr1 = passArrayF64ToWasm0(b, wasm.__wbindgen_malloc);
+    const len1 = WASM_VECTOR_LEN;
+    const ret = wasm.minimum_arrays(ptr0, len0, ptr1, len1);
+    var v3 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+    return v3;
+};
+
+/**
+ * Matrix transpose
+ * @param {Float64Array} a
+ * @param {number} rows
+ * @param {number} cols
+ * @returns {Float64Array}
+ */
+exports.transpose_matrix = function(a, rows, cols) {
+    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.transpose_matrix(ptr0, len0, rows, cols);
+    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+    return v2;
+};
+
 /**
  * Add scalar to array
  * @param {Float64Array} a
@@ -198,21 +209,19 @@ exports.acosh_array = function(a) {
 };
 
 /**
- * Matrix inverse for 2x2 and 3x3 matrices
  * @param {Float64Array} a
- * @param {number} n
+ * @param {Float64Array} b
  * @returns {Float64Array}
  */
-exports.inv_matrix = function(a, n) {
+exports.maximum_arrays = function(a, b) {
     const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.inv_matrix(ptr0, len0, n);
-    if (ret[3]) {
-        throw takeFromExternrefTable0(ret[2]);
-    }
-    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    const ptr1 = passArrayF64ToWasm0(b, wasm.__wbindgen_malloc);
+    const len1 = WASM_VECTOR_LEN;
+    const ret = wasm.maximum_arrays(ptr0, len0, ptr1, len1);
+    var v3 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
     wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
-    return v2;
+    return v3;
 };
 
 /**
@@ -229,16 +238,31 @@ exports.arccos_array = function(a) {
 };
 
 /**
- * Matrix transpose
  * @param {Float64Array} a
- * @param {number} rows
- * @param {number} cols
+ * @param {number} min
+ * @param {number} max
  * @returns {Float64Array}
  */
-exports.transpose_matrix = function(a, rows, cols) {
+exports.clip_array = function(a, min, max) {
     const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.transpose_matrix(ptr0, len0, rows, cols);
+    const ret = wasm.clip_array(ptr0, len0, min, max);
+    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+    return v2;
+};
+
+/**
+ * Fast Fourier Transform (Cooley-Tukey algorithm)
+ * Input: real-valued array of length n (must be power of 2)
+ * Output: interleaved [real, imag] pairs (length 2n)
+ * @param {Float64Array} input
+ * @returns {Float64Array}
+ */
+exports.fft = function(input) {
+    const ptr0 = passArrayF64ToWasm0(input, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.fft(ptr0, len0);
     var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
     wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
     return v2;
@@ -267,6 +291,23 @@ exports.sinh_array = function(a) {
     const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
     const ret = wasm.sinh_array(ptr0, len0);
+    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
+    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
+    return v2;
+};
+
+/**
+ * Inverse Fast Fourier Transform
+ * Input: interleaved [real, imag] pairs (length 2n)
+ * Output: interleaved [real, imag] pairs (length 2n)
+ * @param {Float64Array} input
+ * @param {number} n
+ * @returns {Float64Array}
+ */
+exports.ifft = function(input, n) {
+    const ptr0 = passArrayF64ToWasm0(input, wasm.__wbindgen_malloc);
+    const len0 = WASM_VECTOR_LEN;
+    const ret = wasm.ifft(ptr0, len0, n);
     var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
     wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
     return v2;
@@ -409,17 +450,24 @@ exports.round_array = function(a) {
     return v2;
 };
 
+function takeFromExternrefTable0(idx) {
+    const value = wasm.__wbindgen_externrefs.get(idx);
+    wasm.__externref_table_dealloc(idx);
+    return value;
+}
 /**
- * Fast Fourier Transform (Cooley-Tukey algorithm)
- * Input: real-valued array of length n (must be power of 2)
- * Output: interleaved [real, imag] pairs (length 2n)
- * @param {Float64Array} input
+ * Matrix inverse for 2x2 and 3x3 matrices
+ * @param {Float64Array} a
+ * @param {number} n
  * @returns {Float64Array}
  */
-exports.fft = function(input) {
-    const ptr0 = passArrayF64ToWasm0(input, wasm.__wbindgen_malloc);
+exports.inv_matrix = function(a, n) {
+    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.fft(ptr0, len0);
+    const ret = wasm.inv_matrix(ptr0, len0, n);
+    if (ret[3]) {
+        throw takeFromExternrefTable0(ret[2]);
+    }
     var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
     wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
     return v2;
@@ -441,20 +489,19 @@ exports.sub_scalar = function(a, scalar) {
 };
 
 /**
- * Inverse Fast Fourier Transform
- * Input: interleaved [real, imag] pairs (length 2n)
- * Output: interleaved [real, imag] pairs (length 2n)
- * @param {Float64Array} input
+ * Determinant for 2x2 and 3x3 matrices
+ * @param {Float64Array} a
  * @param {number} n
- * @returns {Float64Array}
+ * @returns {number}
  */
-exports.ifft = function(input, n) {
-    const ptr0 = passArrayF64ToWasm0(input, wasm.__wbindgen_malloc);
+exports.det_matrix = function(a, n) {
+    const ptr0 = passArrayF64ToWasm0(a, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
-    const ret = wasm.ifft(ptr0, len0, n);
-    var v2 = getArrayF64FromWasm0(ret[0], ret[1]).slice();
-    wasm.__wbindgen_free(ret[0], ret[1] * 8, 8);
-    return v2;
+    const ret = wasm.det_matrix(ptr0, len0, n);
+    if (ret[2]) {
+        throw takeFromExternrefTable0(ret[1]);
+    }
+    return ret[0];
 };
 
 /**
