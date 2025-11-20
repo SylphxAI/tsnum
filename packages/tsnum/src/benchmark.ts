@@ -2,7 +2,7 @@
 // Run with: bun run src/benchmark.ts
 
 import { bench, run } from 'mitata'
-import { array, add, mul, sum, mean, pipe, reshape, transpose } from './index'
+import { add, array, mean, mul, pipe, reshape, sum, transpose } from './index'
 
 // ===== Benchmark 1: Array Creation =====
 bench('array creation (1D, n=1000)', () => {
