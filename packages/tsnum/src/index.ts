@@ -160,10 +160,29 @@ export {
   svd,
   inv,
   solve,
+  pinv,
+  matrix_rank,
+  matrix_power,
+  lstsq,
 } from './linalg'
 
 // 2c. Random
-export { random, randint, randn, shuffle, choice, setSeed, getSeed } from './random'
+export {
+  random,
+  randint,
+  randn,
+  shuffle,
+  choice,
+  setSeed,
+  getSeed,
+  uniform,
+  normal,
+  exponential,
+  binomial,
+  poisson,
+  gamma,
+  beta,
+} from './random'
 
 // 2d. FFT
 export { fft, ifft, rfft, irfft } from './fft'

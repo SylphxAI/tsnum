@@ -214,3 +214,340 @@ export function choice<T extends DType>(
     dtype: data.dtype,
   })
 }
+
+// ===== Additional Random Distributions =====
+
+/**
+ * Random samples from uniform distribution [low, high)
+ */
+export function uniform(
+  low = 0,
+  high = 1,
+  shape: number | number[] = 1,
+  dtype: DType = 'float64',
+): NDArray {
+  const shapeArray = typeof shape === 'number' ? [shape] : shape
+  const size = shapeArray.reduce((a, b) => a * b, 1)
+
+  const buffer = createTypedArray(size, dtype)
+  const range = high - low
+
+  for (let i = 0; i < size; i++) {
+    buffer[i] = rand() * range + low
+  }
+
+  const strides = new Array(shapeArray.length)
+  strides[shapeArray.length - 1] = 1
+  for (let i = shapeArray.length - 2; i >= 0; i--) {
+    strides[i] = strides[i + 1] * shapeArray[i + 1]
+  }
+
+  return new NDArray({
+    buffer,
+    shape: shapeArray,
+    strides,
+    dtype,
+  })
+}
+
+/**
+ * Random samples from normal distribution with specified mean and std
+ */
+export function normal(
+  mean = 0,
+  std = 1,
+  shape: number | number[] = 1,
+  dtype: DType = 'float64',
+): NDArray {
+  const shapeArray = typeof shape === 'number' ? [shape] : shape
+  const size = shapeArray.reduce((a, b) => a * b, 1)
+
+  const buffer = createTypedArray(size, dtype)
+
+  // Box-Muller transform
+  for (let i = 0; i < size; i += 2) {
+    const u1 = rand()
+    const u2 = rand()
+
+    const r = Math.sqrt(-2 * Math.log(u1))
+    const theta = 2 * Math.PI * u2
+
+    buffer[i] = r * Math.cos(theta) * std + mean
+    if (i + 1 < size) {
+      buffer[i + 1] = r * Math.sin(theta) * std + mean
+    }
+  }
+
+  const strides = new Array(shapeArray.length)
+  strides[shapeArray.length - 1] = 1
+  for (let i = shapeArray.length - 2; i >= 0; i--) {
+    strides[i] = strides[i + 1] * shapeArray[i + 1]
+  }
+
+  return new NDArray({
+    buffer,
+    shape: shapeArray,
+    strides,
+    dtype,
+  })
+}
+
+/**
+ * Random samples from exponential distribution
+ */
+export function exponential(
+  scale = 1.0,
+  shape: number | number[] = 1,
+  dtype: DType = 'float64',
+): NDArray {
+  const shapeArray = typeof shape === 'number' ? [shape] : shape
+  const size = shapeArray.reduce((a, b) => a * b, 1)
+
+  const buffer = createTypedArray(size, dtype)
+
+  for (let i = 0; i < size; i++) {
+    // Inverse transform sampling: -ln(U) / lambda
+    buffer[i] = -Math.log(1 - rand()) * scale
+  }
+
+  const strides = new Array(shapeArray.length)
+  strides[shapeArray.length - 1] = 1
+  for (let i = shapeArray.length - 2; i >= 0; i--) {
+    strides[i] = strides[i + 1] * shapeArray[i + 1]
+  }
+
+  return new NDArray({
+    buffer,
+    shape: shapeArray,
+    strides,
+    dtype,
+  })
+}
+
+/**
+ * Random samples from binomial distribution
+ * Uses inverse transform method for small n, normal approximation for large n
+ */
+export function binomial(
+  n: number,
+  p: number,
+  shape: number | number[] = 1,
+  dtype: DType = 'int32',
+): NDArray {
+  const shapeArray = typeof shape === 'number' ? [shape] : shape
+  const size = shapeArray.reduce((a, b) => a * b, 1)
+
+  const buffer = createTypedArray(size, dtype)
+
+  if (n * p > 10 && n * (1 - p) > 10) {
+    // Normal approximation for large n
+    const mean = n * p
+    const stdDev = Math.sqrt(n * p * (1 - p))
+
+    for (let i = 0; i < size; i++) {
+      // Box-Muller transform
+      const u1 = rand()
+      const u2 = rand()
+      const z = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2)
+
+      let value = Math.round(z * stdDev + mean)
+      // Clamp to valid range
+      value = Math.max(0, Math.min(n, value))
+      buffer[i] = value
+    }
+  } else {
+    // Direct method for small n
+    for (let i = 0; i < size; i++) {
+      let successes = 0
+      for (let trial = 0; trial < n; trial++) {
+        if (rand() < p) successes++
+      }
+      buffer[i] = successes
+    }
+  }
+
+  const strides = new Array(shapeArray.length)
+  strides[shapeArray.length - 1] = 1
+  for (let i = shapeArray.length - 2; i >= 0; i--) {
+    strides[i] = strides[i + 1] * shapeArray[i + 1]
+  }
+
+  return new NDArray({
+    buffer,
+    shape: shapeArray,
+    strides,
+    dtype,
+  })
+}
+
+/**
+ * Random samples from Poisson distribution
+ * Uses Knuth's algorithm for small lambda, rejection method for large lambda
+ */
+export function poisson(
+  lambda = 1.0,
+  shape: number | number[] = 1,
+  dtype: DType = 'int32',
+): NDArray {
+  const shapeArray = typeof shape === 'number' ? [shape] : shape
+  const size = shapeArray.reduce((a, b) => a * b, 1)
+
+  const buffer = createTypedArray(size, dtype)
+
+  if (lambda < 30) {
+    // Knuth's algorithm for small lambda
+    const L = Math.exp(-lambda)
+
+    for (let i = 0; i < size; i++) {
+      let k = 0
+      let p = 1.0
+
+      do {
+        k++
+        p *= rand()
+      } while (p > L)
+
+      buffer[i] = k - 1
+    }
+  } else {
+    // Normal approximation for large lambda
+    const mean = lambda
+    const stdDev = Math.sqrt(lambda)
+
+    for (let i = 0; i < size; i++) {
+      // Box-Muller transform
+      const u1 = rand()
+      const u2 = rand()
+      const z = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2)
+
+      let value = Math.round(z * stdDev + mean)
+      // Clamp to non-negative
+      value = Math.max(0, value)
+      buffer[i] = value
+    }
+  }
+
+  const strides = new Array(shapeArray.length)
+  strides[shapeArray.length - 1] = 1
+  for (let i = shapeArray.length - 2; i >= 0; i--) {
+    strides[i] = strides[i + 1] * shapeArray[i + 1]
+  }
+
+  return new NDArray({
+    buffer,
+    shape: shapeArray,
+    strides,
+    dtype,
+  })
+}
+
+/**
+ * Random samples from gamma distribution
+ * Uses Marsaglia and Tsang's method
+ */
+export function gamma(
+  shape_param: number,
+  scale = 1.0,
+  shape: number | number[] = 1,
+  dtype: DType = 'float64',
+): NDArray {
+  const shapeArray = typeof shape === 'number' ? [shape] : shape
+  const size = shapeArray.reduce((a, b) => a * b, 1)
+
+  const buffer = createTypedArray(size, dtype)
+  const k = shape_param
+
+  if (k < 1) {
+    // Use shape augmentation for k < 1
+    for (let i = 0; i < size; i++) {
+      const u = rand()
+      const g = gammaHelper(k + 1)
+      buffer[i] = g * Math.pow(u, 1 / k) * scale
+    }
+  } else {
+    for (let i = 0; i < size; i++) {
+      buffer[i] = gammaHelper(k) * scale
+    }
+  }
+
+  const strides = new Array(shapeArray.length)
+  strides[shapeArray.length - 1] = 1
+  for (let i = shapeArray.length - 2; i >= 0; i--) {
+    strides[i] = strides[i + 1] * shapeArray[i + 1]
+  }
+
+  return new NDArray({
+    buffer,
+    shape: shapeArray,
+    strides,
+    dtype,
+  })
+}
+
+/**
+ * Helper function for gamma distribution (Marsaglia and Tsang's method)
+ */
+function gammaHelper(k: number): number {
+  const d = k - 1 / 3
+  const c = 1 / Math.sqrt(9 * d)
+
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    let x: number
+    let v: number
+
+    do {
+      // Generate standard normal
+      const u1 = rand()
+      const u2 = rand()
+      x = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2)
+      v = 1 + c * x
+    } while (v <= 0)
+
+    v = v * v * v
+    const u = rand()
+
+    if (u < 1 - 0.0331 * x * x * x * x) {
+      return d * v
+    }
+
+    if (Math.log(u) < 0.5 * x * x + d * (1 - v + Math.log(v))) {
+      return d * v
+    }
+  }
+}
+
+/**
+ * Random samples from beta distribution
+ * Uses gamma distribution to generate beta samples
+ */
+export function beta(
+  alpha: number,
+  betaParam: number,
+  shape: number | number[] = 1,
+  dtype: DType = 'float64',
+): NDArray {
+  const shapeArray = typeof shape === 'number' ? [shape] : shape
+  const size = shapeArray.reduce((a, b) => a * b, 1)
+
+  const buffer = createTypedArray(size, dtype)
+
+  for (let i = 0; i < size; i++) {
+    const x = gammaHelper(alpha)
+    const y = gammaHelper(betaParam)
+    buffer[i] = x / (x + y)
+  }
+
+  const strides = new Array(shapeArray.length)
+  strides[shapeArray.length - 1] = 1
+  for (let i = shapeArray.length - 2; i >= 0; i--) {
+    strides[i] = strides[i + 1] * shapeArray[i + 1]
+  }
+
+  return new NDArray({
+    buffer,
+    shape: shapeArray,
+    strides,
+    dtype,
+  })
+}

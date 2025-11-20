@@ -1,7 +1,8 @@
 // ===== Linear Algebra =====
 
 import type { DType } from '../core/types'
-import { createTypedArray } from '../core/utils'
+import { computeStrides, createTypedArray } from '../core/utils'
+import { eye } from '../creation'
 import type { NDArray } from '../ndarray'
 import { NDArray as NDArrayImpl } from '../ndarray'
 
@@ -669,4 +670,216 @@ export function solve<T extends DType>(a: NDArray<T>, b: NDArray<T>): NDArray<T>
     strides: [1],
     dtype: aData.dtype,
   })
+}
+
+// ===== Advanced Linear Algebra =====
+
+/**
+ * Compute the Moore-Penrose pseudoinverse
+ * Uses SVD decomposition: A+ = V * Σ+ * U^T
+ */
+export function pinv<T extends DType>(a: NDArray<T>, rcond = 1e-15): NDArray<T> {
+  const aData = a.getData()
+
+  if (aData.shape.length !== 2) {
+    throw new Error('pinv only supports 2D arrays')
+  }
+
+  const [m, n] = aData.shape
+
+  // Use SVD: A = U * Σ * V^T
+  const { u, s, vt } = svd(a)
+  const uData = u.getData()
+  const sData = s.getData()
+  const vtData = vt.getData()
+
+  // Find cutoff for small singular values
+  const sArray = Array.from(sData.buffer)
+  const maxSingular = Math.max(...(sArray as number[]))
+  const cutoff = rcond * maxSingular
+
+  // Compute Σ+ (reciprocal of singular values, zero for small values)
+  const sInv = createTypedArray(sData.buffer.length, sData.dtype)
+  for (let i = 0; i < sData.buffer.length; i++) {
+    sInv[i] = Math.abs(sData.buffer[i]) > cutoff ? 1 / sData.buffer[i] : 0
+  }
+
+  // Compute A+ = V * Σ+ * U^T
+  // Note: vt is V^T, so we need to transpose it
+  const result = createTypedArray(n * m, aData.dtype)
+  const rank = Math.min(m, n)
+
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < m; j++) {
+      let sum = 0
+      for (let k = 0; k < rank; k++) {
+        // vt[k, i] gives V[i, k] after transposing
+        sum += vtData.buffer[k * n + i] * sInv[k] * uData.buffer[j * rank + k]
+      }
+      result[i * m + j] = sum
+    }
+  }
+
+  return new NDArrayImpl({
+    buffer: result,
+    shape: [n, m],
+    strides: computeStrides([n, m]),
+    dtype: aData.dtype,
+  })
+}
+
+/**
+ * Compute the rank of a matrix
+ * Uses SVD to count non-zero singular values
+ */
+export function matrix_rank<T extends DType>(a: NDArray<T>, tol?: number): number {
+  const aData = a.getData()
+
+  if (aData.shape.length !== 2) {
+    throw new Error('matrix_rank only supports 2D arrays')
+  }
+
+  const { s } = svd(a)
+  const sData = s.getData()
+
+  // Determine tolerance if not provided
+  const sArray = Array.from(sData.buffer)
+  const maxSingular = Math.max(...(sArray as number[]))
+  const tolerance = tol ?? maxSingular * Math.max(aData.shape[0], aData.shape[1]) * 1e-15
+
+  // Count singular values above tolerance
+  let rank = 0
+  for (let i = 0; i < sData.buffer.length; i++) {
+    if (Math.abs(sData.buffer[i]) > tolerance) {
+      rank++
+    }
+  }
+
+  return rank
+}
+
+/**
+ * Raise a square matrix to the power n
+ */
+export function matrix_power<T extends DType>(a: NDArray<T>, n: number): NDArray<T> {
+  const aData = a.getData()
+
+  if (aData.shape.length !== 2) {
+    throw new Error('matrix_power only supports 2D arrays')
+  }
+
+  const [rows, cols] = aData.shape
+
+  if (rows !== cols) {
+    throw new Error('matrix_power requires square matrix')
+  }
+
+  if (n === 0) {
+    // Return identity matrix
+    return eye(rows, { dtype: aData.dtype }) as NDArray<T>
+  }
+
+  if (n === 1) {
+    // Return copy of original matrix
+    const buffer = createTypedArray(aData.buffer.length, aData.dtype)
+    for (let i = 0; i < aData.buffer.length; i++) {
+      buffer[i] = aData.buffer[i]
+    }
+    return new NDArrayImpl({
+      buffer,
+      shape: aData.shape,
+      strides: aData.strides,
+      dtype: aData.dtype,
+    })
+  }
+
+  if (n < 0) {
+    // Use inverse for negative powers
+    const aInv = inv(a)
+    return matrix_power(aInv, -n)
+  }
+
+  // Use repeated squaring for efficiency
+  let result = a
+  let power = n
+
+  // Start with identity
+  let accum = eye(rows, { dtype: aData.dtype }) as NDArray<T>
+
+  while (power > 0) {
+    if (power % 2 === 1) {
+      accum = matmul(accum, result)
+    }
+    result = matmul(result, result)
+    power = Math.floor(power / 2)
+  }
+
+  return accum
+}
+
+/**
+ * Solve linear least squares problem: minimize ||Ax - b||^2
+ * Returns x that minimizes the squared error
+ */
+export function lstsq<T extends DType>(
+  a: NDArray<T>,
+  b: NDArray<T>,
+  rcond = 1e-15,
+): { x: NDArray<T>; residuals: number; rank: number } {
+  const aData = a.getData()
+  const bData = b.getData()
+
+  if (aData.shape.length !== 2) {
+    throw new Error('A must be 2D array')
+  }
+
+  if (bData.shape.length !== 1) {
+    throw new Error('b must be 1D array for now')
+  }
+
+  const [m, n] = aData.shape
+
+  if (bData.shape[0] !== m) {
+    throw new Error('Incompatible dimensions')
+  }
+
+  // Use pseudoinverse: x = A+ * b
+  const aPinv = pinv(a, rcond)
+  const aPinvData = aPinv.getData()
+
+  // Compute x = A+ * b
+  const xBuffer = createTypedArray(n, aData.dtype)
+  for (let i = 0; i < n; i++) {
+    let sum = 0
+    for (let j = 0; j < m; j++) {
+      sum += aPinvData.buffer[i * m + j] * bData.buffer[j]
+    }
+    xBuffer[i] = sum
+  }
+
+  const x = new NDArrayImpl({
+    buffer: xBuffer,
+    shape: [n],
+    strides: [1],
+    dtype: aData.dtype,
+  }) as NDArray<T>
+
+  // Compute residuals: ||Ax - b||^2
+  let residualSum = 0
+  for (let i = 0; i < m; i++) {
+    let axValue = 0
+    for (let j = 0; j < n; j++) {
+      axValue += aData.buffer[i * n + j] * xBuffer[j]
+    }
+    const diff = axValue - bData.buffer[i]
+    residualSum += diff * diff
+  }
+
+  const rank = matrix_rank(a, rcond)
+
+  return {
+    x,
+    residuals: residualSum,
+    rank,
+  }
 }
