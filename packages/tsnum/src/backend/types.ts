@@ -43,8 +43,13 @@ export interface Backend {
   cos(a: NDArrayData): NDArrayData
   tan(a: NDArrayData): NDArrayData
 
+  // Linear algebra (advanced) - 2x2 and 3x3 only for now
+  inv(a: NDArrayData): NDArrayData
+  det(a: NDArrayData): number
+  transpose(a: NDArrayData): NDArrayData
+
   // Shape operations (pure TS - no WASM benefit)
-  // reshape, transpose, etc. stay in TS
+  // reshape, etc. stay in TS
 }
 
 /**

@@ -299,6 +299,58 @@ export class WASMBackend implements Backend {
     return this.toNDArrayData(result, a.shape, a.dtype)
   }
 
+  // ===== Linear Algebra (Advanced) =====
+
+  inv(a: NDArrayData): NDArrayData {
+    this.ensureReady()
+
+    if (a.shape.length !== 2 || a.shape[0] !== a.shape[1]) {
+      throw new Error('inv requires square 2D array')
+    }
+
+    const n = a.shape[0]
+    const buffer = this.toFloat64Array(a.buffer)
+
+    try {
+      const result = this.module.inv_matrix(buffer, n)
+      return this.toNDArrayData(result, [n, n], a.dtype)
+    } catch (error) {
+      throw new Error(error instanceof Error ? error.message : 'Matrix inversion failed')
+    }
+  }
+
+  det(a: NDArrayData): number {
+    this.ensureReady()
+
+    if (a.shape.length !== 2 || a.shape[0] !== a.shape[1]) {
+      throw new Error('det requires square 2D array')
+    }
+
+    const n = a.shape[0]
+    const buffer = this.toFloat64Array(a.buffer)
+
+    try {
+      return this.module.det_matrix(buffer, n)
+    } catch (error) {
+      throw new Error(error instanceof Error ? error.message : 'Determinant calculation failed')
+    }
+  }
+
+  transpose(a: NDArrayData): NDArrayData {
+    this.ensureReady()
+
+    if (a.shape.length !== 2) {
+      throw new Error('transpose requires 2D array')
+    }
+
+    const [rows, cols] = a.shape
+    const buffer = this.toFloat64Array(a.buffer)
+
+    const result = this.module.transpose_matrix(buffer, rows, cols)
+
+    return this.toNDArrayData(result, [cols, rows], a.dtype)
+  }
+
   // ===== Helper Methods =====
 
   private ensureReady(): void {

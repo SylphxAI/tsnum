@@ -1,3 +1,4 @@
+import { NDArray } from '../ndarray'
 // ===== Type Testing Utilities =====
 
 import type { DType } from '../core/types'

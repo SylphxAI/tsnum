@@ -1,3 +1,4 @@
+import { NDArray } from '../ndarray'
 import { getBackend } from '../backend/manager'
 import type { AxisOptions } from '../core/types'
 

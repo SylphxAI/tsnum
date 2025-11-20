@@ -352,6 +352,124 @@ export class TypeScriptBackend implements Backend {
     }
   }
 
+  // ===== Linear Algebra (Advanced) =====
+
+  inv(a: NDArrayData): NDArrayData {
+    if (a.shape.length !== 2 || a.shape[0] !== a.shape[1]) {
+      throw new Error('inv requires square 2D array')
+    }
+
+    const n = a.shape[0]
+
+    if (n === 2) {
+      const [a11, a12, a21, a22] = a.buffer
+      const detVal = a11 * a22 - a12 * a21
+
+      if (Math.abs(detVal) < 1e-10) {
+        throw new Error('Matrix is singular')
+      }
+
+      const invBuffer = createTypedArray(4, a.dtype)
+      invBuffer[0] = a22 / detVal
+      invBuffer[1] = -a12 / detVal
+      invBuffer[2] = -a21 / detVal
+      invBuffer[3] = a11 / detVal
+
+      return {
+        buffer: invBuffer,
+        shape: [2, 2],
+        strides: [2, 1],
+        dtype: a.dtype,
+      }
+    }
+
+    if (n === 3) {
+      const [a11, a12, a13, a21, a22, a23, a31, a32, a33] = a.buffer
+
+      // Compute determinant
+      const detVal =
+        a11 * a22 * a33 +
+        a12 * a23 * a31 +
+        a13 * a21 * a32 -
+        a13 * a22 * a31 -
+        a12 * a21 * a33 -
+        a11 * a23 * a32
+
+      if (Math.abs(detVal) < 1e-10) {
+        throw new Error('Matrix is singular')
+      }
+
+      // Compute adjugate matrix
+      const invBuffer = createTypedArray(9, a.dtype)
+      invBuffer[0] = (a22 * a33 - a23 * a32) / detVal
+      invBuffer[1] = (a13 * a32 - a12 * a33) / detVal
+      invBuffer[2] = (a12 * a23 - a13 * a22) / detVal
+      invBuffer[3] = (a23 * a31 - a21 * a33) / detVal
+      invBuffer[4] = (a11 * a33 - a13 * a31) / detVal
+      invBuffer[5] = (a13 * a21 - a11 * a23) / detVal
+      invBuffer[6] = (a21 * a32 - a22 * a31) / detVal
+      invBuffer[7] = (a12 * a31 - a11 * a32) / detVal
+      invBuffer[8] = (a11 * a22 - a12 * a21) / detVal
+
+      return {
+        buffer: invBuffer,
+        shape: [3, 3],
+        strides: [3, 1],
+        dtype: a.dtype,
+      }
+    }
+
+    throw new Error('inv only supports 2x2 and 3x3 matrices')
+  }
+
+  det(a: NDArrayData): number {
+    if (a.shape.length !== 2 || a.shape[0] !== a.shape[1]) {
+      throw new Error('det requires square 2D array')
+    }
+
+    const n = a.shape[0]
+
+    if (n === 2) {
+      return a.buffer[0] * a.buffer[3] - a.buffer[1] * a.buffer[2]
+    }
+
+    if (n === 3) {
+      const [a11, a12, a13, a21, a22, a23, a31, a32, a33] = a.buffer
+      return (
+        a11 * a22 * a33 +
+        a12 * a23 * a31 +
+        a13 * a21 * a32 -
+        a13 * a22 * a31 -
+        a12 * a21 * a33 -
+        a11 * a23 * a32
+      )
+    }
+
+    throw new Error('det only supports 2x2 and 3x3 matrices')
+  }
+
+  transpose(a: NDArrayData): NDArrayData {
+    if (a.shape.length !== 2) {
+      throw new Error('transpose requires 2D array')
+    }
+
+    const [rows, cols] = a.shape
+    const newBuffer = createTypedArray(a.buffer.length, a.dtype)
+
+    for (let i = 0; i < rows; i++) {
+      for (let j = 0; j < cols; j++) {
+        newBuffer[j * rows + i] = a.buffer[i * cols + j]
+      }
+    }
+
+    return {
+      buffer: newBuffer,
+      shape: [cols, rows],
+      strides: [rows, 1],
+      dtype: a.dtype,
+    }
+  }
+
   // ===== Helper Methods =====
 
   private fftRecursive(real: Float64Array, imag: Float64Array, n: number): void {

@@ -1,3 +1,4 @@
+import { NDArray } from '../ndarray'
 // ===== Numerical Stability Functions =====
 
 import type { DType } from '../core/types'

@@ -1,3 +1,4 @@
+import { NDArray } from '../ndarray'
 // ===== Array Information Utilities =====
 
 import type { DType } from '../core/types'

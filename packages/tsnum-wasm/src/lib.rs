@@ -220,6 +220,75 @@ pub fn tan_array(a: &[f64]) -> Vec<f64> {
     a.iter().map(|x| x.tan()).collect()
 }
 
+// ===== Linear Algebra (Advanced) =====
+
+/// Matrix inverse for 2x2 and 3x3 matrices
+#[wasm_bindgen]
+pub fn inv_matrix(a: &[f64], n: usize) -> Result<Vec<f64>, String> {
+    if n == 2 {
+        let det = a[0] * a[3] - a[1] * a[2];
+
+        if det.abs() < 1e-10 {
+            return Err("Matrix is singular".to_string());
+        }
+
+        Ok(vec![
+            a[3] / det,
+            -a[1] / det,
+            -a[2] / det,
+            a[0] / det,
+        ])
+    } else if n == 3 {
+        let det = a[0] * a[4] * a[8] + a[1] * a[5] * a[6] + a[2] * a[3] * a[7]
+                - a[2] * a[4] * a[6] - a[1] * a[3] * a[8] - a[0] * a[5] * a[7];
+
+        if det.abs() < 1e-10 {
+            return Err("Matrix is singular".to_string());
+        }
+
+        Ok(vec![
+            (a[4] * a[8] - a[5] * a[7]) / det,
+            (a[2] * a[7] - a[1] * a[8]) / det,
+            (a[1] * a[5] - a[2] * a[4]) / det,
+            (a[5] * a[6] - a[3] * a[8]) / det,
+            (a[0] * a[8] - a[2] * a[6]) / det,
+            (a[2] * a[3] - a[0] * a[5]) / det,
+            (a[3] * a[7] - a[4] * a[6]) / det,
+            (a[1] * a[6] - a[0] * a[7]) / det,
+            (a[0] * a[4] - a[1] * a[3]) / det,
+        ])
+    } else {
+        Err("inv only supports 2x2 and 3x3 matrices".to_string())
+    }
+}
+
+/// Determinant for 2x2 and 3x3 matrices
+#[wasm_bindgen]
+pub fn det_matrix(a: &[f64], n: usize) -> Result<f64, String> {
+    if n == 2 {
+        Ok(a[0] * a[3] - a[1] * a[2])
+    } else if n == 3 {
+        Ok(a[0] * a[4] * a[8] + a[1] * a[5] * a[6] + a[2] * a[3] * a[7]
+         - a[2] * a[4] * a[6] - a[1] * a[3] * a[8] - a[0] * a[5] * a[7])
+    } else {
+        Err("det only supports 2x2 and 3x3 matrices".to_string())
+    }
+}
+
+/// Matrix transpose
+#[wasm_bindgen]
+pub fn transpose_matrix(a: &[f64], rows: usize, cols: usize) -> Vec<f64> {
+    let mut result = vec![0.0; rows * cols];
+
+    for i in 0..rows {
+        for j in 0..cols {
+            result[j * rows + i] = a[i * cols + j];
+        }
+    }
+
+    result
+}
+
 // ===== FFT Operations =====
 
 /// Fast Fourier Transform (Cooley-Tukey algorithm)
