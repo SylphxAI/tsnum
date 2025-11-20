@@ -3,7 +3,7 @@
 import type { DType } from './core/types'
 import { createTypedArray } from './core/utils'
 import type { NDArray } from './ndarray'
-import { NDArray as NDArrayImpl } from './ndarray'
+import { NDArray } from './ndarray'
 
 /**
  * Discrete linear convolution of two 1D sequences
@@ -60,7 +60,7 @@ export function convolve<T extends DType>(
     result[i] = sum
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: [outLength],
     strides: [1],
@@ -123,7 +123,7 @@ export function correlate<T extends DType>(
     result[i] = sum
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: [outLength],
     strides: [1],

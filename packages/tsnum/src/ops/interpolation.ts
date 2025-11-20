@@ -3,7 +3,7 @@
 import type { DType } from '../core/types'
 import { createTypedArray } from '../core/utils'
 import type { NDArray } from '../ndarray'
-import { NDArray as NDArrayImpl } from '../ndarray'
+import { NDArray } from '../ndarray'
 
 /**
  * One-dimensional linear interpolation
@@ -70,7 +70,7 @@ export function interp<T extends DType>(
     }
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: [...xData.shape],
     strides: [...xData.strides],

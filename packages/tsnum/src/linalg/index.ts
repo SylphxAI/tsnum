@@ -4,7 +4,7 @@ import type { DType } from '../core/types'
 import { computeStrides, createTypedArray } from '../core/utils'
 import { eye } from '../creation'
 import type { NDArray } from '../ndarray'
-import { NDArray as NDArrayImpl } from '../ndarray'
+import { NDArray } from '../ndarray'
 
 // Export numerical stability functions
 export { cond, slogdet, multi_dot } from './numerical-stability'
@@ -55,7 +55,7 @@ export function dot<T extends DType>(a: NDArray<T>, b: NDArray<T>): NDArray<T> |
       newBuffer[j] = sum
     }
 
-    return new NDArrayImpl({
+    return new NDArray({
       buffer: newBuffer,
       shape: [n],
       strides: [1],
@@ -98,7 +98,7 @@ export function matmul<T extends DType>(a: NDArray<T>, b: NDArray<T>): NDArray<T
     }
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: newBuffer,
     shape: [m, n],
     strides: [n, 1],
@@ -127,7 +127,7 @@ export function outer<T extends DType>(a: NDArray<T>, b: NDArray<T>): NDArray<T>
     }
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: newBuffer,
     shape: [m, n],
     strides: [n, 1],
@@ -312,13 +312,13 @@ export function qr<T extends DType>(a: NDArray<T>): { q: NDArray<T>; r: NDArray<
   }
 
   return {
-    q: new NDArrayImpl({
+    q: new NDArray({
       buffer: qBuffer,
       shape: [m, n],
       strides: [n, 1],
       dtype: data.dtype,
     }),
-    r: new NDArrayImpl({
+    r: new NDArray({
       buffer: rBuffer,
       shape: [n, n],
       strides: [n, 1],
@@ -366,7 +366,7 @@ export function cholesky<T extends DType>(a: NDArray<T>): NDArray<T> {
     }
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: lBuffer,
     shape: [n, n],
     strides: [n, 1],
@@ -449,13 +449,13 @@ export function eig<T extends DType>(
   valuesBuffer[0] = eigenvalue
 
   return {
-    values: new NDArrayImpl({
+    values: new NDArray({
       buffer: valuesBuffer,
       shape: [1],
       strides: [1],
       dtype: data.dtype,
     }),
-    vectors: new NDArrayImpl({
+    vectors: new NDArray({
       buffer: v,
       shape: [n],
       strides: [1],
@@ -525,19 +525,19 @@ export function svd<T extends DType>(
     vtBuffer[3] = 1
 
     return {
-      u: new NDArrayImpl({
+      u: new NDArray({
         buffer: uBuffer,
         shape: [2, 2],
         strides: [2, 1],
         dtype: data.dtype,
       }),
-      s: new NDArrayImpl({
+      s: new NDArray({
         buffer: sBuffer,
         shape: [2],
         strides: [1],
         dtype: data.dtype,
       }),
-      vt: new NDArrayImpl({
+      vt: new NDArray({
         buffer: vtBuffer,
         shape: [2, 2],
         strides: [2, 1],
@@ -575,7 +575,7 @@ export function inv<T extends DType>(a: NDArray<T>): NDArray<T> {
     invBuffer[2] = -a21 / detVal
     invBuffer[3] = a11 / detVal
 
-    return new NDArrayImpl({
+    return new NDArray({
       buffer: invBuffer,
       shape: [2, 2],
       strides: [2, 1],
@@ -604,7 +604,7 @@ export function inv<T extends DType>(a: NDArray<T>): NDArray<T> {
     invBuffer[7] = (a12 * a31 - a11 * a32) / detVal
     invBuffer[8] = (a11 * a22 - a12 * a21) / detVal
 
-    return new NDArrayImpl({
+    return new NDArray({
       buffer: invBuffer,
       shape: [3, 3],
       strides: [3, 1],
@@ -646,7 +646,7 @@ export function solve<T extends DType>(a: NDArray<T>, b: NDArray<T>): NDArray<T>
     xBuffer[0] = (a22 * b1 - a12 * b2) / detVal
     xBuffer[1] = (a11 * b2 - a21 * b1) / detVal
 
-    return new NDArrayImpl({
+    return new NDArray({
       buffer: xBuffer,
       shape: [2],
       strides: [1],
@@ -667,7 +667,7 @@ export function solve<T extends DType>(a: NDArray<T>, b: NDArray<T>): NDArray<T>
     xBuffer[i] = sum
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: xBuffer,
     shape: [n],
     strides: [1],
@@ -723,7 +723,7 @@ export function pinv<T extends DType>(a: NDArray<T>, rcond = 1e-15): NDArray<T> 
     }
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: [n, m],
     strides: computeStrides([n, m]),
@@ -788,7 +788,7 @@ export function matrix_power<T extends DType>(a: NDArray<T>, n: number): NDArray
     for (let i = 0; i < aData.buffer.length; i++) {
       buffer[i] = aData.buffer[i]
     }
-    return new NDArrayImpl({
+    return new NDArray({
       buffer,
       shape: aData.shape,
       strides: aData.strides,
@@ -860,7 +860,7 @@ export function lstsq<T extends DType>(
     xBuffer[i] = sum
   }
 
-  const x = new NDArrayImpl({
+  const x = new NDArray({
     buffer: xBuffer,
     shape: [n],
     strides: [1],
@@ -1004,7 +1004,7 @@ export function kron<T extends DType>(a: NDArray<T>, b: NDArray<T>): NDArray<T> 
     }
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: [resultRows, resultCols],
     strides: [resultCols, 1],
@@ -1129,7 +1129,7 @@ export function tensordot<T extends DType>(
         }
       }
 
-      return new NDArrayImpl({
+      return new NDArray({
         buffer: result,
         shape: [n, q],
         strides: [q, 1],

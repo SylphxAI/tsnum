@@ -4,7 +4,7 @@
 import type { DType } from '../core/types'
 import { createTypedArray } from '../core/utils'
 import type { NDArray } from '../ndarray'
-import { NDArray as NDArrayImpl } from '../ndarray'
+import { NDArray } from '../ndarray'
 
 /**
  * Element-wise absolute value
@@ -17,7 +17,7 @@ export function abs<T extends DType>(a: NDArray<T>): NDArray<T> {
     newBuffer[i] = Math.abs(data.buffer[i])
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: newBuffer,
     shape: data.shape,
     strides: data.strides,
@@ -37,7 +37,7 @@ export function sign<T extends DType>(a: NDArray<T>): NDArray<T> {
     newBuffer[i] = val > 0 ? 1 : val < 0 ? -1 : 0
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: newBuffer,
     shape: data.shape,
     strides: data.strides,
@@ -56,7 +56,7 @@ export function sqrt<T extends DType>(a: NDArray<T>): NDArray<T> {
     newBuffer[i] = Math.sqrt(data.buffer[i])
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: newBuffer,
     shape: data.shape,
     strides: data.strides,
@@ -75,7 +75,7 @@ export function exp<T extends DType>(a: NDArray<T>): NDArray<T> {
     newBuffer[i] = Math.exp(data.buffer[i])
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: newBuffer,
     shape: data.shape,
     strides: data.strides,
@@ -94,7 +94,7 @@ export function log<T extends DType>(a: NDArray<T>): NDArray<T> {
     newBuffer[i] = Math.log(data.buffer[i])
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: newBuffer,
     shape: data.shape,
     strides: data.strides,
@@ -113,7 +113,7 @@ export function log10<T extends DType>(a: NDArray<T>): NDArray<T> {
     newBuffer[i] = Math.log10(data.buffer[i])
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: newBuffer,
     shape: data.shape,
     strides: data.strides,
@@ -132,7 +132,7 @@ export function sin<T extends DType>(a: NDArray<T>): NDArray<T> {
     newBuffer[i] = Math.sin(data.buffer[i])
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: newBuffer,
     shape: data.shape,
     strides: data.strides,
@@ -151,7 +151,7 @@ export function cos<T extends DType>(a: NDArray<T>): NDArray<T> {
     newBuffer[i] = Math.cos(data.buffer[i])
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: newBuffer,
     shape: data.shape,
     strides: data.strides,
@@ -170,7 +170,7 @@ export function tan<T extends DType>(a: NDArray<T>): NDArray<T> {
     newBuffer[i] = Math.tan(data.buffer[i])
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: newBuffer,
     shape: data.shape,
     strides: data.strides,
@@ -189,7 +189,7 @@ export function arcsin<T extends DType>(a: NDArray<T>): NDArray<T> {
     newBuffer[i] = Math.asin(data.buffer[i])
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: newBuffer,
     shape: data.shape,
     strides: data.strides,
@@ -208,7 +208,7 @@ export function arccos<T extends DType>(a: NDArray<T>): NDArray<T> {
     newBuffer[i] = Math.acos(data.buffer[i])
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: newBuffer,
     shape: data.shape,
     strides: data.strides,
@@ -227,7 +227,7 @@ export function arctan<T extends DType>(a: NDArray<T>): NDArray<T> {
     newBuffer[i] = Math.atan(data.buffer[i])
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: newBuffer,
     shape: data.shape,
     strides: data.strides,
@@ -246,7 +246,7 @@ export function round<T extends DType>(a: NDArray<T>): NDArray<T> {
     newBuffer[i] = Math.round(data.buffer[i])
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: newBuffer,
     shape: data.shape,
     strides: data.strides,
@@ -265,7 +265,7 @@ export function floor<T extends DType>(a: NDArray<T>): NDArray<T> {
     newBuffer[i] = Math.floor(data.buffer[i])
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: newBuffer,
     shape: data.shape,
     strides: data.strides,
@@ -284,7 +284,7 @@ export function ceil<T extends DType>(a: NDArray<T>): NDArray<T> {
     newBuffer[i] = Math.ceil(data.buffer[i])
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: newBuffer,
     shape: data.shape,
     strides: data.strides,
@@ -303,7 +303,7 @@ export function trunc<T extends DType>(a: NDArray<T>): NDArray<T> {
     newBuffer[i] = Math.trunc(data.buffer[i])
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: newBuffer,
     shape: data.shape,
     strides: data.strides,
@@ -328,7 +328,7 @@ export function maximum<T extends DType>(a: NDArray<T>, b: NDArray<T>): NDArray<
     newBuffer[i] = Math.max(aData.buffer[i], bData.buffer[i])
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: newBuffer,
     shape: aData.shape,
     strides: aData.strides,
@@ -353,7 +353,7 @@ export function minimum<T extends DType>(a: NDArray<T>, b: NDArray<T>): NDArray<
     newBuffer[i] = Math.min(aData.buffer[i], bData.buffer[i])
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: newBuffer,
     shape: aData.shape,
     strides: aData.strides,
@@ -373,7 +373,7 @@ export function clip<T extends DType>(a: NDArray<T>, min: number, max: number): 
     newBuffer[i] = val < min ? min : val > max ? max : val
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: newBuffer,
     shape: data.shape,
     strides: data.strides,
@@ -394,7 +394,7 @@ export function sinh<T extends DType>(a: NDArray<T>): NDArray<T> {
     newBuffer[i] = Math.sinh(data.buffer[i])
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: newBuffer,
     shape: data.shape,
     strides: data.strides,
@@ -413,7 +413,7 @@ export function cosh<T extends DType>(a: NDArray<T>): NDArray<T> {
     newBuffer[i] = Math.cosh(data.buffer[i])
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: newBuffer,
     shape: data.shape,
     strides: data.strides,
@@ -432,7 +432,7 @@ export function tanh<T extends DType>(a: NDArray<T>): NDArray<T> {
     newBuffer[i] = Math.tanh(data.buffer[i])
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: newBuffer,
     shape: data.shape,
     strides: data.strides,
@@ -451,7 +451,7 @@ export function asinh<T extends DType>(a: NDArray<T>): NDArray<T> {
     newBuffer[i] = Math.asinh(data.buffer[i])
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: newBuffer,
     shape: data.shape,
     strides: data.strides,
@@ -470,7 +470,7 @@ export function acosh<T extends DType>(a: NDArray<T>): NDArray<T> {
     newBuffer[i] = Math.acosh(data.buffer[i])
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: newBuffer,
     shape: data.shape,
     strides: data.strides,
@@ -489,7 +489,7 @@ export function atanh<T extends DType>(a: NDArray<T>): NDArray<T> {
     newBuffer[i] = Math.atanh(data.buffer[i])
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: newBuffer,
     shape: data.shape,
     strides: data.strides,
@@ -516,7 +516,7 @@ export function arctan2<T extends DType>(y: NDArray<T>, x: NDArray<T>): NDArray<
     newBuffer[i] = Math.atan2(yData.buffer[i], xData.buffer[i])
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: newBuffer,
     shape: yData.shape,
     strides: yData.strides,
@@ -546,7 +546,7 @@ export function mod<T extends DType>(a: NDArray<T>, b: number | NDArray<T>): NDA
     }
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: newBuffer,
     shape: aData.shape,
     strides: aData.strides,
@@ -577,7 +577,7 @@ export function fmod<T extends DType>(a: NDArray<T>, b: number | NDArray<T>): ND
     }
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: newBuffer,
     shape: aData.shape,
     strides: aData.strides,
@@ -605,7 +605,7 @@ export function exp2<T extends DType>(a: NDArray<T>): NDArray<'float64'> {
     result[i] = 2 ** data.buffer[i]
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: data.shape.slice(),
     strides: data.strides.slice(),
@@ -630,7 +630,7 @@ export function log2<T extends DType>(a: NDArray<T>): NDArray<'float64'> {
     result[i] = Math.log2(data.buffer[i])
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: data.shape.slice(),
     strides: data.strides.slice(),
@@ -656,7 +656,7 @@ export function log1p<T extends DType>(a: NDArray<T>): NDArray<'float64'> {
     result[i] = Math.log1p(data.buffer[i])
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: data.shape.slice(),
     strides: data.strides.slice(),
@@ -682,7 +682,7 @@ export function expm1<T extends DType>(a: NDArray<T>): NDArray<'float64'> {
     result[i] = Math.expm1(data.buffer[i])
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: data.shape.slice(),
     strides: data.strides.slice(),

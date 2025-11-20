@@ -3,7 +3,7 @@
 import type { DType } from '../core/types'
 import { createTypedArray } from '../core/utils'
 import type { NDArray } from '../ndarray'
-import { NDArray as NDArrayImpl } from '../ndarray'
+import { NDArray } from '../ndarray'
 
 /**
  * Extract elements from array where condition is true
@@ -34,7 +34,7 @@ export function extract<T extends DType>(condition: NDArray<T>, arr: NDArray<T>)
     }
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: [count],
     strides: [1],
@@ -119,7 +119,7 @@ export function compress<T extends DType>(
       }
     }
 
-    return new NDArrayImpl({
+    return new NDArray({
       buffer: result,
       shape: [count],
       strides: [1],
@@ -154,7 +154,7 @@ export function compress<T extends DType>(
       }
     }
 
-    return new NDArrayImpl({
+    return new NDArray({
       buffer: result,
       shape: [count],
       strides: [1],
@@ -177,7 +177,7 @@ export function compress<T extends DType>(
 
   const newShape = [count, ...arrData.shape.slice(1)]
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: newShape,
     strides: newShape.map((_, i) => newShape.slice(i + 1).reduce((a, b) => a * b, 1)),
@@ -221,7 +221,7 @@ export function choose<T extends DType>(
     result[i] = choiceData.buffer[i % choiceData.buffer.length]
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: [...indData.shape],
     strides: [...indData.strides],

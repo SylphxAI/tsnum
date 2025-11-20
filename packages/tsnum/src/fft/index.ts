@@ -3,7 +3,7 @@
 import type { DType } from '../core/types'
 import { createTypedArray } from '../core/utils'
 import type { NDArray } from '../ndarray'
-import { NDArray as NDArrayImpl } from '../ndarray'
+import { NDArray } from '../ndarray'
 
 /**
  * Fast Fourier Transform (Cooley-Tukey algorithm)
@@ -43,7 +43,7 @@ export function fft<T extends DType>(a: NDArray<T>): NDArray<'float64'> {
     result[i * 2 + 1] = imag[i]
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: [n, 2],
     strides: [2, 1],
@@ -92,7 +92,7 @@ export function ifft<T extends DType>(a: NDArray<T>): NDArray<'float64'> {
     result[i * 2 + 1] = -imag[i] / n
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: [n, 2],
     strides: [2, 1],
@@ -131,7 +131,7 @@ export function rfft<T extends DType>(a: NDArray<T>): NDArray<'float64'> {
     result[i * 2 + 1] = fullData.buffer[i * 2 + 1]
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: [resultSize, 2],
     strides: [2, 1],
@@ -169,7 +169,7 @@ export function irfft<T extends DType>(a: NDArray<T>, n?: number): NDArray<'floa
     fullBuffer[idx * 2 + 1] = -data.buffer[i * 2 + 1] // conjugate imaginary
   }
 
-  const fullSpectrum = new NDArrayImpl({
+  const fullSpectrum = new NDArray({
     buffer: fullBuffer,
     shape: [fullSize, 2],
     strides: [2, 1],
@@ -186,7 +186,7 @@ export function irfft<T extends DType>(a: NDArray<T>, n?: number): NDArray<'floa
     realResult[i] = resultData.buffer[i * 2]
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: realResult,
     shape: [outputSize],
     strides: [1],
@@ -222,7 +222,7 @@ export function fft2<T extends DType>(a: NDArray<T>): NDArray<'float64'> {
       rowData[j] = data.buffer[i * cols + j]
     }
 
-    const rowArray = new NDArrayImpl({
+    const rowArray = new NDArray({
       buffer: rowData,
       shape: [cols],
       strides: [1],
@@ -257,7 +257,7 @@ export function fft2<T extends DType>(a: NDArray<T>): NDArray<'float64'> {
     }
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: [rows, cols, 2],
     strides: [cols * 2, 2, 1],
@@ -291,7 +291,7 @@ export function ifft2<T extends DType>(a: NDArray<T>): NDArray<'float64'> {
       rowData[j * 2 + 1] = data.buffer[i * cols * 2 + j * 2 + 1]
     }
 
-    const rowArray = new NDArrayImpl({
+    const rowArray = new NDArray({
       buffer: rowData,
       shape: [cols, 2],
       strides: [2, 1],
@@ -332,7 +332,7 @@ export function ifft2<T extends DType>(a: NDArray<T>): NDArray<'float64'> {
     }
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: [rows, cols, 2],
     strides: [cols * 2, 2, 1],
@@ -372,7 +372,7 @@ export function rfft2<T extends DType>(a: NDArray<T>): NDArray<'float64'> {
     }
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: [rows, resultCols, 2],
     strides: [resultCols * 2, 2, 1],
@@ -413,7 +413,7 @@ export function irfft2<T extends DType>(a: NDArray<T>, shape?: [number, number])
     }
   }
 
-  const fullSpectrum = new NDArrayImpl({
+  const fullSpectrum = new NDArray({
     buffer: fullBuffer,
     shape: [inputRows, fullCols, 2],
     strides: [fullCols * 2, 2, 1],
@@ -432,7 +432,7 @@ export function irfft2<T extends DType>(a: NDArray<T>, shape?: [number, number])
     }
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: realResult,
     shape: [outputRows, outputCols],
     strides: [outputCols, 1],
@@ -642,7 +642,7 @@ function fftAlongAxis<T extends DType>(
       }
 
       // Create 1D array and compute FFT
-      const slice = new NDArrayImpl({
+      const slice = new NDArray({
         buffer: sliceData,
         shape: [size],
         strides: [1],
@@ -660,7 +660,7 @@ function fftAlongAxis<T extends DType>(
     }
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: outBuffer,
     shape: outShape,
     strides: computeStridesForShape(outShape),
@@ -718,7 +718,7 @@ function ifftAlongAxis<T extends DType>(
       }
 
       // Create 1D complex array and compute IFFT
-      const slice = new NDArrayImpl({
+      const slice = new NDArray({
         buffer: sliceData,
         shape: [size, 2],
         strides: [2, 1],
@@ -736,7 +736,7 @@ function ifftAlongAxis<T extends DType>(
     }
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: outBuffer,
     shape: outShape,
     strides: computeStridesForShape(outShape),
@@ -789,7 +789,7 @@ function rfftAlongAxis<T extends DType>(
       }
 
       // Create 1D array and compute RFFT
-      const slice = new NDArrayImpl({
+      const slice = new NDArray({
         buffer: sliceData,
         shape: [size],
         strides: [1],
@@ -808,7 +808,7 @@ function rfftAlongAxis<T extends DType>(
     }
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: outBuffer,
     shape: outShape,
     strides: computeStridesForShape(outShape),
@@ -866,7 +866,7 @@ function irfftAlongAxis<T extends DType>(
       }
 
       // Create 1D complex array and compute IRFFT
-      const slice = new NDArrayImpl({
+      const slice = new NDArray({
         buffer: sliceData,
         shape: [axisSize, 2],
         strides: [2, 1],
@@ -883,7 +883,7 @@ function irfftAlongAxis<T extends DType>(
     }
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: outBuffer,
     shape: outShape,
     strides: computeStridesForShape(outShape),
@@ -970,7 +970,7 @@ export function fftfreq(n: number, d: number = 1.0): NDArray<'float64'> {
     freq[i] = (i - n) * val
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: freq,
     shape: [n],
     strides: [1],
@@ -999,7 +999,7 @@ export function rfftfreq(n: number, d: number = 1.0): NDArray<'float64'> {
     freq[i] = i * val
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: freq,
     shape: [outputLen],
     strides: [1],
@@ -1126,7 +1126,7 @@ function rollAxis<T extends DType>(a: NDArray<T>, axis: number, shift: number): 
 
   iterateIndices(new Array(shape.length).fill(0), 0)
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: shape,
     strides: strides,

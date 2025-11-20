@@ -3,7 +3,7 @@
 import type { DType } from '../core/types'
 import { createTypedArray } from '../core/utils'
 import type { NDArray } from '../ndarray'
-import { NDArray as NDArrayImpl } from '../ndarray'
+import { NDArray } from '../ndarray'
 
 /**
  * Assemble arrays from blocks
@@ -64,7 +64,7 @@ export function column_stack<T extends DType>(arrays: NDArray<T>[]): NDArray<T> 
     if (data.shape.length === 1) {
       // Reshape to column vector
       const size = data.shape[0]
-      columns.push(new NDArrayImpl({
+      columns.push(new NDArray({
         buffer: data.buffer.slice(),
         shape: [size, 1],
         strides: [1, 1],
@@ -146,7 +146,7 @@ export function dstack<T extends DType>(arrays: NDArray<T>[]): NDArray<T> {
     if (data.shape.length === 1) {
       // Reshape [n] -> [1, n, 1]
       const n = data.shape[0]
-      arrays3d.push(new NDArrayImpl({
+      arrays3d.push(new NDArray({
         buffer: data.buffer.slice(),
         shape: [1, n, 1],
         strides: [n, 1, 1],
@@ -155,7 +155,7 @@ export function dstack<T extends DType>(arrays: NDArray<T>[]): NDArray<T> {
     } else if (data.shape.length === 2) {
       // Reshape [m, n] -> [m, n, 1]
       const [m, n] = data.shape
-      arrays3d.push(new NDArrayImpl({
+      arrays3d.push(new NDArray({
         buffer: data.buffer.slice(),
         shape: [m, n, 1],
         strides: [n, 1, 1],
@@ -279,7 +279,7 @@ function concatenateArrays<T extends DType>(arrays: NDArray<T>[], axis: number):
     stride *= outShape[i]
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: outBuffer,
     shape: outShape,
     strides: outStrides,
@@ -347,7 +347,7 @@ function splitAtIndices<T extends DType>(
       stride *= newShape[d]
     }
 
-    results.push(new NDArrayImpl({
+    results.push(new NDArray({
       buffer: newBuffer,
       shape: newShape,
       strides: newStrides,

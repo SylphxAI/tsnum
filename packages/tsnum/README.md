@@ -1,16 +1,17 @@
 # tsnum
 
-> High-performance TypeScript NumPy alternative with WASM acceleration
+> High-performance TypeScript numerical computing library with pragmatic functional design
 
 A TypeScript library that brings NumPy's powerful array operations to JavaScript/TypeScript with near-native performance through WebAssembly.
 
 ## Features
 
-- 🚀 **High Performance** - WASM-accelerated operations with fallback to optimized TypeScript
-- 🎯 **NumPy Compatible** - Familiar API for Python developers (~41% feature parity)
+- 🚀 **High Performance** - WASM-accelerated operations with optimized TypeScript fallback
+- 🎯 **NumPy-Inspired** - Familiar functional API for array operations (~41% feature parity with NumPy)
 - 📦 **Type Safe** - Full TypeScript support with generic types
 - 🔢 **Multiple Data Types** - Support for int32, float32, float64, uint8
 - 🧮 **Comprehensive** - 244+ functions covering linear algebra, statistics, FFT, and more
+- ⚡ **Pragmatic FP** - Immutable external API with optimized internal operations for maximum performance
 
 ## Installation
 
@@ -21,14 +22,14 @@ npm install tsnum
 ## Quick Start
 
 ```typescript
-import { array, dot, fft, mean } from 'tsnum'
+import { array, add, dot, fft, mean, matmul } from 'tsnum'
 
 // Create arrays
 const a = array([1, 2, 3, 4])
 const b = array([5, 6, 7, 8])
 
-// Mathematical operations
-const sum = a.add(b)  // [6, 8, 10, 12]
+// Mathematical operations (functional API)
+const sum = add(a, b)  // [6, 8, 10, 12]
 const product = dot(a, b)  // 70
 
 // Statistics
@@ -41,6 +42,36 @@ const freq = fft(a)
 const A = array([[1, 2], [3, 4]])
 const B = array([[5, 6], [7, 8]])
 const C = matmul(A, B)  // Matrix multiplication
+
+// Convenience: .T property for transpose
+const AT = A.T  // Transpose of A
+```
+
+## Design Philosophy
+
+**Pragmatic Functional Programming**
+
+tsnum follows a pragmatic functional approach that balances purity with performance:
+
+- **Immutable External API**: All operations return new arrays, inputs are never modified
+- **Optimized Internals**: Hot loops use mutable operations for maximum performance
+- **Zero-Copy Operations**: Views (reshape, transpose) share underlying buffers when possible
+- **Functional Core**: Pure functions for all computations - same input always produces same output
+- **Single Implementation**: No duplicate code paths, clean architecture
+
+```typescript
+// ✅ Immutable API - inputs never change
+const a = array([1, 2, 3])
+const b = add(a, 10)  // Returns new array [11, 12, 13]
+// a is still [1, 2, 3]
+
+// ✅ Zero-copy views
+const reshaped = reshape(a, [3, 1])  // Shares buffer with a
+const transposed = A.T  // Shares buffer with A
+
+// ✅ Functional composition
+import { pipe, mean, abs, sqrt } from 'tsnum'
+const rms = pipe(data, x => mul(x, x), mean, sqrt)
 ```
 
 ## Feature Coverage

@@ -3,7 +3,7 @@
 import type { DType } from '../core/types'
 import { createTypedArray } from '../core/utils'
 import type { NDArray } from '../ndarray'
-import { NDArray as NDArrayImpl } from '../ndarray'
+import { NDArray } from '../ndarray'
 
 /**
  * Test element-wise for NaN
@@ -16,7 +16,7 @@ export function isnan<T extends DType>(a: NDArray<T>): NDArray<'int32'> {
     buffer[i] = Number.isNaN(data.buffer[i]) ? 1 : 0
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer,
     shape: data.shape,
     strides: data.strides,
@@ -35,7 +35,7 @@ export function isinf<T extends DType>(a: NDArray<T>): NDArray<'int32'> {
     buffer[i] = !Number.isFinite(data.buffer[i]) && !Number.isNaN(data.buffer[i]) ? 1 : 0
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer,
     shape: data.shape,
     strides: data.strides,
@@ -54,7 +54,7 @@ export function isfinite<T extends DType>(a: NDArray<T>): NDArray<'int32'> {
     buffer[i] = Number.isFinite(data.buffer[i]) ? 1 : 0
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer,
     shape: data.shape,
     strides: data.strides,
@@ -91,7 +91,7 @@ export function isclose<T extends DType>(
     buffer[i] = diff <= tolerance ? 1 : 0
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer,
     shape: aData.shape,
     strides: aData.strides,
@@ -146,7 +146,7 @@ export function nonzero<T extends DType>(a: NDArray<T>): NDArray<'int32'> {
 
   const buffer = new Int32Array(indices)
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer,
     shape: [indices.length],
     strides: [1],
@@ -214,7 +214,7 @@ export function nan_to_num<T extends DType>(
     }
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: [...data.shape],
     strides: [...data.strides],

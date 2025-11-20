@@ -3,7 +3,7 @@
 import type { DType } from '../core/types'
 import { createTypedArray } from '../core/utils'
 import type { NDArray } from '../ndarray'
-import { NDArray as NDArrayImpl } from '../ndarray'
+import { NDArray } from '../ndarray'
 
 /**
  * Integrate using trapezoidal rule
@@ -75,7 +75,7 @@ export function cumtrapz<T extends DType>(
   if (n < 2) {
     const result = createTypedArray(1, yData.dtype)
     result[0] = initial
-    return new NDArrayImpl({
+    return new NDArray({
       buffer: result,
       shape: [1],
       strides: [1],
@@ -107,7 +107,7 @@ export function cumtrapz<T extends DType>(
     }
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: [...yData.shape],
     strides: [...yData.strides],

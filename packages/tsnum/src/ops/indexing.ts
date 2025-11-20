@@ -3,7 +3,7 @@
 import type { DType, NDArrayData } from '../core/types'
 import { indexToOffset } from '../core/utils'
 import { NDArray } from '../ndarray'
-import { NDArray as NDArrayImpl } from '../ndarray'
+import { NDArray } from '../ndarray'
 
 // ===== Types =====
 export type SliceRange = number | [number, number] | [number, number, number] // value | [start, stop] | [start, stop, step]
@@ -187,7 +187,7 @@ export function flatnonzero<T extends DType>(a: NDArray<T>): NDArray<'int32'> {
 
   const result = new Int32Array(indices)
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: [indices.length],
     strides: [1],

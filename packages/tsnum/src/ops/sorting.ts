@@ -3,7 +3,7 @@
 import type { DType } from '../core/types'
 import { createTypedArray } from '../core/utils'
 import type { NDArray } from '../ndarray'
-import { NDArray as NDArrayImpl } from '../ndarray'
+import { NDArray } from '../ndarray'
 
 /**
  * Return indices that would sort an array
@@ -23,7 +23,7 @@ export function argsort<T extends DType>(a: NDArray<T>): NDArray<'int32'> {
 
   const newBuffer = new Int32Array(indices)
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: newBuffer,
     shape: data.shape,
     strides: [1],
@@ -52,7 +52,7 @@ export function sort<T extends DType>(a: NDArray<T>): NDArray<T> {
     newBuffer[i] = sorted[i]
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: newBuffer,
     shape: data.shape,
     strides: data.strides,

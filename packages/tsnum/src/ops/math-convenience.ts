@@ -3,7 +3,7 @@
 import type { DType } from '../core/types'
 import { createTypedArray } from '../core/utils'
 import type { NDArray } from '../ndarray'
-import { NDArray as NDArrayImpl } from '../ndarray'
+import { NDArray } from '../ndarray'
 
 /**
  * Convert angles from degrees to radians
@@ -17,7 +17,7 @@ export function deg2rad<T extends DType>(x: NDArray<T>): NDArray<'float64'> {
     result[i] = (data.buffer[i] * Math.PI) / 180
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: data.shape.slice(),
     strides: data.strides.slice(),
@@ -37,7 +37,7 @@ export function rad2deg<T extends DType>(x: NDArray<T>): NDArray<'float64'> {
     result[i] = (data.buffer[i] * 180) / Math.PI
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: data.shape.slice(),
     strides: data.strides.slice(),
@@ -64,7 +64,7 @@ export function hypot<T extends DType>(x1: NDArray<T>, x2: NDArray<T>): NDArray<
     result[i] = Math.hypot(data1.buffer[i], data2.buffer[i])
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: data1.shape.slice(),
     strides: data1.strides.slice(),
@@ -91,7 +91,7 @@ export function sinc<T extends DType>(x: NDArray<T>): NDArray<'float64'> {
     }
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: data.shape.slice(),
     strides: data.strides.slice(),
@@ -111,7 +111,7 @@ export function cbrt<T extends DType>(x: NDArray<T>): NDArray<'float64'> {
     result[i] = Math.cbrt(data.buffer[i])
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: data.shape.slice(),
     strides: data.strides.slice(),
@@ -131,7 +131,7 @@ export function square<T extends DType>(x: NDArray<T>): NDArray<'float64'> {
     result[i] = data.buffer[i] * data.buffer[i]
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: data.shape.slice(),
     strides: data.strides.slice(),
@@ -151,7 +151,7 @@ export function reciprocal<T extends DType>(x: NDArray<T>): NDArray<'float64'> {
     result[i] = 1 / data.buffer[i]
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: data.shape.slice(),
     strides: data.strides.slice(),
@@ -186,7 +186,7 @@ export function gcd<T extends DType>(x1: NDArray<T>, x2: NDArray<T>): NDArray<'i
     result[i] = a
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: data1.shape.slice(),
     strides: data1.strides.slice(),
@@ -224,7 +224,7 @@ export function lcm<T extends DType>(x1: NDArray<T>, x2: NDArray<T>): NDArray<'i
     result[i] = (a * b) / gcdVal
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: data1.shape.slice(),
     strides: data1.strides.slice(),
@@ -252,7 +252,7 @@ export function heaviside<T extends DType>(x: NDArray<T>, h0 = 0.5): NDArray<'fl
     }
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: data.shape.slice(),
     strides: data.strides.slice(),
@@ -286,13 +286,13 @@ export function divmod<T extends DType>(
   }
 
   return {
-    quotient: new NDArrayImpl({
+    quotient: new NDArray({
       buffer: quotient,
       shape: data1.shape.slice(),
       strides: data1.strides.slice(),
       dtype: 'float64',
     }),
-    remainder: new NDArrayImpl({
+    remainder: new NDArray({
       buffer: remainder,
       shape: data1.shape.slice(),
       strides: data1.strides.slice(),

@@ -3,7 +3,7 @@
 import type { DType } from '../core/types'
 import { createTypedArray } from '../core/utils'
 import type { NDArray } from '../ndarray'
-import { NDArray as NDArrayImpl } from '../ndarray'
+import { NDArray } from '../ndarray'
 
 /**
  * Find unique values in array
@@ -32,7 +32,7 @@ export function unique<T extends DType>(a: NDArray<T>): NDArray<T> {
     buffer[i] = uniqueValues[i]
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer,
     shape: [uniqueValues.length],
     strides: [1],
@@ -56,7 +56,7 @@ export function isin<T extends DType>(a: NDArray<T>, testElements: NDArray<T>): 
     buffer[i] = testSet.has(aData.buffer[i]) ? 1 : 0
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer,
     shape: aData.shape,
     strides: aData.strides,
@@ -92,7 +92,7 @@ export function intersect1d<T extends DType>(a: NDArray<T>, b: NDArray<T>): NDAr
     buffer[i] = intersection[i]
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer,
     shape: [intersection.length],
     strides: [1],
@@ -117,7 +117,7 @@ export function union1d<T extends DType>(a: NDArray<T>, b: NDArray<T>): NDArray<
     buffer[i] = union[i]
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer,
     shape: [union.length],
     strides: [1],
@@ -152,7 +152,7 @@ export function setdiff1d<T extends DType>(a: NDArray<T>, b: NDArray<T>): NDArra
     buffer[i] = diff[i]
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer,
     shape: [diff.length],
     strides: [1],
@@ -196,7 +196,7 @@ export function setxor1d<T extends DType>(a: NDArray<T>, b: NDArray<T>): NDArray
     buffer[i] = xor[i]
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer,
     shape: [xor.length],
     strides: [1],

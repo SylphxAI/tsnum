@@ -3,7 +3,7 @@
 import type { DType } from '../core/types'
 import { createTypedArray } from '../core/utils'
 import type { NDArray } from '../ndarray'
-import { NDArray as NDArrayImpl } from '../ndarray'
+import { NDArray } from '../ndarray'
 import { mean } from './reductions'
 
 /**
@@ -68,7 +68,7 @@ export function corrcoef<T extends DType>(a: NDArray<T>, b?: NDArray<T>): NDArra
     // Auto-correlation (always 1)
     const buffer = createTypedArray(1, aData.dtype)
     buffer[0] = 1
-    return new NDArrayImpl({
+    return new NDArray({
       buffer,
       shape: [1],
       strides: [1],
@@ -109,7 +109,7 @@ export function corrcoef<T extends DType>(a: NDArray<T>, b?: NDArray<T>): NDArra
   buffer[2] = correlation // corr(b, a)
   buffer[3] = 1 // corr(b, b)
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer,
     shape: [2, 2],
     strides: [2, 1],
@@ -142,7 +142,7 @@ export function cov<T extends DType>(a: NDArray<T>, b?: NDArray<T>): NDArray<T> 
     const buffer = createTypedArray(1, aData.dtype)
     buffer[0] = variance
 
-    return new NDArrayImpl({
+    return new NDArray({
       buffer,
       shape: [1],
       strides: [1],
@@ -183,7 +183,7 @@ export function cov<T extends DType>(a: NDArray<T>, b?: NDArray<T>): NDArray<T> 
   buffer[2] = covAB
   buffer[3] = varB
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer,
     shape: [2, 2],
     strides: [2, 1],
@@ -230,13 +230,13 @@ export function histogram<T extends DType>(
   }
 
   return {
-    counts: new NDArrayImpl({
+    counts: new NDArray({
       buffer: counts,
       shape: [bins],
       strides: [1],
       dtype: 'int32',
     }),
-    edges: new NDArrayImpl({
+    edges: new NDArray({
       buffer: edges,
       shape: [bins + 1],
       strides: [1],
@@ -428,7 +428,7 @@ export function bincount<T extends DType>(a: NDArray<T>, minlength = 0): NDArray
     counts[val]++
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: counts,
     shape: [length],
     strides: [1],
@@ -478,7 +478,7 @@ export function digitize<T extends DType>(
     indices[i] = binIdx
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: indices,
     shape: aData.shape,
     strides: aData.strides,
@@ -511,7 +511,7 @@ export function argwhere<T extends DType>(a: NDArray<T>): NDArray<'int32'> {
       }
     }
 
-    return new NDArrayImpl({
+    return new NDArray({
       buffer: indices,
       shape: [count],
       strides: [1],
@@ -535,7 +535,7 @@ export function argwhere<T extends DType>(a: NDArray<T>): NDArray<'int32'> {
       }
     }
 
-    return new NDArrayImpl({
+    return new NDArray({
       buffer: indices,
       shape: [count, 2],
       strides: [2, 1],

@@ -3,7 +3,7 @@
 import type { DType } from '../core/types'
 import { createTypedArray } from '../core/utils'
 import type { NDArray } from '../ndarray'
-import { NDArray as NDArrayImpl } from '../ndarray'
+import { NDArray } from '../ndarray'
 
 /**
  * Return a deep copy of the array
@@ -17,7 +17,7 @@ export function copy<T extends DType>(a: NDArray<T>): NDArray<T> {
     newBuffer[i] = data.buffer[i]
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: newBuffer,
     shape: [...data.shape],
     strides: [...data.strides],
@@ -33,7 +33,7 @@ export function view<T extends DType>(a: NDArray<T>): NDArray<T> {
   const data = a.getData()
 
   // Share the same buffer (shallow copy)
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: data.buffer,
     shape: [...data.shape],
     strides: [...data.strides],

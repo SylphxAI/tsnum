@@ -3,7 +3,7 @@
 import type { DType } from '../core/types'
 import { createTypedArray } from '../core/utils'
 import type { NDArray } from '../ndarray'
-import { NDArray as NDArrayImpl } from '../ndarray'
+import { NDArray } from '../ndarray'
 
 /**
  * Return the real part of complex argument element-wise
@@ -33,7 +33,7 @@ export function real<T extends DType>(a: NDArray<T>): NDArray<'float64'> {
       result[i] = data.buffer[i * 2] // Real part at even indices
     }
 
-    return new NDArrayImpl({
+    return new NDArray({
       buffer: result,
       shape: realShape,
       strides: computeStrides(realShape),
@@ -47,7 +47,7 @@ export function real<T extends DType>(a: NDArray<T>): NDArray<'float64'> {
     result[i] = data.buffer[i]
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: shape,
     strides: data.strides.slice(),
@@ -83,7 +83,7 @@ export function imag<T extends DType>(a: NDArray<T>): NDArray<'float64'> {
       result[i] = data.buffer[i * 2 + 1] // Imaginary part at odd indices
     }
 
-    return new NDArrayImpl({
+    return new NDArray({
       buffer: result,
       shape: imagShape,
       strides: computeStrides(imagShape),
@@ -97,7 +97,7 @@ export function imag<T extends DType>(a: NDArray<T>): NDArray<'float64'> {
     result[i] = 0
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: shape,
     strides: data.strides.slice(),
@@ -138,7 +138,7 @@ export function angle<T extends DType>(a: NDArray<T>, deg: boolean = false): NDA
       }
     }
 
-    return new NDArrayImpl({
+    return new NDArray({
       buffer: result,
       shape: angleShape,
       strides: computeStrides(angleShape),
@@ -157,7 +157,7 @@ export function angle<T extends DType>(a: NDArray<T>, deg: boolean = false): NDA
     }
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: shape,
     strides: data.strides.slice(),
@@ -190,7 +190,7 @@ export function conj<T extends DType>(a: NDArray<T>): NDArray<'float64'> {
       result[i + 1] = -data.buffer[i + 1] // Negate imaginary part
     }
 
-    return new NDArrayImpl({
+    return new NDArray({
       buffer: result,
       shape: shape,
       strides: data.strides.slice(),
@@ -204,7 +204,7 @@ export function conj<T extends DType>(a: NDArray<T>): NDArray<'float64'> {
     result[i] = data.buffer[i]
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: shape,
     strides: data.strides.slice(),

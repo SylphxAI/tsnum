@@ -3,7 +3,7 @@
 import type { DType } from '../core/types'
 import { createTypedArray } from '../core/utils'
 import type { NDArray } from '../ndarray'
-import { NDArray as NDArrayImpl } from '../ndarray'
+import { NDArray } from '../ndarray'
 
 /**
  * Compute bitwise AND of two arrays element-wise
@@ -22,7 +22,7 @@ export function bitwise_and<T extends DType>(a: NDArray<T>, b: NDArray<T>): NDAr
     result[i] = Math.floor(aData.buffer[i]) & Math.floor(bData.buffer[i])
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: [...aData.shape],
     strides: [...aData.strides],
@@ -47,7 +47,7 @@ export function bitwise_or<T extends DType>(a: NDArray<T>, b: NDArray<T>): NDArr
     result[i] = Math.floor(aData.buffer[i]) | Math.floor(bData.buffer[i])
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: [...aData.shape],
     strides: [...aData.strides],
@@ -72,7 +72,7 @@ export function bitwise_xor<T extends DType>(a: NDArray<T>, b: NDArray<T>): NDAr
     result[i] = Math.floor(aData.buffer[i]) ^ Math.floor(bData.buffer[i])
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: [...aData.shape],
     strides: [...aData.strides],
@@ -91,7 +91,7 @@ export function bitwise_not<T extends DType>(a: NDArray<T>): NDArray<T> {
     result[i] = ~Math.floor(data.buffer[i])
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: [...data.shape],
     strides: [...data.strides],
@@ -112,7 +112,7 @@ export function left_shift<T extends DType>(a: NDArray<T>, shift: number | NDArr
       result[i] = Math.floor(aData.buffer[i]) << shift
     }
 
-    return new NDArrayImpl({
+    return new NDArray({
       buffer: result,
       shape: [...aData.shape],
       strides: [...aData.strides],
@@ -132,7 +132,7 @@ export function left_shift<T extends DType>(a: NDArray<T>, shift: number | NDArr
     result[i] = Math.floor(aData.buffer[i]) << Math.floor(shiftData.buffer[i])
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: [...aData.shape],
     strides: [...aData.strides],
@@ -156,7 +156,7 @@ export function right_shift<T extends DType>(
       result[i] = Math.floor(aData.buffer[i]) >> shift
     }
 
-    return new NDArrayImpl({
+    return new NDArray({
       buffer: result,
       shape: [...aData.shape],
       strides: [...aData.strides],
@@ -176,7 +176,7 @@ export function right_shift<T extends DType>(
     result[i] = Math.floor(aData.buffer[i]) >> Math.floor(shiftData.buffer[i])
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: [...aData.shape],
     strides: [...aData.strides],

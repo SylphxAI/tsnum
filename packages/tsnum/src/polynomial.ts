@@ -3,7 +3,7 @@
 import type { DType } from './core/types'
 import { createTypedArray } from './core/utils'
 import type { NDArray } from './ndarray'
-import { NDArray as NDArrayImpl } from './ndarray'
+import { NDArray } from './ndarray'
 import { lstsq } from './linalg'
 
 /**
@@ -42,7 +42,7 @@ export function polyfit<T extends DType>(
     }
   }
 
-  const V = new NDArrayImpl({
+  const V = new NDArray({
     buffer: vBuffer,
     shape: [n, deg + 1],
     strides: [deg + 1, 1],
@@ -86,7 +86,7 @@ export function polyval<T extends DType>(p: NDArray<T>, x: NDArray<T>): NDArray<
     result[i] = value
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: [...xData.shape],
     strides: [...xData.strides],
@@ -110,7 +110,7 @@ export function roots<T extends DType>(p: NDArray<T>): NDArray<'float64'> {
 
   if (n === 1) {
     // Constant polynomial has no roots
-    return new NDArrayImpl({
+    return new NDArray({
       buffer: new Float64Array(0),
       shape: [0],
       strides: [1],
@@ -121,7 +121,7 @@ export function roots<T extends DType>(p: NDArray<T>): NDArray<'float64'> {
   if (n === 2) {
     // Linear: ax + b = 0 => x = -b/a
     const root = -pData.buffer[1] / pData.buffer[0]
-    return new NDArrayImpl({
+    return new NDArray({
       buffer: Float64Array.from([root]),
       shape: [1],
       strides: [1],
@@ -141,7 +141,7 @@ export function roots<T extends DType>(p: NDArray<T>): NDArray<'float64'> {
       const sqrtD = Math.sqrt(discriminant)
       const root1 = (-b + sqrtD) / (2 * a)
       const root2 = (-b - sqrtD) / (2 * a)
-      return new NDArrayImpl({
+      return new NDArray({
         buffer: Float64Array.from([root1, root2]),
         shape: [2],
         strides: [1],
@@ -150,7 +150,7 @@ export function roots<T extends DType>(p: NDArray<T>): NDArray<'float64'> {
     } else {
       // Complex roots - return real parts only for now
       const realPart = -b / (2 * a)
-      return new NDArrayImpl({
+      return new NDArray({
         buffer: Float64Array.from([realPart, realPart]),
         shape: [2],
         strides: [1],
@@ -187,7 +187,7 @@ export function polyder<T extends DType>(p: NDArray<T>, m = 1): NDArray<T> {
     for (let i = 0; i < pData.buffer.length; i++) {
       buffer[i] = pData.buffer[i]
     }
-    return new NDArrayImpl({
+    return new NDArray({
       buffer,
       shape: [...pData.shape],
       strides: [...pData.strides],
@@ -223,7 +223,7 @@ export function polyder<T extends DType>(p: NDArray<T>, m = 1): NDArray<T> {
     buffer[i] = coeffs[i]
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer,
     shape: [coeffs.length],
     strides: [1],
@@ -253,7 +253,7 @@ export function polyint<T extends DType>(p: NDArray<T>, m = 1, k: number | numbe
     for (let i = 0; i < pData.buffer.length; i++) {
       buffer[i] = pData.buffer[i]
     }
-    return new NDArrayImpl({
+    return new NDArray({
       buffer,
       shape: [...pData.shape],
       strides: [...pData.strides],
@@ -287,7 +287,7 @@ export function polyint<T extends DType>(p: NDArray<T>, m = 1, k: number | numbe
     buffer[i] = coeffs[i]
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer,
     shape: [coeffs.length],
     strides: [1],

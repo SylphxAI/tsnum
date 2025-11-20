@@ -3,7 +3,7 @@
 import type { DType } from './core/types'
 import { createTypedArray } from './core/utils'
 import type { NDArray } from './ndarray'
-import { NDArray as NDArrayImpl } from './ndarray'
+import { NDArray } from './ndarray'
 
 /**
  * Return the Hamming window
@@ -15,7 +15,7 @@ export function hamming<T extends DType = 'float64'>(M: number): NDArray<T> {
   }
 
   if (M === 0) {
-    return new NDArrayImpl({
+    return new NDArray({
       buffer: createTypedArray(0, 'float64' as T),
       shape: [0],
       strides: [1],
@@ -26,7 +26,7 @@ export function hamming<T extends DType = 'float64'>(M: number): NDArray<T> {
   if (M === 1) {
     const buffer = createTypedArray(1, 'float64' as T)
     buffer[0] = 1
-    return new NDArrayImpl({
+    return new NDArray({
       buffer,
       shape: [1],
       strides: [1],
@@ -42,7 +42,7 @@ export function hamming<T extends DType = 'float64'>(M: number): NDArray<T> {
     buffer[n] = alpha - beta * Math.cos((2 * Math.PI * n) / (M - 1))
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer,
     shape: [M],
     strides: [1],
@@ -60,7 +60,7 @@ export function hanning<T extends DType = 'float64'>(M: number): NDArray<T> {
   }
 
   if (M === 0) {
-    return new NDArrayImpl({
+    return new NDArray({
       buffer: createTypedArray(0, 'float64' as T),
       shape: [0],
       strides: [1],
@@ -71,7 +71,7 @@ export function hanning<T extends DType = 'float64'>(M: number): NDArray<T> {
   if (M === 1) {
     const buffer = createTypedArray(1, 'float64' as T)
     buffer[0] = 1
-    return new NDArrayImpl({
+    return new NDArray({
       buffer,
       shape: [1],
       strides: [1],
@@ -85,7 +85,7 @@ export function hanning<T extends DType = 'float64'>(M: number): NDArray<T> {
     buffer[n] = 0.5 - 0.5 * Math.cos((2 * Math.PI * n) / (M - 1))
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer,
     shape: [M],
     strides: [1],
@@ -103,7 +103,7 @@ export function blackman<T extends DType = 'float64'>(M: number): NDArray<T> {
   }
 
   if (M === 0) {
-    return new NDArrayImpl({
+    return new NDArray({
       buffer: createTypedArray(0, 'float64' as T),
       shape: [0],
       strides: [1],
@@ -114,7 +114,7 @@ export function blackman<T extends DType = 'float64'>(M: number): NDArray<T> {
   if (M === 1) {
     const buffer = createTypedArray(1, 'float64' as T)
     buffer[0] = 1
-    return new NDArrayImpl({
+    return new NDArray({
       buffer,
       shape: [1],
       strides: [1],
@@ -134,7 +134,7 @@ export function blackman<T extends DType = 'float64'>(M: number): NDArray<T> {
       a2 * Math.cos((4 * Math.PI * n) / (M - 1))
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer,
     shape: [M],
     strides: [1],
@@ -152,7 +152,7 @@ export function bartlett<T extends DType = 'float64'>(M: number): NDArray<T> {
   }
 
   if (M === 0) {
-    return new NDArrayImpl({
+    return new NDArray({
       buffer: createTypedArray(0, 'float64' as T),
       shape: [0],
       strides: [1],
@@ -163,7 +163,7 @@ export function bartlett<T extends DType = 'float64'>(M: number): NDArray<T> {
   if (M === 1) {
     const buffer = createTypedArray(1, 'float64' as T)
     buffer[0] = 1
-    return new NDArrayImpl({
+    return new NDArray({
       buffer,
       shape: [1],
       strides: [1],
@@ -181,7 +181,7 @@ export function bartlett<T extends DType = 'float64'>(M: number): NDArray<T> {
     }
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer,
     shape: [M],
     strides: [1],
@@ -199,7 +199,7 @@ export function kaiser<T extends DType = 'float64'>(M: number, beta = 0.0): NDAr
   }
 
   if (M === 0) {
-    return new NDArrayImpl({
+    return new NDArray({
       buffer: createTypedArray(0, 'float64' as T),
       shape: [0],
       strides: [1],
@@ -210,7 +210,7 @@ export function kaiser<T extends DType = 'float64'>(M: number, beta = 0.0): NDAr
   if (M === 1) {
     const buffer = createTypedArray(1, 'float64' as T)
     buffer[0] = 1
-    return new NDArrayImpl({
+    return new NDArray({
       buffer,
       shape: [1],
       strides: [1],
@@ -227,7 +227,7 @@ export function kaiser<T extends DType = 'float64'>(M: number, beta = 0.0): NDAr
     buffer[n] = besselI0(x) / i0Beta
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer,
     shape: [M],
     strides: [1],

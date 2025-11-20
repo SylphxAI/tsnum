@@ -3,7 +3,7 @@
 import type { DType } from '../core/types'
 import { createTypedArray } from '../core/utils'
 import type { NDArray } from '../ndarray'
-import { NDArray as NDArrayImpl } from '../ndarray'
+import { NDArray } from '../ndarray'
 
 /**
  * Construct open mesh from multiple sequences
@@ -42,7 +42,7 @@ export function ix_<T extends DType>(...arrays: NDArray<T>[]): NDArray<T>[] {
     strides[i] = 1
 
     result.push(
-      new NDArrayImpl({
+      new NDArray({
         buffer: newBuffer,
         shape: newShape,
         strides,

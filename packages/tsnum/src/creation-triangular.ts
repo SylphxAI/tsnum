@@ -3,7 +3,7 @@
 import type { DType } from './core/types'
 import { createTypedArray } from './core/utils'
 import type { NDArray } from './ndarray'
-import { NDArray as NDArrayImpl } from './ndarray'
+import { NDArray } from './ndarray'
 
 /**
  * Lower triangle of an array
@@ -50,7 +50,7 @@ export function tril<T extends DType>(m: NDArray<T>, k: number = 0): NDArray<T> 
     }
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: data.shape.slice(),
     strides: data.strides.slice(),
@@ -103,7 +103,7 @@ export function triu<T extends DType>(m: NDArray<T>, k: number = 0): NDArray<T> 
     }
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: data.shape.slice(),
     strides: data.strides.slice(),

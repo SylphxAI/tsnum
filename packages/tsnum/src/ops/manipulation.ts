@@ -4,7 +4,7 @@
 import type { DType } from '../core/types'
 import { createTypedArray } from '../core/utils'
 import type { NDArray } from '../ndarray'
-import { NDArray as NDArrayImpl } from '../ndarray'
+import { NDArray } from '../ndarray'
 
 /**
  * Concatenate arrays along an axis
@@ -39,7 +39,7 @@ export function concat<T extends DType>(arrays: NDArray<T>[], axis = 0): NDArray
 
     // Calculate new shape
     if (firstData.shape.length === 1) {
-      return new NDArrayImpl({
+      return new NDArray({
         buffer: newBuffer,
         shape: [totalLength],
         strides: [1],
@@ -51,7 +51,7 @@ export function concat<T extends DType>(arrays: NDArray<T>[], axis = 0): NDArray
     const cols = firstData.shape[1]
     const rows = totalLength / cols
 
-    return new NDArrayImpl({
+    return new NDArray({
       buffer: newBuffer,
       shape: [rows, cols],
       strides: [cols, 1],
@@ -132,7 +132,7 @@ export function stack<T extends DType>(arrays: NDArray<T>[], axis = 0): NDArray<
     newStrides[i] = newStrides[i + 1] * newShape[i + 1]
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: newBuffer,
     shape: newShape,
     strides: newStrides,
@@ -164,7 +164,7 @@ export function repeat<T extends DType>(a: NDArray<T>, repeats: number): NDArray
     newStrides[i] = newStrides[i + 1] * newShape[i + 1]
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: newBuffer,
     shape: newShape,
     strides: newStrides,
@@ -217,7 +217,7 @@ export function split<T extends DType>(
     }
 
     results.push(
-      new NDArrayImpl({
+      new NDArray({
         buffer,
         shape: [length],
         strides: [1],
@@ -286,7 +286,7 @@ export function tile<T extends DType>(a: NDArray<T>, reps: number | number[]): N
     }
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: newBuffer,
     shape: [newLength],
     strides: [1],
@@ -307,7 +307,7 @@ export function flip<T extends DType>(a: NDArray<T>, axis?: number): NDArray<T> 
       newBuffer[i] = data.buffer[data.buffer.length - 1 - i]
     }
 
-    return new NDArrayImpl({
+    return new NDArray({
       buffer: newBuffer,
       shape: data.shape,
       strides: data.strides,
@@ -341,7 +341,7 @@ export function flip<T extends DType>(a: NDArray<T>, axis?: number): NDArray<T> 
       }
     }
 
-    return new NDArrayImpl({
+    return new NDArray({
       buffer: newBuffer,
       shape: data.shape,
       strides: data.strides,
@@ -373,7 +373,7 @@ export function rot90<T extends DType>(a: NDArray<T>, k = 1): NDArray<T> {
     for (let i = 0; i < data.buffer.length; i++) {
       newBuffer[i] = data.buffer[i]
     }
-    return new NDArrayImpl({
+    return new NDArray({
       buffer: newBuffer,
       shape: data.shape,
       strides: data.strides,
@@ -389,7 +389,7 @@ export function rot90<T extends DType>(a: NDArray<T>, k = 1): NDArray<T> {
         newBuffer[(cols - 1 - j) * rows + i] = data.buffer[i * cols + j]
       }
     }
-    return new NDArrayImpl({
+    return new NDArray({
       buffer: newBuffer,
       shape: [cols, rows],
       strides: [rows, 1],
@@ -403,7 +403,7 @@ export function rot90<T extends DType>(a: NDArray<T>, k = 1): NDArray<T> {
     for (let i = 0; i < data.buffer.length; i++) {
       newBuffer[i] = data.buffer[data.buffer.length - 1 - i]
     }
-    return new NDArrayImpl({
+    return new NDArray({
       buffer: newBuffer,
       shape: data.shape,
       strides: data.strides,
@@ -418,7 +418,7 @@ export function rot90<T extends DType>(a: NDArray<T>, k = 1): NDArray<T> {
       newBuffer[j * rows + (rows - 1 - i)] = data.buffer[i * cols + j]
     }
   }
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: newBuffer,
     shape: [cols, rows],
     strides: [rows, 1],
@@ -469,7 +469,7 @@ export function pad<T extends DType>(
       }
     }
 
-    return new NDArrayImpl({
+    return new NDArray({
       buffer: newBuffer,
       shape: [newLength],
       strides: [1],
@@ -496,7 +496,7 @@ export function moveaxis<T extends DType>(a: NDArray<T>, source: number, destina
     for (let i = 0; i < data.buffer.length; i++) {
       newBuffer[i] = data.buffer[i]
     }
-    return new NDArrayImpl({
+    return new NDArray({
       buffer: newBuffer,
       shape: data.shape,
       strides: data.strides,
@@ -514,7 +514,7 @@ export function moveaxis<T extends DType>(a: NDArray<T>, source: number, destina
     }
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: newBuffer,
     shape: [cols, rows],
     strides: [rows, 1],
@@ -554,7 +554,7 @@ export function deleteArr<T extends DType>(
       }
     }
 
-    return new NDArrayImpl({
+    return new NDArray({
       buffer: result,
       shape: [newLength],
       strides: [1],
@@ -583,7 +583,7 @@ export function deleteArr<T extends DType>(
       }
     }
 
-    return new NDArrayImpl({
+    return new NDArray({
       buffer: result,
       shape: [newRows],
       strides: [1],
@@ -606,7 +606,7 @@ export function deleteArr<T extends DType>(
 
   const newShape = [newRows, ...data.shape.slice(1)]
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: newShape,
     strides: newShape.map((_, i) => newShape.slice(i + 1).reduce((a, b) => a * b, 1)),
@@ -667,7 +667,7 @@ export function insert<T extends DType>(
       }
     }
 
-    return new NDArrayImpl({
+    return new NDArray({
       buffer: result,
       shape: [newLength],
       strides: [1],
@@ -713,7 +713,7 @@ export function append<T extends DType>(
     result[data.buffer.length + i] = valuesArray[i]
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: [newLength],
     strides: [1],
@@ -735,7 +735,7 @@ export function resize<T extends DType>(arr: NDArray<T>, newShape: number[]): ND
     result[i] = data.buffer[i % data.buffer.length]
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: newShape,
     strides: newShape.map((_, i) => newShape.slice(i + 1).reduce((a, b) => a * b, 1)),
@@ -767,7 +767,7 @@ export function roll<T extends DType>(arr: NDArray<T>, shift: number, axis?: num
       result[(i + normalizedShift) % n] = data.buffer[i]
     }
 
-    return new NDArrayImpl({
+    return new NDArray({
       buffer: result,
       shape: [...data.shape],
       strides: [...data.strides],
@@ -790,7 +790,7 @@ export function roll<T extends DType>(arr: NDArray<T>, shift: number, axis?: num
       result[(i + normalizedShift) % rows] = data.buffer[i]
     }
 
-    return new NDArrayImpl({
+    return new NDArray({
       buffer: result,
       shape: [...data.shape],
       strides: [...data.strides],
@@ -809,7 +809,7 @@ export function roll<T extends DType>(arr: NDArray<T>, shift: number, axis?: num
     }
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: [...data.shape],
     strides: [...data.strides],

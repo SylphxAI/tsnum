@@ -3,7 +3,7 @@
 import type { DType } from '../core/types'
 import { createTypedArray } from '../core/utils'
 import type { NDArray } from '../ndarray'
-import { NDArray as NDArrayImpl } from '../ndarray'
+import { NDArray } from '../ndarray'
 
 /**
  * Trim zeros from beginning and/or end of 1D array
@@ -42,7 +42,7 @@ export function trim_zeros<T extends DType>(
     result[i] = data.buffer[start + i]
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: [length],
     strides: [1],
@@ -90,7 +90,7 @@ export function ediff1d<T extends DType>(
     result[i] = diffs[i]
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: [diffs.length],
     strides: [1],
@@ -111,7 +111,7 @@ export function around<T extends DType>(arr: NDArray<T>, decimals = 0): NDArray<
     result[i] = Math.round(data.buffer[i] * multiplier) / multiplier
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: result,
     shape: [...data.shape],
     strides: [...data.strides],

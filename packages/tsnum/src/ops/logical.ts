@@ -4,7 +4,7 @@
 import type { DType } from '../core/types'
 import { createTypedArray } from '../core/utils'
 import type { NDArray } from '../ndarray'
-import { NDArray as NDArrayImpl } from '../ndarray'
+import { NDArray } from '../ndarray'
 
 /**
  * Test whether any array element is true
@@ -49,7 +49,7 @@ export function logicalAnd<T extends DType>(a: NDArray<T>, b: NDArray<T>): NDArr
     newBuffer[i] = aData.buffer[i] !== 0 && bData.buffer[i] !== 0 ? 1 : 0
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: newBuffer,
     shape: aData.shape,
     strides: aData.strides,
@@ -74,7 +74,7 @@ export function logicalOr<T extends DType>(a: NDArray<T>, b: NDArray<T>): NDArra
     newBuffer[i] = aData.buffer[i] !== 0 || bData.buffer[i] !== 0 ? 1 : 0
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: newBuffer,
     shape: aData.shape,
     strides: aData.strides,
@@ -93,7 +93,7 @@ export function logicalNot<T extends DType>(a: NDArray<T>): NDArray<T> {
     newBuffer[i] = data.buffer[i] === 0 ? 1 : 0
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: newBuffer,
     shape: data.shape,
     strides: data.strides,
@@ -120,7 +120,7 @@ export function logicalXor<T extends DType>(a: NDArray<T>, b: NDArray<T>): NDArr
     newBuffer[i] = aBool !== bBool ? 1 : 0
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: newBuffer,
     shape: aData.shape,
     strides: aData.strides,
@@ -153,7 +153,7 @@ export function where<T extends DType>(
     newBuffer[i] = condData.buffer[i] !== 0 ? xData.buffer[i] : yData.buffer[i]
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: newBuffer,
     shape: xData.shape,
     strides: xData.strides,

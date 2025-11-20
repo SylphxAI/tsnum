@@ -3,7 +3,7 @@
 import type { DType } from '../core/types'
 import { createTypedArray } from '../core/utils'
 import type { NDArray } from '../ndarray'
-import { NDArray as NDArrayImpl } from '../ndarray'
+import { NDArray } from '../ndarray'
 
 /**
  * Cumulative sum of array elements
@@ -18,7 +18,7 @@ export function cumsum<T extends DType>(a: NDArray<T>): NDArray<T> {
     buffer[i] = sum
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer,
     shape: data.shape,
     strides: data.strides,
@@ -39,7 +39,7 @@ export function cumprod<T extends DType>(a: NDArray<T>): NDArray<T> {
     buffer[i] = prod
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer,
     shape: data.shape,
     strides: data.strides,
@@ -68,7 +68,7 @@ export function diff<T extends DType>(a: NDArray<T>, n = 1): NDArray<T> {
   for (let iteration = 0; iteration < n; iteration++) {
     if (currentLength <= 1) {
       // No more differences possible
-      return new NDArrayImpl({
+      return new NDArray({
         buffer: createTypedArray(0, data.dtype),
         shape: [0],
         strides: [1],
@@ -87,7 +87,7 @@ export function diff<T extends DType>(a: NDArray<T>, n = 1): NDArray<T> {
     currentLength = newLength
   }
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: current,
     shape: [currentLength],
     strides: [1],
@@ -107,7 +107,7 @@ export function gradient<T extends DType>(a: NDArray<T>): NDArray<T> {
 
   const n = data.buffer.length
   if (n === 0) {
-    return new NDArrayImpl({
+    return new NDArray({
       buffer: createTypedArray(0, data.dtype),
       shape: [0],
       strides: [1],
@@ -116,7 +116,7 @@ export function gradient<T extends DType>(a: NDArray<T>): NDArray<T> {
   }
 
   if (n === 1) {
-    return new NDArrayImpl({
+    return new NDArray({
       buffer: createTypedArray(1, data.dtype),
       shape: [1],
       strides: [1],
@@ -137,7 +137,7 @@ export function gradient<T extends DType>(a: NDArray<T>): NDArray<T> {
   // Last element: backward difference
   buffer[n - 1] = Number(data.buffer[n - 1]) - Number(data.buffer[n - 2])
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer,
     shape: data.shape,
     strides: data.strides,

@@ -3,7 +3,7 @@
 import type { DType } from '../core/types'
 import { computeStrides, createTypedArray } from '../core/utils'
 import type { NDArray } from '../ndarray'
-import { NDArray as NDArrayImpl } from '../ndarray'
+import { NDArray } from '../ndarray'
 
 /**
  * View input as array with at least 1 dimension
@@ -14,7 +14,7 @@ export function atleast_1d<T extends DType>(...arrays: NDArray<T>[]): NDArray<T>
 
     if (data.shape.length === 0) {
       // Scalar -> 1D array
-      return new NDArrayImpl({
+      return new NDArray({
         buffer: data.buffer,
         shape: [1],
         strides: [1],
@@ -36,7 +36,7 @@ export function atleast_2d<T extends DType>(...arrays: NDArray<T>[]): NDArray<T>
 
     if (data.shape.length === 0) {
       // Scalar -> 2D array [1, 1]
-      return new NDArrayImpl({
+      return new NDArray({
         buffer: data.buffer,
         shape: [1, 1],
         strides: [1, 1],
@@ -46,7 +46,7 @@ export function atleast_2d<T extends DType>(...arrays: NDArray<T>[]): NDArray<T>
 
     if (data.shape.length === 1) {
       // 1D -> 2D array [1, n]
-      return new NDArrayImpl({
+      return new NDArray({
         buffer: data.buffer,
         shape: [1, data.shape[0]],
         strides: [data.shape[0], 1],
@@ -68,7 +68,7 @@ export function atleast_3d<T extends DType>(...arrays: NDArray<T>[]): NDArray<T>
 
     if (data.shape.length === 0) {
       // Scalar -> 3D array [1, 1, 1]
-      return new NDArrayImpl({
+      return new NDArray({
         buffer: data.buffer,
         shape: [1, 1, 1],
         strides: [1, 1, 1],
@@ -78,7 +78,7 @@ export function atleast_3d<T extends DType>(...arrays: NDArray<T>[]): NDArray<T>
 
     if (data.shape.length === 1) {
       // 1D -> 3D array [1, n, 1]
-      return new NDArrayImpl({
+      return new NDArray({
         buffer: data.buffer,
         shape: [1, data.shape[0], 1],
         strides: [data.shape[0], 1, 1],
@@ -88,7 +88,7 @@ export function atleast_3d<T extends DType>(...arrays: NDArray<T>[]): NDArray<T>
 
     if (data.shape.length === 2) {
       // 2D -> 3D array [m, n, 1]
-      return new NDArrayImpl({
+      return new NDArray({
         buffer: data.buffer,
         shape: [...data.shape, 1],
         strides: [...data.strides, 1],
@@ -118,7 +118,7 @@ export function broadcast_to<T extends DType>(a: NDArray<T>, shape: number[]): N
     for (let i = 0; i < data.buffer.length; i++) {
       newBuffer[i] = data.buffer[i]
     }
-    return new NDArrayImpl({
+    return new NDArray({
       buffer: newBuffer,
       shape: [...data.shape],
       strides: [...data.strides],
@@ -133,7 +133,7 @@ export function broadcast_to<T extends DType>(a: NDArray<T>, shape: number[]): N
   // Fill with broadcasted values
   fillBroadcasted(newBuffer, shape, data.buffer, data.shape)
 
-  return new NDArrayImpl({
+  return new NDArray({
     buffer: newBuffer,
     shape: [...shape],
     strides: computeStrides(shape),
