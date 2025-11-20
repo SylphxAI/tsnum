@@ -128,7 +128,7 @@ Complete tracking table for all operations with backend implementation status.
 | `det` | 🟦 | 🟧 | ✅ | Determinant |
 | `slogdet` | 🟦 | ⬜ | ✅ | Sign and log det |
 | `trace` | 🟦 | 🟧 | ✅ | Matrix trace |
-| `norm` | 🟦 | ⬜ | ✅ | Vector/matrix norm |
+| `norm` | 🟦 | 🟧 | ✅ | Vector/matrix norm |
 | `qr` | 🟦 | ⬜ | ✅ | QR decomposition |
 | `svd` | 🟦 | ⬜ | ✅ | SVD |
 | `cholesky` | 🟦 | ⬜ | ✅ | Cholesky decomposition |
@@ -216,8 +216,8 @@ Complete tracking table for all operations with backend implementation status.
 
 | Category | Total | Implemented | TS Backend | WASM Backend | Tested |
 |----------|:-----:|:-----------:|:----------:|:------------:|:------:|
-| **Core Ops** | 251 | 251 ✅ | 251 🟦 | 62 🟧 | 251 ✅ |
-| **WASM Coverage** | 62/251 | **24.7%** | - | - | - |
+| **Core Ops** | 251 | 251 ✅ | 251 🟦 | 63 🟧 | 251 ✅ |
+| **WASM Coverage** | 63/251 | **25.1%** | - | - | - |
 | **Test Coverage** | 415 tests | **100%** | - | - | - |
 
 ### WASM Implementation Priority
@@ -227,10 +227,10 @@ Complete tracking table for all operations with backend implementation status.
 2. **2D/ND FFT** (fft2, fftn, rfft2, rfftn) - 5-20x speedup
 3. **Real FFT** (rfft, irfft) - 3-5x speedup
 
-**✅ Dual Backend** (62 operations):
+**✅ Dual Backend** (63 operations):
 - Arithmetic: add, sub, mul, div, pow (5)
 - Reductions: sum, mean, max, min, std, variance, prod, argmax, argmin (9)
-- Linear Algebra: matmul, dot, inv, det, transpose, trace, outer, inner (8)
+- Linear Algebra: matmul, dot, inv, det, transpose, trace, outer, inner, norm (9)
 - FFT: fft, ifft (2)
 - Math: abs, sign, sqrt, cbrt, square, reciprocal, exp, exp2, expm1, log, log2, log10, log1p, round, floor, ceil, trunc, maximum, minimum, clip, mod, fmod, deg2rad, rad2deg, hypot, sin, cos, tan, sinh, cosh, tanh, arcsin, arccos, arctan, arctan2, asinh, acosh, atanh (38)
 

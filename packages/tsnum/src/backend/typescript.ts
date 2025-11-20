@@ -129,6 +129,47 @@ export class TypeScriptBackend implements Backend {
     return minIdx
   }
 
+  norm(a: NDArrayData, ord: number | 'fro'): number {
+    if (ord === 2) {
+      // L2 norm (Euclidean)
+      let sum = 0
+      for (let i = 0; i < a.buffer.length; i++) {
+        sum += a.buffer[i] * a.buffer[i]
+      }
+      return Math.sqrt(sum)
+    }
+
+    if (ord === 1) {
+      // L1 norm (Manhattan)
+      let sum = 0
+      for (let i = 0; i < a.buffer.length; i++) {
+        sum += Math.abs(a.buffer[i])
+      }
+      return sum
+    }
+
+    if (ord === Number.POSITIVE_INFINITY) {
+      // Max norm
+      let max = 0
+      for (let i = 0; i < a.buffer.length; i++) {
+        const abs = Math.abs(a.buffer[i])
+        if (abs > max) max = abs
+      }
+      return max
+    }
+
+    if (ord === 'fro') {
+      // Frobenius norm (same as L2)
+      let sum = 0
+      for (let i = 0; i < a.buffer.length; i++) {
+        sum += a.buffer[i] * a.buffer[i]
+      }
+      return Math.sqrt(sum)
+    }
+
+    throw new Error(`Unsupported norm order: ${ord}`)
+  }
+
   // ===== Linear Algebra Operations =====
 
   matmul(a: NDArrayData, b: NDArrayData): NDArrayData {

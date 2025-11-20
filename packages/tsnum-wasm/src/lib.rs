@@ -170,6 +170,34 @@ pub fn argmin(a: &[f64]) -> usize {
     min_idx
 }
 
+/// Compute vector/matrix norm
+#[wasm_bindgen]
+pub fn norm(a: &[f64], ord: f64) -> Result<f64, String> {
+    if ord == 2.0 {
+        // L2 norm (Euclidean)
+        let sum: f64 = a.iter().map(|x| x * x).sum();
+        Ok(sum.sqrt())
+    } else if ord == 1.0 {
+        // L1 norm (Manhattan)
+        Ok(a.iter().map(|x| x.abs()).sum())
+    } else if ord == f64::INFINITY {
+        // Max norm
+        a.iter()
+            .map(|x| x.abs())
+            .fold(None, |max, x| match max {
+                None => Some(x),
+                Some(m) => Some(if x > m { x } else { m }),
+            })
+            .ok_or_else(|| "Empty array".to_string())
+    } else if ord == -1.0 {
+        // Special marker for Frobenius norm (same as L2)
+        let sum: f64 = a.iter().map(|x| x * x).sum();
+        Ok(sum.sqrt())
+    } else {
+        Err(format!("Unsupported norm order: {}", ord))
+    }
+}
+
 // ===== Linear Algebra =====
 
 /// Matrix multiplication: C = A @ B

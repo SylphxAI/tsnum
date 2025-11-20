@@ -100,49 +100,14 @@ export function inner<T extends DType>(a: NDArray<T>, b: NDArray<T>): number {
 }
 
 /**
- * Compute the norm of a vector or matrix
+ * Compute the norm of a vector or matrix (delegates to backend)
  */
 export function norm<T extends DType>(a: NDArray<T>, ord: number | 'fro' = 2): number {
   const data = a.getData()
 
-  if (ord === 2) {
-    // L2 norm (Euclidean)
-    let sum = 0
-    for (let i = 0; i < data.buffer.length; i++) {
-      sum += data.buffer[i] * data.buffer[i]
-    }
-    return Math.sqrt(sum)
-  }
-
-  if (ord === 1) {
-    // L1 norm (Manhattan)
-    let sum = 0
-    for (let i = 0; i < data.buffer.length; i++) {
-      sum += Math.abs(data.buffer[i])
-    }
-    return sum
-  }
-
-  if (ord === Number.POSITIVE_INFINITY) {
-    // Max norm
-    let max = 0
-    for (let i = 0; i < data.buffer.length; i++) {
-      const abs = Math.abs(data.buffer[i])
-      if (abs > max) max = abs
-    }
-    return max
-  }
-
-  if (ord === 'fro') {
-    // Frobenius norm (same as L2 for vectors)
-    let sum = 0
-    for (let i = 0; i < data.buffer.length; i++) {
-      sum += data.buffer[i] * data.buffer[i]
-    }
-    return Math.sqrt(sum)
-  }
-
-  throw new Error(`Unsupported norm order: ${ord}`)
+  // Delegate to backend (WASM if available, TS fallback)
+  const backend = getBackend()
+  return backend.norm(data, ord)
 }
 
 /**

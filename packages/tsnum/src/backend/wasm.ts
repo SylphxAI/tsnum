@@ -149,6 +149,20 @@ export class WASMBackend implements Backend {
     return this.module.argmin(buffer)
   }
 
+  norm(a: NDArrayData, ord: number | 'fro'): number {
+    this.ensureReady()
+    const buffer = this.toFloat64Array(a.buffer)
+
+    // Map 'fro' to -1 for WASM (special marker)
+    const ordValue = ord === 'fro' ? -1 : ord
+
+    try {
+      return this.module.norm(buffer, ordValue)
+    } catch (error) {
+      throw new Error(error instanceof Error ? error.message : 'Norm calculation failed')
+    }
+  }
+
   // ===== Linear Algebra Operations =====
 
   matmul(a: NDArrayData, b: NDArrayData): NDArrayData {

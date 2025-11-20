@@ -75,6 +75,7 @@ export interface Backend {
   asinh(a: NDArrayData): NDArrayData
   acosh(a: NDArrayData): NDArrayData
   atanh(a: NDArrayData): NDArrayData
+  norm(a: NDArrayData, ord: number | 'fro'): number
 
   // Linear algebra (advanced) - 2x2 and 3x3 only for now
   inv(a: NDArrayData): NDArrayData
