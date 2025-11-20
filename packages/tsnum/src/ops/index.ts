@@ -37,6 +37,15 @@ export {
   maximum,
   minimum,
   clip,
+  sinh,
+  cosh,
+  tanh,
+  asinh,
+  acosh,
+  atanh,
+  arctan2,
+  mod,
+  fmod,
 } from './math'
 
 // Logical operations
@@ -49,7 +58,21 @@ export { argmax, argmin, argsort, sort } from './sorting'
 export { concat, hstack, hsplit, repeat, split, stack, tile, vstack, vsplit } from './manipulation'
 
 // Statistics
-export { corrcoef, cov, histogram, median, percentile, quantile } from './statistics'
+export {
+  corrcoef,
+  cov,
+  histogram,
+  median,
+  percentile,
+  quantile,
+  nanmean,
+  nansum,
+  nanmin,
+  nanmax,
+  nanstd,
+  nanmedian,
+  nanvar,
+} from './statistics'
 
 // Set operations
 export { intersect1d, isin, setdiff1d, setxor1d, union1d, unique } from './set'
@@ -67,3 +90,6 @@ export {
   nonzero,
   searchsorted,
 } from './validation'
+
+// Copy and view operations
+export { ascontiguousarray, copy, view } from './copy'

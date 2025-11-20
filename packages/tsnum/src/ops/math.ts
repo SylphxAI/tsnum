@@ -380,3 +380,207 @@ export function clip<T extends DType>(a: NDArray<T>, min: number, max: number): 
     dtype: data.dtype,
   })
 }
+
+// ===== Hyperbolic Functions =====
+
+/**
+ * Element-wise hyperbolic sine
+ */
+export function sinh<T extends DType>(a: NDArray<T>): NDArray<T> {
+  const data = a.getData()
+  const newBuffer = createTypedArray(data.buffer.length, data.dtype)
+
+  for (let i = 0; i < data.buffer.length; i++) {
+    newBuffer[i] = Math.sinh(data.buffer[i])
+  }
+
+  return new NDArrayImpl({
+    buffer: newBuffer,
+    shape: data.shape,
+    strides: data.strides,
+    dtype: data.dtype,
+  })
+}
+
+/**
+ * Element-wise hyperbolic cosine
+ */
+export function cosh<T extends DType>(a: NDArray<T>): NDArray<T> {
+  const data = a.getData()
+  const newBuffer = createTypedArray(data.buffer.length, data.dtype)
+
+  for (let i = 0; i < data.buffer.length; i++) {
+    newBuffer[i] = Math.cosh(data.buffer[i])
+  }
+
+  return new NDArrayImpl({
+    buffer: newBuffer,
+    shape: data.shape,
+    strides: data.strides,
+    dtype: data.dtype,
+  })
+}
+
+/**
+ * Element-wise hyperbolic tangent
+ */
+export function tanh<T extends DType>(a: NDArray<T>): NDArray<T> {
+  const data = a.getData()
+  const newBuffer = createTypedArray(data.buffer.length, data.dtype)
+
+  for (let i = 0; i < data.buffer.length; i++) {
+    newBuffer[i] = Math.tanh(data.buffer[i])
+  }
+
+  return new NDArrayImpl({
+    buffer: newBuffer,
+    shape: data.shape,
+    strides: data.strides,
+    dtype: data.dtype,
+  })
+}
+
+/**
+ * Element-wise inverse hyperbolic sine
+ */
+export function asinh<T extends DType>(a: NDArray<T>): NDArray<T> {
+  const data = a.getData()
+  const newBuffer = createTypedArray(data.buffer.length, data.dtype)
+
+  for (let i = 0; i < data.buffer.length; i++) {
+    newBuffer[i] = Math.asinh(data.buffer[i])
+  }
+
+  return new NDArrayImpl({
+    buffer: newBuffer,
+    shape: data.shape,
+    strides: data.strides,
+    dtype: data.dtype,
+  })
+}
+
+/**
+ * Element-wise inverse hyperbolic cosine
+ */
+export function acosh<T extends DType>(a: NDArray<T>): NDArray<T> {
+  const data = a.getData()
+  const newBuffer = createTypedArray(data.buffer.length, data.dtype)
+
+  for (let i = 0; i < data.buffer.length; i++) {
+    newBuffer[i] = Math.acosh(data.buffer[i])
+  }
+
+  return new NDArrayImpl({
+    buffer: newBuffer,
+    shape: data.shape,
+    strides: data.strides,
+    dtype: data.dtype,
+  })
+}
+
+/**
+ * Element-wise inverse hyperbolic tangent
+ */
+export function atanh<T extends DType>(a: NDArray<T>): NDArray<T> {
+  const data = a.getData()
+  const newBuffer = createTypedArray(data.buffer.length, data.dtype)
+
+  for (let i = 0; i < data.buffer.length; i++) {
+    newBuffer[i] = Math.atanh(data.buffer[i])
+  }
+
+  return new NDArrayImpl({
+    buffer: newBuffer,
+    shape: data.shape,
+    strides: data.strides,
+    dtype: data.dtype,
+  })
+}
+
+// ===== Additional Math Functions =====
+
+/**
+ * Element-wise arc tangent of y/x in radians
+ */
+export function arctan2<T extends DType>(y: NDArray<T>, x: NDArray<T>): NDArray<T> {
+  const yData = y.getData()
+  const xData = x.getData()
+
+  if (yData.buffer.length !== xData.buffer.length) {
+    throw new Error('Arrays must have same length for arctan2')
+  }
+
+  const newBuffer = createTypedArray(yData.buffer.length, yData.dtype)
+
+  for (let i = 0; i < yData.buffer.length; i++) {
+    newBuffer[i] = Math.atan2(yData.buffer[i], xData.buffer[i])
+  }
+
+  return new NDArrayImpl({
+    buffer: newBuffer,
+    shape: yData.shape,
+    strides: yData.strides,
+    dtype: yData.dtype,
+  })
+}
+
+/**
+ * Element-wise modulo (remainder after division)
+ */
+export function mod<T extends DType>(a: NDArray<T>, b: number | NDArray<T>): NDArray<T> {
+  const aData = a.getData()
+  const newBuffer = createTypedArray(aData.buffer.length, aData.dtype)
+
+  if (typeof b === 'number') {
+    for (let i = 0; i < aData.buffer.length; i++) {
+      newBuffer[i] = aData.buffer[i] % b
+    }
+  } else {
+    const bData = b.getData()
+    if (aData.buffer.length !== bData.buffer.length) {
+      throw new Error('Arrays must have same length for mod')
+    }
+
+    for (let i = 0; i < aData.buffer.length; i++) {
+      newBuffer[i] = aData.buffer[i] % bData.buffer[i]
+    }
+  }
+
+  return new NDArrayImpl({
+    buffer: newBuffer,
+    shape: aData.shape,
+    strides: aData.strides,
+    dtype: aData.dtype,
+  })
+}
+
+/**
+ * Element-wise floating-point modulo (IEEE remainder)
+ */
+export function fmod<T extends DType>(a: NDArray<T>, b: number | NDArray<T>): NDArray<T> {
+  const aData = a.getData()
+  const newBuffer = createTypedArray(aData.buffer.length, aData.dtype)
+
+  if (typeof b === 'number') {
+    for (let i = 0; i < aData.buffer.length; i++) {
+      // JavaScript % operator is already fmod for floats
+      newBuffer[i] = aData.buffer[i] % b
+    }
+  } else {
+    const bData = b.getData()
+    if (aData.buffer.length !== bData.buffer.length) {
+      throw new Error('Arrays must have same length for fmod')
+    }
+
+    for (let i = 0; i < aData.buffer.length; i++) {
+      newBuffer[i] = aData.buffer[i] % bData.buffer[i]
+    }
+  }
+
+  return new NDArrayImpl({
+    buffer: newBuffer,
+    shape: aData.shape,
+    strides: aData.strides,
+    dtype: aData.dtype,
+  })
+}

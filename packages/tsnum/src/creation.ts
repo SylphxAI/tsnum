@@ -277,6 +277,165 @@ export function emptyLike<T extends DType>(a: NDArray, options?: ArrayOptions): 
   return empty<T>([...data.shape], { dtype })
 }
 
+/**
+ * Create a diagonal matrix or extract diagonal from 2D array
+ */
+export function diag<T extends DType = 'float64'>(
+  v: NDArray<T> | number[],
+  k = 0,
+  options?: ArrayOptions,
+): NDArray<T> {
+  // Convert array to NDArray if needed
+  let vArray: NDArray<T>
+  let dtype: T
+
+  if (Array.isArray(v)) {
+    vArray = array(v, options) as NDArray<T>
+    dtype = (options?.dtype ?? 'float64') as T
+  } else {
+    vArray = v
+    const vData = vArray.getData()
+    dtype = (options?.dtype ?? vData.dtype) as T
+  }
+
+  const vData = vArray.getData()
+
+  if (vData.shape.length === 1) {
+    // Create diagonal matrix from 1D array
+    const n = vData.buffer.length
+    const size = n + Math.abs(k)
+    const totalSize = size * size
+    const buffer = createTypedArray(totalSize, dtype)
+
+    // Fill diagonal
+    for (let i = 0; i < n; i++) {
+      const row = k >= 0 ? i : i - k
+      const col = k >= 0 ? i + k : i
+      buffer[row * size + col] = vData.buffer[i]
+    }
+
+    return new NDArray<T>({
+      buffer,
+      shape: [size, size],
+      strides: computeStrides([size, size]),
+      dtype,
+    })
+  }
+
+  if (vData.shape.length === 2) {
+    // Extract diagonal from 2D array
+    const [rows, cols] = vData.shape
+    const diagLength = Math.min(rows - Math.max(0, -k), cols - Math.max(0, k))
+
+    if (diagLength <= 0) {
+      return new NDArray<T>({
+        buffer: createTypedArray(0, dtype),
+        shape: [0],
+        strides: [1],
+        dtype,
+      })
+    }
+
+    const buffer = createTypedArray(diagLength, dtype)
+
+    for (let i = 0; i < diagLength; i++) {
+      const row = k >= 0 ? i : i - k
+      const col = k >= 0 ? i + k : i
+      buffer[i] = vData.buffer[row * cols + col]
+    }
+
+    return new NDArray<T>({
+      buffer,
+      shape: [diagLength],
+      strides: [1],
+      dtype,
+    })
+  }
+
+  throw new Error('diag only supports 1D and 2D arrays')
+}
+
+/**
+ * Create a lower triangular matrix
+ */
+export function tri<T extends DType = 'float64'>(
+  n: number,
+  m?: number,
+  k = 0,
+  options?: ArrayOptions,
+): NDArray<T> {
+  const cols = m ?? n
+  const dtype = (options?.dtype ?? 'float64') as T
+  const size = n * cols
+  const buffer = createTypedArray(size, dtype)
+
+  // Fill lower triangle
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < cols; j++) {
+      if (j <= i + k) {
+        buffer[i * cols + j] = 1
+      }
+    }
+  }
+
+  return new NDArray<T>({
+    buffer,
+    shape: [n, cols],
+    strides: computeStrides([n, cols]),
+    dtype,
+  })
+}
+
+/**
+ * Create coordinate matrices from coordinate vectors
+ */
+export function meshgrid<T extends DType = 'float64'>(
+  x: NDArray<T>,
+  y: NDArray<T>,
+): { X: NDArray<T>; Y: NDArray<T> } {
+  const xData = x.getData()
+  const yData = y.getData()
+
+  if (xData.shape.length !== 1 || yData.shape.length !== 1) {
+    throw new Error('meshgrid only supports 1D arrays')
+  }
+
+  const nx = xData.buffer.length
+  const ny = yData.buffer.length
+  const totalSize = ny * nx
+
+  // Create X grid (repeat x across rows)
+  const xBuffer = createTypedArray(totalSize, xData.dtype)
+  for (let i = 0; i < ny; i++) {
+    for (let j = 0; j < nx; j++) {
+      xBuffer[i * nx + j] = xData.buffer[j]
+    }
+  }
+
+  // Create Y grid (repeat y down columns)
+  const yBuffer = createTypedArray(totalSize, yData.dtype)
+  for (let i = 0; i < ny; i++) {
+    for (let j = 0; j < nx; j++) {
+      yBuffer[i * nx + j] = yData.buffer[i]
+    }
+  }
+
+  return {
+    X: new NDArray<T>({
+      buffer: xBuffer,
+      shape: [ny, nx],
+      strides: computeStrides([ny, nx]),
+      dtype: xData.dtype,
+    }),
+    Y: new NDArray<T>({
+      buffer: yBuffer,
+      shape: [ny, nx],
+      strides: computeStrides([ny, nx]),
+      dtype: yData.dtype,
+    }),
+  }
+}
+
 // ===== Helper functions =====
 function inferShapeAndFlatten(data: number | number[] | number[][] | number[][][]): {
   shape: number[]

@@ -10,6 +10,9 @@ export {
   eye,
   arange,
   linspace,
+  diag,
+  tri,
+  meshgrid,
   // Like functions
   zerosLike,
   onesLike,
@@ -63,6 +66,15 @@ export {
   arcsin,
   arccos,
   arctan,
+  sinh,
+  cosh,
+  tanh,
+  asinh,
+  acosh,
+  atanh,
+  arctan2,
+  mod,
+  fmod,
   round,
   floor,
   ceil,
@@ -100,6 +112,13 @@ export {
   corrcoef,
   cov,
   histogram,
+  nanmean,
+  nansum,
+  nanmin,
+  nanmax,
+  nanstd,
+  nanmedian,
+  nanvar,
   // Cumulative
   cumsum,
   cumprod,
@@ -120,6 +139,10 @@ export {
   allclose,
   nonzero,
   searchsorted,
+  // Copy and view
+  copy,
+  view,
+  ascontiguousarray,
 } from './ops'
 
 // 2b. Linear Algebra
