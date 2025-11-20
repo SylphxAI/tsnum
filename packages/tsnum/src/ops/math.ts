@@ -24,19 +24,12 @@ export function abs<T extends DType>(a: NDArray<T>): NDArray<T> {
  */
 export function sign<T extends DType>(a: NDArray<T>): NDArray<T> {
   const data = a.getData()
-  const newBuffer = createTypedArray(data.buffer.length, data.dtype)
 
-  for (let i = 0; i < data.buffer.length; i++) {
-    const val = data.buffer[i]
-    newBuffer[i] = val > 0 ? 1 : val < 0 ? -1 : 0
-  }
+  // Delegate to backend (WASM if available, TS fallback)
+  const backend = getBackend()
+  const resultData = backend.sign(data)
 
-  return new NDArray({
-    buffer: newBuffer,
-    shape: data.shape,
-    strides: data.strides,
-    dtype: data.dtype,
-  })
+  return new NDArray(resultData)
 }
 
 /**
@@ -351,22 +344,11 @@ export function arctan2<T extends DType>(y: NDArray<T>, x: NDArray<T>): NDArray<
   const yData = y.getData()
   const xData = x.getData()
 
-  if (yData.buffer.length !== xData.buffer.length) {
-    throw new Error('Arrays must have same length for arctan2')
-  }
+  // Delegate to backend (WASM if available, TS fallback)
+  const backend = getBackend()
+  const resultData = backend.arctan2(yData, xData)
 
-  const newBuffer = createTypedArray(yData.buffer.length, yData.dtype)
-
-  for (let i = 0; i < yData.buffer.length; i++) {
-    newBuffer[i] = Math.atan2(yData.buffer[i], xData.buffer[i])
-  }
-
-  return new NDArray({
-    buffer: newBuffer,
-    shape: yData.shape,
-    strides: yData.strides,
-    dtype: yData.dtype,
-  })
+  return new NDArray(resultData)
 }
 
 /**
@@ -374,29 +356,13 @@ export function arctan2<T extends DType>(y: NDArray<T>, x: NDArray<T>): NDArray<
  */
 export function mod<T extends DType>(a: NDArray<T>, b: number | NDArray<T>): NDArray<T> {
   const aData = a.getData()
-  const newBuffer = createTypedArray(aData.buffer.length, aData.dtype)
+  const bData = typeof b === 'number' ? b : b.getData()
 
-  if (typeof b === 'number') {
-    for (let i = 0; i < aData.buffer.length; i++) {
-      newBuffer[i] = aData.buffer[i] % b
-    }
-  } else {
-    const bData = b.getData()
-    if (aData.buffer.length !== bData.buffer.length) {
-      throw new Error('Arrays must have same length for mod')
-    }
+  // Delegate to backend (WASM if available, TS fallback)
+  const backend = getBackend()
+  const resultData = backend.mod(aData, bData)
 
-    for (let i = 0; i < aData.buffer.length; i++) {
-      newBuffer[i] = aData.buffer[i] % bData.buffer[i]
-    }
-  }
-
-  return new NDArray({
-    buffer: newBuffer,
-    shape: aData.shape,
-    strides: aData.strides,
-    dtype: aData.dtype,
-  })
+  return new NDArray(resultData)
 }
 
 /**
@@ -404,30 +370,13 @@ export function mod<T extends DType>(a: NDArray<T>, b: number | NDArray<T>): NDA
  */
 export function fmod<T extends DType>(a: NDArray<T>, b: number | NDArray<T>): NDArray<T> {
   const aData = a.getData()
-  const newBuffer = createTypedArray(aData.buffer.length, aData.dtype)
+  const bData = typeof b === 'number' ? b : b.getData()
 
-  if (typeof b === 'number') {
-    for (let i = 0; i < aData.buffer.length; i++) {
-      // JavaScript % operator is already fmod for floats
-      newBuffer[i] = aData.buffer[i] % b
-    }
-  } else {
-    const bData = b.getData()
-    if (aData.buffer.length !== bData.buffer.length) {
-      throw new Error('Arrays must have same length for fmod')
-    }
+  // Delegate to backend (WASM if available, TS fallback)
+  const backend = getBackend()
+  const resultData = backend.fmod(aData, bData)
 
-    for (let i = 0; i < aData.buffer.length; i++) {
-      newBuffer[i] = aData.buffer[i] % bData.buffer[i]
-    }
-  }
-
-  return new NDArray({
-    buffer: newBuffer,
-    shape: aData.shape,
-    strides: aData.strides,
-    dtype: aData.dtype,
-  })
+  return new NDArray(resultData)
 }
 
 // ===== Numerical Stability Math Functions =====

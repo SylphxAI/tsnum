@@ -553,6 +553,89 @@ export class TypeScriptBackend implements Backend {
     }
   }
 
+  sign(a: NDArrayData): NDArrayData {
+    const newBuffer = createTypedArray(a.buffer.length, a.dtype)
+
+    for (let i = 0; i < a.buffer.length; i++) {
+      const val = a.buffer[i]
+      newBuffer[i] = val > 0 ? 1 : val < 0 ? -1 : 0
+    }
+
+    return {
+      buffer: newBuffer,
+      shape: [...a.shape],
+      strides: [...a.strides],
+      dtype: a.dtype,
+    }
+  }
+
+  mod(a: NDArrayData, b: NDArrayData | number): NDArrayData {
+    const newBuffer = createTypedArray(a.buffer.length, a.dtype)
+
+    if (typeof b === 'number') {
+      for (let i = 0; i < a.buffer.length; i++) {
+        newBuffer[i] = a.buffer[i] % b
+      }
+    } else {
+      if (a.buffer.length !== b.buffer.length) {
+        throw new Error('Arrays must have same length for mod')
+      }
+      for (let i = 0; i < a.buffer.length; i++) {
+        newBuffer[i] = a.buffer[i] % b.buffer[i]
+      }
+    }
+
+    return {
+      buffer: newBuffer,
+      shape: [...a.shape],
+      strides: [...a.strides],
+      dtype: a.dtype,
+    }
+  }
+
+  fmod(a: NDArrayData, b: NDArrayData | number): NDArrayData {
+    const newBuffer = createTypedArray(a.buffer.length, a.dtype)
+
+    if (typeof b === 'number') {
+      for (let i = 0; i < a.buffer.length; i++) {
+        newBuffer[i] = a.buffer[i] % b
+      }
+    } else {
+      if (a.buffer.length !== b.buffer.length) {
+        throw new Error('Arrays must have same length for fmod')
+      }
+      for (let i = 0; i < a.buffer.length; i++) {
+        newBuffer[i] = a.buffer[i] % b.buffer[i]
+      }
+    }
+
+    return {
+      buffer: newBuffer,
+      shape: [...a.shape],
+      strides: [...a.strides],
+      dtype: a.dtype,
+    }
+  }
+
+  arctan2(y: NDArrayData, x: NDArrayData): NDArrayData {
+    if (y.buffer.length !== x.buffer.length) {
+      throw new Error('Arrays must have same length for arctan2')
+    }
+
+    const newBuffer = createTypedArray(y.buffer.length, y.dtype)
+
+    for (let i = 0; i < y.buffer.length; i++) {
+      newBuffer[i] = Math.atan2(y.buffer[i], x.buffer[i])
+    }
+
+    return {
+      buffer: newBuffer,
+      shape: [...y.shape],
+      strides: [...y.strides],
+      dtype: y.dtype,
+    }
+  }
+
   sin(a: NDArrayData): NDArrayData {
     const newBuffer = createTypedArray(a.buffer.length, a.dtype)
 

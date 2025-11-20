@@ -52,6 +52,10 @@ export interface Backend {
   maximum(a: NDArrayData, b: NDArrayData): NDArrayData
   minimum(a: NDArrayData, b: NDArrayData): NDArrayData
   clip(a: NDArrayData, min: number, max: number): NDArrayData
+  sign(a: NDArrayData): NDArrayData
+  mod(a: NDArrayData, b: NDArrayData | number): NDArrayData
+  fmod(a: NDArrayData, b: NDArrayData | number): NDArrayData
+  arctan2(y: NDArrayData, x: NDArrayData): NDArrayData
   sin(a: NDArrayData): NDArrayData
   cos(a: NDArrayData): NDArrayData
   tan(a: NDArrayData): NDArrayData

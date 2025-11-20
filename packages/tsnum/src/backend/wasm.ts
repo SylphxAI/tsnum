@@ -394,6 +394,69 @@ export class WASMBackend implements Backend {
     return this.toNDArrayData(result, a.shape, a.dtype)
   }
 
+  sign(a: NDArrayData): NDArrayData {
+    this.ensureReady()
+
+    const buffer = this.toFloat64Array(a.buffer)
+    const result = this.module.sign_array(buffer)
+
+    return this.toNDArrayData(result, a.shape, a.dtype)
+  }
+
+  mod(a: NDArrayData, b: NDArrayData | number): NDArrayData {
+    this.ensureReady()
+
+    const bufferA = this.toFloat64Array(a.buffer)
+
+    if (typeof b === 'number') {
+      const result = this.module.mod_scalar(bufferA, b)
+      return this.toNDArrayData(result, a.shape, a.dtype)
+    }
+
+    if (a.buffer.length !== b.buffer.length) {
+      throw new Error('Arrays must have same length for mod')
+    }
+
+    const bufferB = this.toFloat64Array(b.buffer)
+    const result = this.module.mod_arrays(bufferA, bufferB)
+
+    return this.toNDArrayData(result, a.shape, a.dtype)
+  }
+
+  fmod(a: NDArrayData, b: NDArrayData | number): NDArrayData {
+    this.ensureReady()
+
+    const bufferA = this.toFloat64Array(a.buffer)
+
+    if (typeof b === 'number') {
+      const result = this.module.fmod_scalar(bufferA, b)
+      return this.toNDArrayData(result, a.shape, a.dtype)
+    }
+
+    if (a.buffer.length !== b.buffer.length) {
+      throw new Error('Arrays must have same length for fmod')
+    }
+
+    const bufferB = this.toFloat64Array(b.buffer)
+    const result = this.module.fmod_arrays(bufferA, bufferB)
+
+    return this.toNDArrayData(result, a.shape, a.dtype)
+  }
+
+  arctan2(y: NDArrayData, x: NDArrayData): NDArrayData {
+    this.ensureReady()
+
+    if (y.buffer.length !== x.buffer.length) {
+      throw new Error('Arrays must have same length for arctan2')
+    }
+
+    const bufferY = this.toFloat64Array(y.buffer)
+    const bufferX = this.toFloat64Array(x.buffer)
+    const result = this.module.arctan2_arrays(bufferY, bufferX)
+
+    return this.toNDArrayData(result, y.shape, y.dtype)
+  }
+
   sin(a: NDArrayData): NDArrayData {
     this.ensureReady()
 

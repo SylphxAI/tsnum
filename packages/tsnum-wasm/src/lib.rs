@@ -334,6 +334,46 @@ pub fn clip_array(a: &[f64], min: f64, max: f64) -> Vec<f64> {
     a.iter().map(|x| x.clamp(min, max)).collect()
 }
 
+// ===== Miscellaneous Math Functions =====
+
+#[wasm_bindgen]
+pub fn sign_array(a: &[f64]) -> Vec<f64> {
+    a.iter().map(|x| {
+        if *x > 0.0 {
+            1.0
+        } else if *x < 0.0 {
+            -1.0
+        } else {
+            0.0
+        }
+    }).collect()
+}
+
+#[wasm_bindgen]
+pub fn mod_scalar(a: &[f64], b: f64) -> Vec<f64> {
+    a.iter().map(|x| x % b).collect()
+}
+
+#[wasm_bindgen]
+pub fn mod_arrays(a: &[f64], b: &[f64]) -> Vec<f64> {
+    a.iter().zip(b.iter()).map(|(x, y)| x % y).collect()
+}
+
+#[wasm_bindgen]
+pub fn fmod_scalar(a: &[f64], b: f64) -> Vec<f64> {
+    a.iter().map(|x| x % b).collect()
+}
+
+#[wasm_bindgen]
+pub fn fmod_arrays(a: &[f64], b: &[f64]) -> Vec<f64> {
+    a.iter().zip(b.iter()).map(|(x, y)| x % y).collect()
+}
+
+#[wasm_bindgen]
+pub fn arctan2_arrays(y: &[f64], x: &[f64]) -> Vec<f64> {
+    y.iter().zip(x.iter()).map(|(y_val, x_val)| y_val.atan2(*x_val)).collect()
+}
+
 // ===== Linear Algebra (Advanced) =====
 
 /// Matrix inverse for 2x2 and 3x3 matrices

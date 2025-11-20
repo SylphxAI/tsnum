@@ -140,8 +140,8 @@ Complete tracking table for all operations with backend implementation status.
 #### 4. Math Functions (40)
 | Operation | TS | WASM | Tested | Notes |
 |-----------|:--:|:----:|:------:|-------|
-| `sin`, `cos`, `tan` | 🟦 | 🟧 | ✅ | Trigonometric |
-| `arcsin`, `arccos`, `arctan`, `arctan2` | 🟦 | 🟧 | ✅ | Inverse trig |
+| `sin`, `cos`, `tan`, `arctan2` | 🟦 | 🟧 | ✅ | Trigonometric |
+| `arcsin`, `arccos`, `arctan` | 🟦 | 🟧 | ✅ | Inverse trig |
 | `sinh`, `cosh`, `tanh` | 🟦 | 🟧 | ✅ | Hyperbolic |
 | `asinh`, `acosh`, `atanh` | 🟦 | 🟧 | ✅ | Inverse hyperbolic |
 | `exp`, `exp2`, `expm1` | 🟦 | 🟧 | ✅ | Exponential |
@@ -150,6 +150,7 @@ Complete tracking table for all operations with backend implementation status.
 | `abs`, `sign` | 🟦 | 🟧 | ✅ | Sign operations |
 | `round`, `floor`, `ceil`, `trunc` | 🟦 | 🟧 | ✅ | Rounding |
 | `maximum`, `minimum`, `clip` | 🟦 | 🟧 | ✅ | Comparisons |
+| `mod`, `fmod` | 🟦 | 🟧 | ✅ | Modulo |
 | `deg2rad`, `rad2deg`, `hypot`, `sinc`, `heaviside`, `gcd`, `lcm`, `reciprocal` | 🟦 | ⬜ | ✅ | Utilities |
 
 #### 5. FFT (16)
@@ -215,8 +216,8 @@ Complete tracking table for all operations with backend implementation status.
 
 | Category | Total | Implemented | TS Backend | WASM Backend | Tested |
 |----------|:-----:|:-----------:|:----------:|:------------:|:------:|
-| **Core Ops** | 251 | 251 ✅ | 251 🟦 | 48 🟧 | 251 ✅ |
-| **WASM Coverage** | 48/251 | **19.1%** | - | - | - |
+| **Core Ops** | 251 | 251 ✅ | 251 🟦 | 52 🟧 | 251 ✅ |
+| **WASM Coverage** | 52/251 | **20.7%** | - | - | - |
 | **Test Coverage** | 415 tests | **100%** | - | - | - |
 
 ### WASM Implementation Priority
@@ -224,14 +225,14 @@ Complete tracking table for all operations with backend implementation status.
 **🎯 Next Priority** (Expected Performance Gains):
 1. **Linear Algebra** (solve, qr, svd, eig) - 10-30x speedup
 2. **2D/ND FFT** (fft2, fftn, rfft2, rfftn) - 5-20x speedup
-3. **Miscellaneous Math** (mod, fmod, sign, arctan2) - 2-3x speedup
+3. **Real FFT** (rfft, irfft) - 3-5x speedup
 
-**✅ Dual Backend** (48 operations):
+**✅ Dual Backend** (52 operations):
 - Arithmetic: add, sub, mul, div, pow (5)
 - Reductions: sum, mean, max, min, std, variance (6)
 - Linear Algebra: matmul, dot, inv, det, transpose (5)
 - FFT: fft, ifft (2)
-- Math: abs, sqrt, cbrt, square, exp, exp2, expm1, log, log2, log10, log1p, round, floor, ceil, trunc, maximum, minimum, clip, sin, cos, tan, sinh, cosh, tanh, arcsin, arccos, arctan, asinh, acosh, atanh (30)
+- Math: abs, sign, sqrt, cbrt, square, exp, exp2, expm1, log, log2, log10, log1p, round, floor, ceil, trunc, maximum, minimum, clip, mod, fmod, sin, cos, tan, sinh, cosh, tanh, arcsin, arccos, arctan, arctan2, asinh, acosh, atanh (34)
 
 ### ✅ Implemented Functions (251)
 
@@ -395,7 +396,7 @@ User Code → NDArray API → Backend Interface → WASM (fast) or TypeScript (f
 - ✅ Reductions (sum, mean, max, min, std, variance)
 - ✅ Linear algebra (matmul, dot, inv, det, transpose)
 - ✅ FFT operations (fft, ifft)
-- ✅ Math functions (sin, cos, tan, sinh, cosh, tanh, arcsin, arccos, arctan, asinh, acosh, atanh, exp, exp2, expm1, log, log2, log10, log1p, abs, sqrt, cbrt, square, round, floor, ceil, trunc, maximum, minimum, clip)
+- ✅ Math functions (sin, cos, tan, sinh, cosh, tanh, arcsin, arccos, arctan, arctan2, asinh, acosh, atanh, exp, exp2, expm1, log, log2, log10, log1p, abs, sign, sqrt, cbrt, square, round, floor, ceil, trunc, maximum, minimum, clip, mod, fmod)
 
 ### Benchmarks
 
