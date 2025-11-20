@@ -95,6 +95,59 @@ export class TypeScriptBackend implements Backend {
     return sumSquares / a.buffer.length
   }
 
+  // ===== Linear Algebra Operations =====
+
+  matmul(a: NDArrayData, b: NDArrayData): NDArrayData {
+    if (a.shape.length !== 2 || b.shape.length !== 2) {
+      throw new Error('matmul requires 2D arrays')
+    }
+
+    const m = a.shape[0]
+    const k = a.shape[1]
+    const n = b.shape[1]
+
+    if (k !== b.shape[0]) {
+      throw new Error(`Shape mismatch: (${m}, ${k}) and (${b.shape[0]}, ${n})`)
+    }
+
+    const newBuffer = createTypedArray(m * n, a.dtype)
+
+    // Matrix multiplication: C[i,j] = sum(A[i,k] * B[k,j])
+    for (let i = 0; i < m; i++) {
+      for (let j = 0; j < n; j++) {
+        let sum = 0
+        for (let kIdx = 0; kIdx < k; kIdx++) {
+          sum += a.buffer[i * k + kIdx] * b.buffer[kIdx * n + j]
+        }
+        newBuffer[i * n + j] = sum
+      }
+    }
+
+    return {
+      buffer: newBuffer,
+      shape: [m, n],
+      strides: [n, 1],
+      dtype: a.dtype,
+    }
+  }
+
+  dot(a: NDArrayData, b: NDArrayData): number {
+    // 1D dot product (inner product)
+    if (a.shape.length === 1 && b.shape.length === 1) {
+      if (a.buffer.length !== b.buffer.length) {
+        throw new Error('Arrays must have same length for dot product')
+      }
+
+      let result = 0
+      for (let i = 0; i < a.buffer.length; i++) {
+        result += a.buffer[i] * b.buffer[i]
+      }
+      return result
+    }
+
+    throw new Error('dot backend method only supports 1D arrays')
+  }
+
   // ===== Helper Methods =====
 
   private scalarOp(

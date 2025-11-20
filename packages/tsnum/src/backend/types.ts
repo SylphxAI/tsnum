@@ -25,12 +25,12 @@ export interface Backend {
   std(a: NDArrayData): number
   variance(a: NDArrayData): number
 
+  // Linear algebra operations
+  matmul(a: NDArrayData, b: NDArrayData): NDArrayData
+  dot(a: NDArrayData, b: NDArrayData): number
+
   // Shape operations (pure TS - no WASM benefit)
   // reshape, transpose, etc. stay in TS
-
-  // Future: Linear algebra
-  // matmul(a: NDArrayData, b: NDArrayData): NDArrayData
-  // dot(a: NDArrayData, b: NDArrayData): number
 }
 
 /**

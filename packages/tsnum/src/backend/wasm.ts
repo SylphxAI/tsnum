@@ -23,13 +23,15 @@ export class WASMBackend implements Backend {
 
   async init(): Promise<void> {
     try {
-      // Dynamic import of compiled WASM module
+      // Import the WASM module
       const module = await import('../../wasm/tsnum_wasm.js')
 
-      // Initialize WASM (loads .wasm file)
-      await module.default()
+      // Initialize WASM by loading the .wasm file
+      // For web target, need to explicitly call the init function
+      const wasmPath = new URL('../../wasm/tsnum_wasm_bg.wasm', import.meta.url)
+      await module.default(wasmPath)
 
-      this.wasmModule = module
+      this.wasmModule = module as unknown as WASMModule
       this._isReady = true
     } catch (error) {
       throw new Error(`Failed to initialize WASM: ${error}`)
@@ -132,6 +134,51 @@ export class WASMBackend implements Backend {
     this.ensureReady()
     const buffer = this.toFloat64Array(a.buffer)
     return this.module.variance(buffer)
+  }
+
+  // ===== Linear Algebra Operations =====
+
+  matmul(a: NDArrayData, b: NDArrayData): NDArrayData {
+    this.ensureReady()
+
+    if (a.shape.length !== 2 || b.shape.length !== 2) {
+      throw new Error('matmul requires 2D arrays')
+    }
+
+    const m = a.shape[0]
+    const k = a.shape[1]
+    const n = b.shape[1]
+
+    if (k !== b.shape[0]) {
+      throw new Error(`Shape mismatch: (${m}, ${k}) and (${b.shape[0]}, ${n})`)
+    }
+
+    const bufA = this.toFloat64Array(a.buffer)
+    const bufB = this.toFloat64Array(b.buffer)
+
+    // Call WASM matmul (we'll add this to WASM module)
+    const result = this.module.matmul(bufA, bufB, m, k, n)
+
+    return this.toNDArrayData(result, [m, n], a.dtype)
+  }
+
+  dot(a: NDArrayData, b: NDArrayData): number {
+    this.ensureReady()
+
+    // 1D dot product (inner product)
+    if (a.shape.length === 1 && b.shape.length === 1) {
+      if (a.buffer.length !== b.buffer.length) {
+        throw new Error('Arrays must have same length for dot product')
+      }
+
+      const bufA = this.toFloat64Array(a.buffer)
+      const bufB = this.toFloat64Array(b.buffer)
+
+      // Call WASM dot (we'll add this to WASM module)
+      return this.module.dot(bufA, bufB)
+    }
+
+    throw new Error('dot backend method only supports 1D arrays')
   }
 
   // ===== Helper Methods =====

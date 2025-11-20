@@ -1,5 +1,6 @@
 // ===== Linear Algebra =====
 
+import { getBackend } from '../backend'
 import type { DType } from '../core/types'
 import { computeStrides, createTypedArray } from '../core/utils'
 import { eye } from '../creation'
@@ -10,7 +11,7 @@ import { NDArray } from '../ndarray'
 export { cond, slogdet, multi_dot } from './numerical-stability'
 
 /**
- * Dot product of two arrays
+ * Dot product of two arrays (delegates to backend when possible)
  * For 1D: inner product
  * For 2D: matrix multiplication
  */
@@ -18,20 +19,13 @@ export function dot<T extends DType>(a: NDArray<T>, b: NDArray<T>): NDArray<T> |
   const aData = a.getData()
   const bData = b.getData()
 
-  // 1D dot product (inner product)
+  // 1D dot product (inner product) - delegate to backend
   if (aData.shape.length === 1 && bData.shape.length === 1) {
-    if (aData.buffer.length !== bData.buffer.length) {
-      throw new Error('Arrays must have same length for dot product')
-    }
-
-    let result = 0
-    for (let i = 0; i < aData.buffer.length; i++) {
-      result += aData.buffer[i] * bData.buffer[i]
-    }
-    return result
+    const backend = getBackend()
+    return backend.dot(aData, bData)
   }
 
-  // 2D matrix multiplication
+  // 2D matrix multiplication - delegate to matmul (which uses backend)
   if (aData.shape.length === 2 && bData.shape.length === 2) {
     return matmul(a, b)
   }
@@ -67,43 +61,17 @@ export function dot<T extends DType>(a: NDArray<T>, b: NDArray<T>): NDArray<T> |
 }
 
 /**
- * Matrix multiplication
+ * Matrix multiplication (delegates to backend for performance)
  */
 export function matmul<T extends DType>(a: NDArray<T>, b: NDArray<T>): NDArray<T> {
   const aData = a.getData()
   const bData = b.getData()
 
-  if (aData.shape.length !== 2 || bData.shape.length !== 2) {
-    throw new Error('matmul requires 2D arrays')
-  }
+  // Delegate to backend (WASM if available, TS fallback)
+  const backend = getBackend()
+  const resultData = backend.matmul(aData, bData)
 
-  const m = aData.shape[0]
-  const k = aData.shape[1]
-  const n = bData.shape[1]
-
-  if (k !== bData.shape[0]) {
-    throw new Error(`Shape mismatch: (${m}, ${k}) and (${bData.shape[0]}, ${n})`)
-  }
-
-  const newBuffer = createTypedArray(m * n, aData.dtype)
-
-  // Matrix multiplication: C[i,j] = sum(A[i,k] * B[k,j])
-  for (let i = 0; i < m; i++) {
-    for (let j = 0; j < n; j++) {
-      let sum = 0
-      for (let kIdx = 0; kIdx < k; kIdx++) {
-        sum += aData.buffer[i * k + kIdx] * bData.buffer[kIdx * n + j]
-      }
-      newBuffer[i * n + j] = sum
-    }
-  }
-
-  return new NDArray({
-    buffer: newBuffer,
-    shape: [m, n],
-    strides: [n, 1],
-    dtype: aData.dtype,
-  })
+  return new NDArray(resultData)
 }
 
 /**

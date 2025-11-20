@@ -49,7 +49,7 @@ const AT = A.T  // Transpose of A
 
 ## Design Philosophy
 
-**Pragmatic Functional Programming**
+**Pragmatic Functional Programming + Dual Backend Architecture**
 
 tsnum follows a pragmatic functional approach that balances purity with performance:
 
@@ -57,7 +57,7 @@ tsnum follows a pragmatic functional approach that balances purity with performa
 - **Optimized Internals**: Hot loops use mutable operations for maximum performance
 - **Zero-Copy Operations**: Views (reshape, transpose) share underlying buffers when possible
 - **Functional Core**: Pure functions for all computations - same input always produces same output
-- **Single Implementation**: No duplicate code paths, clean architecture
+- **Dual Backend System**: TypeScript (always available) + WASM (automatic acceleration when available)
 
 ```typescript
 // ✅ Immutable API - inputs never change
@@ -217,13 +217,40 @@ const rms = pipe(data, x => mul(x, x), mean, sqrt)
 
 ## Performance
 
-tsnum uses WebAssembly for performance-critical operations with automatic fallback to optimized TypeScript:
+### Dual Backend Architecture
 
-- **Matrix multiplication**: ~10-50x faster than pure JS
-- **FFT operations**: ~5-20x faster than pure JS
-- **Element-wise operations**: ~2-10x faster than pure JS
+tsnum implements a sophisticated dual backend system for optimal performance:
 
-See [PERFORMANCE.md](./PERFORMANCE.md) for detailed benchmarks.
+```typescript
+User Code → NDArray API → Backend Interface → WASM (fast) or TypeScript (fallback)
+```
+
+**TypeScript Backend**: Always available, pure TS implementation
+- Ensures reliability - works everywhere
+- Fallback for environments without WASM support
+- Reference implementation for correctness
+
+**WASM Backend**: Near-native performance through Rust
+- Automatically used when available (no code changes needed)
+- Cache-optimized algorithms (matmul uses i-k-j loop order)
+- SIMD-ready for future optimization
+
+**Current Backend Coverage**:
+- ✅ Arithmetic operations (add, sub, mul, div, pow)
+- ✅ Reductions (sum, mean, max, min, std, variance)
+- ✅ Linear algebra (matmul, dot)
+- 🚧 FFT operations (coming soon)
+
+### Benchmarks
+
+TypeScript Backend (current):
+- **matmul 2×2**: ~24 ns/iter
+- **matmul 10×10**: ~1.23 µs/iter
+- **matmul 100×100**: ~1.15 ms/iter
+- **dot 100 elements**: ~39 ns/iter
+- **Reshape (zero-copy)**: ~24 ns/iter
+
+See [PERFORMANCE.md](./PERFORMANCE.md) for detailed benchmarks and methodology.
 
 ## API Documentation
 

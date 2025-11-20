@@ -134,6 +134,42 @@ pub fn variance(a: &[f64]) -> f64 {
     sum_squared_diff / a.len() as f64
 }
 
+// ===== Linear Algebra =====
+
+/// Matrix multiplication: C = A @ B
+/// A is m×k, B is k×n, result is m×n
+#[wasm_bindgen]
+pub fn matmul(a: &[f64], b: &[f64], m: usize, k: usize, n: usize) -> Vec<f64> {
+    assert_eq!(a.len(), m * k, "A size mismatch");
+    assert_eq!(b.len(), k * n, "B size mismatch");
+
+    let mut result = vec![0.0; m * n];
+
+    // Matrix multiplication: C[i,j] = sum(A[i,k] * B[k,j])
+    // Optimized: iterate in cache-friendly order
+    for i in 0..m {
+        for kk in 0..k {
+            let a_val = a[i * k + kk];
+            for j in 0..n {
+                result[i * n + j] += a_val * b[kk * n + j];
+            }
+        }
+    }
+
+    result
+}
+
+/// Dot product (inner product) of two 1D arrays
+#[wasm_bindgen]
+pub fn dot(a: &[f64], b: &[f64]) -> f64 {
+    assert_eq!(a.len(), b.len(), "Arrays must have same length");
+
+    a.iter()
+        .zip(b.iter())
+        .map(|(x, y)| x * y)
+        .sum()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -169,5 +205,22 @@ mod tests {
     fn test_variance() {
         let a = vec![2.0, 4.0, 6.0, 8.0];
         assert_eq!(variance(&a), 5.0);
+    }
+
+    #[test]
+    fn test_matmul_2x2() {
+        let a = vec![1.0, 2.0, 3.0, 4.0]; // [[1, 2], [3, 4]]
+        let b = vec![5.0, 6.0, 7.0, 8.0]; // [[5, 6], [7, 8]]
+        let result = matmul(&a, &b, 2, 2, 2);
+        // Expected: [[19, 22], [43, 50]]
+        assert_eq!(result, vec![19.0, 22.0, 43.0, 50.0]);
+    }
+
+    #[test]
+    fn test_dot_product() {
+        let a = vec![1.0, 2.0, 3.0];
+        let b = vec![4.0, 5.0, 6.0];
+        let result = dot(&a, &b);
+        assert_eq!(result, 32.0); // 1*4 + 2*5 + 3*6 = 32
     }
 }

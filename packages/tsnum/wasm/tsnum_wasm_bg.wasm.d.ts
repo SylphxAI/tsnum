@@ -1,22 +1,24 @@
 /* tslint:disable */
 /* eslint-disable */
-export const memory: WebAssembly.Memory
-export const add_arrays: (a: number, b: number, c: number, d: number) => [number, number]
-export const add_scalar: (a: number, b: number, c: number) => [number, number]
-export const div_arrays: (a: number, b: number, c: number, d: number) => [number, number]
-export const div_scalar: (a: number, b: number, c: number) => [number, number]
-export const max: (a: number, b: number) => number
-export const mean: (a: number, b: number) => number
-export const min: (a: number, b: number) => number
-export const mul_arrays: (a: number, b: number, c: number, d: number) => [number, number]
-export const mul_scalar: (a: number, b: number, c: number) => [number, number]
-export const pow_scalar: (a: number, b: number, c: number) => [number, number]
-export const std: (a: number, b: number) => number
-export const sub_arrays: (a: number, b: number, c: number, d: number) => [number, number]
-export const sub_scalar: (a: number, b: number, c: number) => [number, number]
-export const sum: (a: number, b: number) => number
-export const variance: (a: number, b: number) => number
-export const __wbindgen_externrefs: WebAssembly.Table
-export const __wbindgen_malloc: (a: number, b: number) => number
-export const __wbindgen_free: (a: number, b: number, c: number) => void
-export const __wbindgen_start: () => void
+export const memory: WebAssembly.Memory;
+export const add_arrays: (a: number, b: number, c: number, d: number) => [number, number];
+export const add_scalar: (a: number, b: number, c: number) => [number, number];
+export const div_arrays: (a: number, b: number, c: number, d: number) => [number, number];
+export const div_scalar: (a: number, b: number, c: number) => [number, number];
+export const dot: (a: number, b: number, c: number, d: number) => number;
+export const matmul: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => [number, number];
+export const max: (a: number, b: number) => number;
+export const mean: (a: number, b: number) => number;
+export const min: (a: number, b: number) => number;
+export const mul_arrays: (a: number, b: number, c: number, d: number) => [number, number];
+export const mul_scalar: (a: number, b: number, c: number) => [number, number];
+export const pow_scalar: (a: number, b: number, c: number) => [number, number];
+export const std: (a: number, b: number) => number;
+export const sub_arrays: (a: number, b: number, c: number, d: number) => [number, number];
+export const sub_scalar: (a: number, b: number, c: number) => [number, number];
+export const sum: (a: number, b: number) => number;
+export const variance: (a: number, b: number) => number;
+export const __wbindgen_externrefs: WebAssembly.Table;
+export const __wbindgen_malloc: (a: number, b: number) => number;
+export const __wbindgen_free: (a: number, b: number, c: number) => void;
+export const __wbindgen_start: () => void;
