@@ -664,6 +664,49 @@ export class WASMBackend implements Backend {
     return this.toNDArrayData(result, [cols, rows], a.dtype)
   }
 
+  trace(a: NDArrayData): number {
+    this.ensureReady()
+
+    if (a.shape.length !== 2) {
+      throw new Error('trace requires 2D array')
+    }
+
+    const buffer = this.toFloat64Array(a.buffer)
+    return this.module.trace_matrix(buffer, a.shape[0], a.shape[1])
+  }
+
+  outer(a: NDArrayData, b: NDArrayData): NDArrayData {
+    this.ensureReady()
+
+    if (a.shape.length !== 1 || b.shape.length !== 1) {
+      throw new Error('outer requires 1D arrays')
+    }
+
+    const bufferA = this.toFloat64Array(a.buffer)
+    const bufferB = this.toFloat64Array(b.buffer)
+
+    const result = this.module.outer_product(bufferA, bufferB)
+
+    return this.toNDArrayData(result, [a.buffer.length, b.buffer.length], a.dtype)
+  }
+
+  inner(a: NDArrayData, b: NDArrayData): number {
+    this.ensureReady()
+
+    if (a.shape.length !== 1 || b.shape.length !== 1) {
+      throw new Error('inner requires 1D arrays')
+    }
+
+    if (a.buffer.length !== b.buffer.length) {
+      throw new Error('Arrays must have same length for inner product')
+    }
+
+    const bufferA = this.toFloat64Array(a.buffer)
+    const bufferB = this.toFloat64Array(b.buffer)
+
+    return this.module.inner_product(bufferA, bufferB)
+  }
+
   // ===== Helper Methods =====
 
   private ensureReady(): void {

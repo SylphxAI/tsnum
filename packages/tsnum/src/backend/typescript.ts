@@ -1034,6 +1034,60 @@ export class TypeScriptBackend implements Backend {
     }
   }
 
+  trace(a: NDArrayData): number {
+    if (a.shape.length !== 2) {
+      throw new Error('trace requires 2D array')
+    }
+
+    const n = Math.min(a.shape[0], a.shape[1])
+    const stride = a.shape[1] + 1
+
+    let sum = 0
+    for (let i = 0; i < n; i++) {
+      sum += a.buffer[i * stride]
+    }
+    return sum
+  }
+
+  outer(a: NDArrayData, b: NDArrayData): NDArrayData {
+    if (a.shape.length !== 1 || b.shape.length !== 1) {
+      throw new Error('outer requires 1D arrays')
+    }
+
+    const m = a.buffer.length
+    const n = b.buffer.length
+    const newBuffer = createTypedArray(m * n, a.dtype)
+
+    for (let i = 0; i < m; i++) {
+      for (let j = 0; j < n; j++) {
+        newBuffer[i * n + j] = a.buffer[i] * b.buffer[j]
+      }
+    }
+
+    return {
+      buffer: newBuffer,
+      shape: [m, n],
+      strides: [n, 1],
+      dtype: a.dtype,
+    }
+  }
+
+  inner(a: NDArrayData, b: NDArrayData): number {
+    if (a.shape.length !== 1 || b.shape.length !== 1) {
+      throw new Error('inner requires 1D arrays')
+    }
+
+    if (a.buffer.length !== b.buffer.length) {
+      throw new Error('Arrays must have same length for inner product')
+    }
+
+    let result = 0
+    for (let i = 0; i < a.buffer.length; i++) {
+      result += a.buffer[i] * b.buffer[i]
+    }
+    return result
+  }
+
   // ===== Helper Methods =====
 
   private fftRecursive(real: Float64Array, imag: Float64Array, n: number): void {

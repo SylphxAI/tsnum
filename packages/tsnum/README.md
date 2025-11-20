@@ -115,8 +115,8 @@ Complete tracking table for all operations with backend implementation status.
 |-----------|:--:|:----:|:------:|-------|
 | `matmul` | 🟦 | 🟧 | ✅ | **Matrix multiplication** |
 | `dot` | 🟦 | 🟧 | ✅ | **Dot product** |
-| `outer` | 🟦 | ⬜ | ✅ | Outer product |
-| `inner` | 🟦 | ⬜ | ✅ | Inner product |
+| `outer` | 🟦 | 🟧 | ✅ | Outer product |
+| `inner` | 🟦 | 🟧 | ✅ | Inner product |
 | `vdot` | 🟦 | ⬜ | ✅ | Complex conjugate dot |
 | `kron` | 🟦 | ⬜ | ✅ | Kronecker product |
 | `tensordot` | 🟦 | ⬜ | ✅ | Tensor contraction |
@@ -127,7 +127,7 @@ Complete tracking table for all operations with backend implementation status.
 | `lstsq` | 🟦 | ⬜ | ✅ | Least squares |
 | `det` | 🟦 | 🟧 | ✅ | Determinant |
 | `slogdet` | 🟦 | ⬜ | ✅ | Sign and log det |
-| `trace` | 🟦 | ⬜ | ✅ | Matrix trace |
+| `trace` | 🟦 | 🟧 | ✅ | Matrix trace |
 | `norm` | 🟦 | ⬜ | ✅ | Vector/matrix norm |
 | `qr` | 🟦 | ⬜ | ✅ | QR decomposition |
 | `svd` | 🟦 | ⬜ | ✅ | SVD |
@@ -217,7 +217,7 @@ Complete tracking table for all operations with backend implementation status.
 | Category | Total | Implemented | TS Backend | WASM Backend | Tested |
 |----------|:-----:|:-----------:|:----------:|:------------:|:------:|
 | **Core Ops** | 251 | 251 ✅ | 251 🟦 | 52 🟧 | 251 ✅ |
-| **WASM Coverage** | 57/251 | **22.7%** | - | - | - |
+| **WASM Coverage** | 60/251 | **23.9%** | - | - | - |
 | **Test Coverage** | 415 tests | **100%** | - | - | - |
 
 ### WASM Implementation Priority
@@ -227,10 +227,10 @@ Complete tracking table for all operations with backend implementation status.
 2. **2D/ND FFT** (fft2, fftn, rfft2, rfftn) - 5-20x speedup
 3. **Real FFT** (rfft, irfft) - 3-5x speedup
 
-**✅ Dual Backend** (57 operations):
+**✅ Dual Backend** (60 operations):
 - Arithmetic: add, sub, mul, div, pow (5)
 - Reductions: sum, mean, max, min, std, variance, prod (7)
-- Linear Algebra: matmul, dot, inv, det, transpose (5)
+- Linear Algebra: matmul, dot, inv, det, transpose, trace, outer, inner (8)
 - FFT: fft, ifft (2)
 - Math: abs, sign, sqrt, cbrt, square, reciprocal, exp, exp2, expm1, log, log2, log10, log1p, round, floor, ceil, trunc, maximum, minimum, clip, mod, fmod, deg2rad, rad2deg, hypot, sin, cos, tan, sinh, cosh, tanh, arcsin, arccos, arctan, arctan2, asinh, acosh, atanh (38)
 

@@ -35,19 +35,21 @@ export function fmod_arrays(a: Float64Array, b: Float64Array): Float64Array;
  * Multiply array by scalar
  */
 export function mul_scalar(a: Float64Array, scalar: number): Float64Array;
-export function asinh_array(a: Float64Array): Float64Array;
 /**
  * Fast Fourier Transform (Cooley-Tukey algorithm)
  * Input: real-valued array of length n (must be power of 2)
  * Output: interleaved [real, imag] pairs (length 2n)
  */
 export function fft(input: Float64Array): Float64Array;
+export function asinh_array(a: Float64Array): Float64Array;
 /**
- * Inverse Fast Fourier Transform
- * Input: interleaved [real, imag] pairs (length 2n)
- * Output: interleaved [real, imag] pairs (length 2n)
+ * Matrix inverse for 2x2 and 3x3 matrices
  */
-export function ifft(input: Float64Array, n: number): Float64Array;
+export function inv_matrix(a: Float64Array, n: number): Float64Array;
+/**
+ * Determinant for 2x2 and 3x3 matrices
+ */
+export function det_matrix(a: Float64Array, n: number): number;
 export function trunc_array(a: Float64Array): Float64Array;
 export function arcsin_array(a: Float64Array): Float64Array;
 export function minimum_arrays(a: Float64Array, b: Float64Array): Float64Array;
@@ -74,9 +76,9 @@ export function acosh_array(a: Float64Array): Float64Array;
 export function ceil_array(a: Float64Array): Float64Array;
 export function square_array(a: Float64Array): Float64Array;
 /**
- * Matrix inverse for 2x2 and 3x3 matrices
+ * Trace of a matrix (sum of diagonal elements)
  */
-export function inv_matrix(a: Float64Array, n: number): Float64Array;
+export function trace_matrix(a: Float64Array, rows: number, cols: number): number;
 /**
  * Element-wise sine
  */
@@ -119,6 +121,12 @@ export function log1p_array(a: Float64Array): Float64Array;
 export function tanh_array(a: Float64Array): Float64Array;
 export function cosh_array(a: Float64Array): Float64Array;
 export function arccos_array(a: Float64Array): Float64Array;
+/**
+ * Inverse Fast Fourier Transform
+ * Input: interleaved [real, imag] pairs (length 2n)
+ * Output: interleaved [real, imag] pairs (length 2n)
+ */
+export function ifft(input: Float64Array, n: number): Float64Array;
 export function log2_array(a: Float64Array): Float64Array;
 export function deg2rad_array(a: Float64Array): Float64Array;
 /**
@@ -130,10 +138,14 @@ export function cos_array(a: Float64Array): Float64Array;
  */
 export function add_arrays(a: Float64Array, b: Float64Array): Float64Array;
 /**
- * Determinant for 2x2 and 3x3 matrices
+ * Outer product of two vectors
  */
-export function det_matrix(a: Float64Array, n: number): number;
+export function outer_product(a: Float64Array, b: Float64Array): Float64Array;
 export function sinh_array(a: Float64Array): Float64Array;
+/**
+ * Matrix transpose
+ */
+export function transpose_matrix(a: Float64Array, rows: number, cols: number): Float64Array;
 /**
  * Multiply two arrays element-wise
  */
@@ -145,9 +157,9 @@ export function cbrt_array(a: Float64Array): Float64Array;
 export function variance(a: Float64Array): number;
 export function arctan_array(a: Float64Array): Float64Array;
 /**
- * Matrix transpose
+ * Inner product of two vectors
  */
-export function transpose_matrix(a: Float64Array, rows: number, cols: number): Float64Array;
+export function inner_product(a: Float64Array, b: Float64Array): number;
 /**
  * Element-wise base-10 logarithm
  */

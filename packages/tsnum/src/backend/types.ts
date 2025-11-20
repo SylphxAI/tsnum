@@ -78,6 +78,9 @@ export interface Backend {
   inv(a: NDArrayData): NDArrayData
   det(a: NDArrayData): number
   transpose(a: NDArrayData): NDArrayData
+  trace(a: NDArrayData): number
+  outer(a: NDArrayData, b: NDArrayData): NDArrayData
+  inner(a: NDArrayData, b: NDArrayData): number
 
   // Shape operations (pure TS - no WASM benefit)
   // reshape, etc. stay in TS

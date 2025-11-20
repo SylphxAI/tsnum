@@ -402,6 +402,41 @@ pub fn reciprocal_array(a: &[f64]) -> Vec<f64> {
 
 // ===== Linear Algebra (Advanced) =====
 
+/// Trace of a matrix (sum of diagonal elements)
+#[wasm_bindgen]
+pub fn trace_matrix(a: &[f64], rows: usize, cols: usize) -> f64 {
+    let n = rows.min(cols);
+    let stride = cols + 1;
+
+    let mut sum = 0.0;
+    for i in 0..n {
+        sum += a[i * stride];
+    }
+    sum
+}
+
+/// Outer product of two vectors
+#[wasm_bindgen]
+pub fn outer_product(a: &[f64], b: &[f64]) -> Vec<f64> {
+    let m = a.len();
+    let n = b.len();
+    let mut result = Vec::with_capacity(m * n);
+
+    for i in 0..m {
+        for j in 0..n {
+            result.push(a[i] * b[j]);
+        }
+    }
+    result
+}
+
+/// Inner product of two vectors
+#[wasm_bindgen]
+pub fn inner_product(a: &[f64], b: &[f64]) -> f64 {
+    assert_eq!(a.len(), b.len());
+    a.iter().zip(b.iter()).map(|(x, y)| x * y).sum()
+}
+
 /// Matrix inverse for 2x2 and 3x3 matrices
 #[wasm_bindgen]
 pub fn inv_matrix(a: &[f64], n: usize) -> Result<Vec<f64>, String> {

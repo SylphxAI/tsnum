@@ -74,54 +74,29 @@ export function matmul<T extends DType>(a: NDArray<T>, b: NDArray<T>): NDArray<T
 }
 
 /**
- * Outer product of two vectors
+ * Outer product of two vectors (delegates to backend)
  */
 export function outer<T extends DType>(a: NDArray<T>, b: NDArray<T>): NDArray<T> {
   const aData = a.getData()
   const bData = b.getData()
 
-  if (aData.shape.length !== 1 || bData.shape.length !== 1) {
-    throw new Error('outer requires 1D arrays')
-  }
+  // Delegate to backend (WASM if available, TS fallback)
+  const backend = getBackend()
+  const resultData = backend.outer(aData, bData)
 
-  const m = aData.buffer.length
-  const n = bData.buffer.length
-  const newBuffer = createTypedArray(m * n, aData.dtype)
-
-  for (let i = 0; i < m; i++) {
-    for (let j = 0; j < n; j++) {
-      newBuffer[i * n + j] = aData.buffer[i] * bData.buffer[j]
-    }
-  }
-
-  return new NDArray({
-    buffer: newBuffer,
-    shape: [m, n],
-    strides: [n, 1],
-    dtype: aData.dtype,
-  })
+  return new NDArray(resultData)
 }
 
 /**
- * Inner product of two vectors (same as dot for 1D)
+ * Inner product of two vectors (delegates to backend)
  */
 export function inner<T extends DType>(a: NDArray<T>, b: NDArray<T>): number {
   const aData = a.getData()
   const bData = b.getData()
 
-  if (aData.shape.length !== 1 || bData.shape.length !== 1) {
-    throw new Error('inner requires 1D arrays')
-  }
-
-  if (aData.buffer.length !== bData.buffer.length) {
-    throw new Error('Arrays must have same length for inner product')
-  }
-
-  let result = 0
-  for (let i = 0; i < aData.buffer.length; i++) {
-    result += aData.buffer[i] * bData.buffer[i]
-  }
-  return result
+  // Delegate to backend (WASM if available, TS fallback)
+  const backend = getBackend()
+  return backend.inner(aData, bData)
 }
 
 /**
@@ -197,18 +172,9 @@ export function det<T extends DType>(a: NDArray<T>): number {
 export function trace<T extends DType>(a: NDArray<T>): number {
   const data = a.getData()
 
-  if (data.shape.length !== 2) {
-    throw new Error('trace requires 2D array')
-  }
-
-  const n = Math.min(data.shape[0], data.shape[1])
-  const stride = data.shape[1] + 1
-
-  let sum = 0
-  for (let i = 0; i < n; i++) {
-    sum += data.buffer[i * stride]
-  }
-  return sum
+  // Delegate to backend (WASM if available, TS fallback)
+  const backend = getBackend()
+  return backend.trace(data)
 }
 
 /**
