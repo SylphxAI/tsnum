@@ -49,6 +49,10 @@ export {
   arctan2,
   mod,
   fmod,
+  exp2,
+  log2,
+  log1p,
+  expm1,
 } from './math'
 
 // Math convenience functions
@@ -115,6 +119,10 @@ export {
   bincount,
   digitize,
   argwhere,
+  average,
+  ptp,
+  nanpercentile,
+  nanquantile,
 } from './statistics'
 
 // Set operations
@@ -161,3 +169,6 @@ export { trim_zeros, ediff1d, around } from './array-utils'
 
 // Type testing
 export { isscalar, isreal, iscomplex, iscomplexobj, isrealobj } from './type-testing'
+
+// Complex number operations
+export { real, imag, angle, conj, conjugate } from './complex'

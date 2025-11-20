@@ -19,6 +19,9 @@ export {
   meshgrid,
   fromfunction,
   indices,
+  tril,
+  triu,
+  vander,
   // Like functions
   zerosLike,
   onesLike,
@@ -101,6 +104,10 @@ export {
   maximum,
   minimum,
   clip,
+  exp2,
+  log2,
+  log1p,
+  expm1,
   // Math convenience
   deg2rad,
   rad2deg,
@@ -167,6 +174,10 @@ export {
   bincount,
   digitize,
   argwhere,
+  average,
+  ptp,
+  nanpercentile,
+  nanquantile,
   // Cumulative
   cumsum,
   cumprod,
@@ -232,6 +243,12 @@ export {
   iscomplex,
   iscomplexobj,
   isrealobj,
+  // Complex operations
+  real,
+  imag,
+  angle,
+  conj,
+  conjugate,
 } from './ops'
 
 // 2b. Linear Algebra
@@ -256,6 +273,9 @@ export {
   cond,
   slogdet,
   multi_dot,
+  vdot,
+  kron,
+  tensordot,
 } from './linalg'
 
 // 2c. Random
@@ -277,7 +297,24 @@ export {
 } from './random'
 
 // 2d. FFT
-export { fft, ifft, rfft, irfft, fft2, ifft2, rfft2, irfft2, fftn, ifftn, rfftn, irfftn } from './fft'
+export {
+  fft,
+  ifft,
+  rfft,
+  irfft,
+  fft2,
+  ifft2,
+  rfft2,
+  irfft2,
+  fftn,
+  ifftn,
+  rfftn,
+  irfftn,
+  fftfreq,
+  rfftfreq,
+  fftshift,
+  ifftshift,
+} from './fft'
 
 // 2e. Polynomial
 export { polyfit, polyval, roots, polyder, polyint } from './polynomial'
