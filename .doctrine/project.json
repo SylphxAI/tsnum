@@ -1,0 +1,143 @@
+{
+  "schemaVersion": 1,
+  "project": {
+    "repo": "SylphxAI/tsnum",
+    "name": "tsnum",
+    "lifecycle": "active",
+    "layer": "foundation",
+    "summary": "Foundation TypeScript numerical computing library family with a functional API, TypeScript implementation, WASM backend package, benchmarks, tests, and package exports.",
+    "goals": [
+      "Provide a typed, functional-first numerical computing API for JavaScript and TypeScript consumers.",
+      "Keep TypeScript and WASM backend behavior coherent through package exports, tests, and benchmarks.",
+      "Publish only documented package exports and performance claims that can be reproduced by repository-local evidence."
+    ],
+    "nonGoals": [
+      "Own NumPy upstream behavior, scientific correctness beyond the documented package contract, or downstream application modeling decisions.",
+      "Own consumer product numerical policy, visualization, storage, or UI behavior.",
+      "Publish enterprise doctrine, project manifest schema, org rulesets, rollout issue reconciliation, or shared CI and release policy."
+    ]
+  },
+  "boundaries": {
+    "owns": [
+      {
+        "name": "tsnum-core-package",
+        "description": "The tsnum package exports, TypeScript implementation, tests, and documented numerical API behavior."
+      },
+      {
+        "name": "tsnum-wasm-backend",
+        "description": "Rust/WASM backend package and compatibility expectations for accelerated numerical operations."
+      },
+      {
+        "name": "tsnum-benchmark-evidence",
+        "description": "Repository-local benchmark and performance documentation used to support package performance claims."
+      }
+    ],
+    "doesNotOwn": [
+      "NumPy upstream behavior, consumer scientific modeling decisions, or downstream application numerical policy.",
+      "Visualization, persistence, UI, or product-specific workflows built on top of numerical arrays.",
+      "Enterprise doctrine, project manifest schema, rollout issue reconciliation, org rulesets, or shared workflow implementation."
+    ],
+    "publicSurfaces": [
+      {
+        "type": "documentation",
+        "name": "Library README",
+        "location": "README.md"
+      },
+      {
+        "type": "documentation",
+        "name": "Package README",
+        "location": "packages/tsnum/README.md"
+      },
+      {
+        "type": "package-export",
+        "name": "tsnum package exports",
+        "location": "packages/tsnum/package.json"
+      },
+      {
+        "type": "package-export",
+        "name": "tsnum WASM backend package",
+        "location": "packages/tsnum-wasm/Cargo.toml"
+      },
+      {
+        "type": "documentation",
+        "name": "Performance evidence",
+        "location": "PERFORMANCE.md"
+      },
+      {
+        "type": "manifest",
+        "name": "Workspace package manifest",
+        "location": "package.json"
+      },
+      {
+        "type": "manifest",
+        "name": "Project control-plane manifest",
+        "location": ".doctrine/project.json"
+      }
+    ],
+    "allowedDependencies": [
+      {
+        "repo": "SylphxAI/doctrine",
+        "surface": "project manifest schema, standards, and rollout audit",
+        "direction": "downward"
+      }
+    ],
+    "forbiddenCouplings": [
+      "Do not require consumers to import internal source paths instead of documented package exports.",
+      "Do not encode one consumer product's numerical policy or dataset assumptions as hidden library behavior.",
+      "Do not publish performance claims that lack reproducible benchmark evidence in this repository.",
+      "Do not publish enterprise process policy from this repository instead of SylphxAI/doctrine."
+    ]
+  },
+  "documentation": {
+    "adr": {
+      "path": "docs/adr/",
+      "status": "planned"
+    },
+    "specs": {
+      "path": "packages/tsnum/README.md",
+      "status": "present"
+    },
+    "catalog": {
+      "path": ".doctrine/project.json",
+      "status": "present"
+    },
+    "runbooks": {
+      "path": "PERFORMANCE.md",
+      "status": "present"
+    },
+    "generatedReferences": {
+      "path": "packages/tsnum/dist/",
+      "status": "generated"
+    }
+  },
+  "delivery": {
+    "ciModel": "none",
+    "requiredContexts": [],
+    "deployPath": "No repo-local CI or release workflow is declared; package changes currently rely on local Bun/Turbo, TypeScript, test, benchmark, and changeset evidence before publish.",
+    "productionProof": "Published package changes require build/test evidence, benchmark evidence for performance-sensitive changes, npm/package readback after release, and consumer smoke proof for affected exports.",
+    "recoveryClass": "forward-fix-only"
+  },
+  "adoption": {
+    "status": "baseline",
+    "gaps": [
+      {
+        "id": "ci-not-declared",
+        "description": "Declare pull-request validation for install, lint, typecheck, tests, build, WASM backend compatibility, and benchmark smoke before full adoption.",
+        "owner": "SylphxAI/tsnum",
+        "target": "Before full adoption"
+      },
+      {
+        "id": "release-proof-missing",
+        "description": "Document package release, npm readback, changelog, and consumer smoke evidence required after publishing tsnum.",
+        "owner": "SylphxAI/tsnum",
+        "target": "Before commercial-grade library operation"
+      },
+      {
+        "id": "benchmark-contract-missing",
+        "description": "Turn performance claims and WASM fallback expectations into a stable benchmark contract or generated report.",
+        "owner": "SylphxAI/tsnum",
+        "target": "Before full package adoption"
+      }
+    ]
+  }
+}
