@@ -33,7 +33,7 @@ benchmark gate passes on the same machine against Python/NumPy.
 | API direction | NumPy-compatible spelling and behavior are the target. |
 | Benchmarks | `bench/python-parity` compares TypeScript and NumPy on identical inputs. |
 | Native path | Bun/macOS can initialize a native BLAS-backed fast path for float64 hot loops. |
-| Proven today | Some reductions already pass the 1.05x parity gate on local evidence. |
+| Proven today | Checksum parity passes for the covered benchmark cases; `sum`, `mean`, and `transpose` pass the 1.05x speed gate in the latest local run. |
 | Not claimed yet | Full NumPy API coverage, all-op 1.05x performance parity, and npm rename completion. |
 
 **Features:**
@@ -469,34 +469,36 @@ pipe(
 
 **Advantages of `pipe`:**
 - Works with any function
-- No OOP overhead
+- No method chaining required
 - Smaller bundle size
 - More flexible composition
 - Matches functional programming idioms
 
 ## Performance
 
-### WASM-First Architecture
+### Backend Architecture
 
-tsnum uses a **WASM-first backend** with automatic TypeScript fallback:
+tsnum keeps the public API in TypeScript while routing hot paths through the
+best available backend:
 
 ```typescript
-import { initWASM, getBackendInfo } from 'tsnum'
+import { getBackendInfo, initNativeBLAS, initWASM } from 'tsnum'
 
-// Optional: Preload WASM during app startup
+// Optional: preload an accelerated backend during app startup
+await initNativeBLAS()
 await initWASM()
 
 // Check which backend is active
 const info = getBackendInfo()
-console.log(info.name)  // 'wasm' or 'typescript'
+console.log(info.name)  // 'native-blas', 'wasm', or 'typescript'
 console.log(info.usingWASM)  // true if WASM loaded
 ```
 
 **How it works:**
-- 🚀 **WASM-first**: If WebAssembly available, use it (near-native performance)
-- 🔄 **Automatic fallback**: If WASM unavailable, seamlessly fall back to TypeScript
-- 🎯 **No configuration**: Just works - no threshold logic or manual switching
-- ⚡ **Lazy loading**: WASM loads on first operation (or manually with `initWASM()`)
+- 🚀 **Native BLAS path**: Bun/macOS can use Accelerate for covered float64 kernels
+- 🔄 **WASM path**: portable acceleration for supported operations
+- 🧱 **TypeScript fallback**: always available reference implementation
+- ⚡ **Explicit preload**: accelerated backends can be initialized during startup
 
 **Performance:**
 - **Native/WASM backend paths**: Accelerated execution for covered hot paths
@@ -504,7 +506,8 @@ console.log(info.usingWASM)  // true if WASM loaded
 - **Python parity gate**: Run `bun run bench:python-parity:enforce` before
   publishing NumPy-speed claims
 - **Tree-shakeable**: Only bundle what you use
-- **No OOP overhead**: Pure functions throughout
+- **Functional API**: operations are exposed as composable functions over a thin
+  NDArray container
 
 ## Development
 
@@ -526,7 +529,7 @@ bun run lint
 
 - [x] v0.1: Core functional API (creation, arithmetic, reductions, shapes)
 - [x] v0.2: Broadcasting, indexing, slicing
-- [x] v0.3: WASM-first backend infrastructure (Rust WASM module)
+- [x] v0.3: Backend infrastructure (Rust WASM module)
 - [x] v0.4: Complete WASM implementation (arithmetic, reductions)
 - [x] v0.5: Math functions (20+ functions: trig, exp, log, rounding)
 - [x] v0.6: Logical operations, sorting, array manipulation
