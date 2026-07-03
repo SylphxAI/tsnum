@@ -18,6 +18,9 @@ Current truth:
 - Target API: NumPy-compatible `np` namespace.
 - Target package: `@sylphx/numpy` after the rename/publish migration.
 - Acceleration: TypeScript fallback plus WASM and native BLAS paths.
+- Latest benchmark evidence: checksum parity passes for covered operations;
+  native-backed `sum`, `mean`, and `transpose` pass the 1.05x speed gate in the
+  latest local run.
 - Claim boundary: full NumPy parity is the target, not a completed claim.
 
 ## Features
@@ -389,12 +392,13 @@ Complete tracking table for all operations with backend implementation status.
 
 ## Performance
 
-### Dual Backend Architecture
+### Backend Architecture
 
-tsnum implements a sophisticated dual backend system for optimal performance:
+tsnum separates the TypeScript API from execution backends so public DX can stay
+NumPy-like while hot kernels move to native implementations as they mature:
 
 ```typescript
-User Code → NDArray API → Backend Interface → WASM (fast) or TypeScript (fallback)
+User Code -> NDArray API -> Backend Interface -> native BLAS, WASM, or TypeScript fallback
 ```
 
 **TypeScript Backend**: Always available, pure TS implementation
@@ -402,10 +406,15 @@ User Code → NDArray API → Backend Interface → WASM (fast) or TypeScript (f
 - Fallback for environments without WASM support
 - Reference implementation for correctness
 
-**WASM Backend**: Near-native performance through Rust
-- Automatically used when available (no code changes needed)
-- Cache-optimized algorithms (matmul uses i-k-j loop order)
-- SIMD-ready for future optimization
+**Native BLAS Backend**: Bun/macOS fast path through Accelerate
+- Float64 hot kernels for vector arithmetic, reductions, matmul, and transpose
+- Used by the Python parity benchmark when available
+- Falls back to TypeScript for unsupported dtypes and operations
+
+**WASM Backend**: Portable acceleration path
+- Available as a non-native fallback acceleration layer
+- Cache-oriented algorithms for selected kernels
+- Still subject to the Python parity gate before speed claims are made
 
 **Current Backend Coverage**:
 - ✅ Arithmetic operations (add, sub, mul, div, pow)
@@ -416,12 +425,20 @@ User Code → NDArray API → Backend Interface → WASM (fast) or TypeScript (f
 
 ### Benchmarks
 
-TypeScript Backend (current):
-- **matmul 2×2**: ~24 ns/iter
-- **matmul 10×10**: ~1.23 µs/iter
-- **matmul 100×100**: ~1.15 ms/iter
-- **dot 100 elements**: ~39 ns/iter
-- **Reshape (zero-copy)**: ~24 ns/iter
+Run the Python parity benchmark before making public performance claims:
+
+```bash
+bun run bench:python-parity
+bun run bench:python-parity:enforce
+```
+
+Current local evidence after the native reduction path:
+
+- Checksum parity: all covered benchmark cases pass.
+- Speed parity at 1.05x: `sum`, `mean`, and `transpose` pass in the latest
+  local run.
+- Remaining speed work: array add, scalar add/mul, and 128x128 matmul still miss
+  the 1.05x target.
 
 See [PERFORMANCE.md](./PERFORMANCE.md) for detailed benchmarks and methodology.
 
@@ -509,7 +526,7 @@ const centered = fftshift(freq)
 Full type safety with generics:
 
 ```typescript
-import { array, NDArray } from 'tsnum'
+import { array, div, mean, std, sub, type DType, type NDArray } from 'tsnum'
 
 // Type inference
 const a = array([1, 2, 3])  // NDArray<'int32'>
@@ -519,7 +536,7 @@ const b = array([1.5, 2.5], { dtype: 'float64' })  // NDArray<'float64'>
 function normalize<T extends DType>(arr: NDArray<T>): NDArray<'float64'> {
   const m = mean(arr)
   const s = std(arr)
-  return arr.sub(m).div(s)
+  return div(sub(arr, m), s)
 }
 ```
 
@@ -527,29 +544,29 @@ function normalize<T extends DType>(arr: NDArray<T>): NDArray<'float64'> {
 
 ```bash
 # Install dependencies
-npm install
+bun install
 
 # Run tests
-bun test
+bun run test
 
 # Build
-npm run build
+bun run build
 
-# Benchmarks
-bun bench
+# Python parity benchmark
+bun run bench:python-parity
 ```
 
 ## Testing
 
-357 tests covering all implemented features:
+417 tests covering implemented features and native backend semantics:
 
 ```bash
-bun test
+bun run test
 
 # Output:
-# ✓ 357 pass
+# ✓ 417 pass
 # ✓ 0 fail
-# ✓ 779 expect() calls
+# ✓ 1689 expect() calls
 ```
 
 ## License
@@ -563,5 +580,5 @@ Contributions welcome! See the feature coverage above for areas that need implem
 ## Acknowledgments
 
 - Inspired by [NumPy](https://numpy.org/)
-- WASM acceleration powered by custom implementations
+- Native and WASM acceleration paths powered by backend-specific kernels
 - Built with TypeScript and Bun
