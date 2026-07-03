@@ -6,6 +6,8 @@ dist
 coverage
 .env
 .env.local
+.venv/
+bench/python-parity/results/
 
 # Rust
 target/

@@ -11,7 +11,9 @@ import { TypeScriptBackend } from './typescript'
 class BackendManager {
   private currentBackend: Backend
   private wasmInitPromise: Promise<BackendInit> | null = null
+  private nativeBLASInitPromise: Promise<BackendInit> | null = null
   private wasmInitialized = false
+  private nativeBLASInitialized = false
 
   constructor() {
     // Start with TypeScript backend (always available)
@@ -48,6 +50,30 @@ class BackendManager {
     if (result.success) {
       this.currentBackend = result.backend
       this.wasmInitialized = true
+    }
+
+    return result
+  }
+
+  /**
+   * Initialize native BLAS backend when available.
+   * Currently supports Bun on macOS via Accelerate.framework.
+   */
+  async initNativeBLAS(): Promise<BackendInit> {
+    if (this.nativeBLASInitialized) {
+      return { success: true, backend: this.currentBackend }
+    }
+
+    if (this.nativeBLASInitPromise) {
+      return this.nativeBLASInitPromise
+    }
+
+    this.nativeBLASInitPromise = this.loadNativeBLAS()
+    const result = await this.nativeBLASInitPromise
+
+    if (result.success) {
+      this.currentBackend = result.backend
+      this.nativeBLASInitialized = true
     }
 
     return result
@@ -90,11 +116,56 @@ class BackendManager {
     }
   }
 
+  private async loadNativeBLAS(): Promise<BackendInit> {
+    try {
+      if (typeof process !== 'undefined' && process.env?.TSNUM_NATIVE_BLAS === '0') {
+        return {
+          success: false,
+          error: 'Native BLAS disabled via TSNUM_NATIVE_BLAS=0',
+        }
+      }
+
+      if (typeof Bun === 'undefined') {
+        return {
+          success: false,
+          error: 'Native BLAS backend currently requires Bun FFI',
+        }
+      }
+
+      if (typeof process === 'undefined' || process.platform !== 'darwin') {
+        return {
+          success: false,
+          error: 'Native BLAS backend currently supports macOS Accelerate only',
+        }
+      }
+
+      const { NativeBLASBackend } = await import('./native-blas')
+      const nativeBackend = new NativeBLASBackend()
+
+      return {
+        success: true,
+        backend: nativeBackend,
+      }
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      }
+    }
+  }
+
   /**
    * Check if WASM is currently active
    */
   isUsingWASM(): boolean {
     return this.currentBackend.name === 'wasm' && this.currentBackend.isReady
+  }
+
+  /**
+   * Check if native BLAS is currently active
+   */
+  isUsingNativeBLAS(): boolean {
+    return this.currentBackend.name === 'native-blas' && this.currentBackend.isReady
   }
 
   /**
@@ -104,7 +175,9 @@ class BackendManager {
   useTypeScript(): void {
     this.currentBackend = new TypeScriptBackend()
     this.wasmInitialized = false
+    this.nativeBLASInitialized = false
     this.wasmInitPromise = null
+    this.nativeBLASInitPromise = null
   }
 }
 
@@ -127,17 +200,26 @@ export async function initWASM(): Promise<BackendInit> {
 }
 
 /**
+ * Initialize native BLAS (optional).
+ */
+export async function initNativeBLAS(): Promise<BackendInit> {
+  return backendManager.initNativeBLAS()
+}
+
+/**
  * Check backend status
  */
 export function getBackendInfo(): {
-  name: 'wasm' | 'typescript'
+  name: 'native-blas' | 'wasm' | 'typescript'
   ready: boolean
+  usingNativeBLAS: boolean
   usingWASM: boolean
 } {
   const backend = backendManager.get()
   return {
     name: backend.name,
     ready: backend.isReady,
+    usingNativeBLAS: backendManager.isUsingNativeBLAS(),
     usingWASM: backendManager.isUsingWASM(),
   }
 }

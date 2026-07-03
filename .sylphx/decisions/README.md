@@ -7,6 +7,8 @@ Index of all ADRs for tsnum project.
 - [002-typed-array-backends](./002-typed-array-backends.md) - TypedArray-based storage
 - [003-monorepo-tooling](./003-monorepo-tooling.md) - Bun + Turbo + Biome stack
 - [004-pure-functional-first](./004-pure-functional-first.md) - Pure functional-first API (single API)
+- [005-python-parity-performance-contract](./005-python-parity-performance-contract.md) - Python/NumPy API and performance parity gate
+- [006-python-native-dx-and-naming-contract](./006-python-native-dx-and-naming-contract.md) - NumPy-native naming, syntax mapping, and async DX contract
 
 ## Superseded
 

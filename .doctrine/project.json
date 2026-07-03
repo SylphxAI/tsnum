@@ -5,10 +5,11 @@
     "name": "tsnum",
     "lifecycle": "active",
     "layer": "foundation",
-    "summary": "Foundation TypeScript numerical computing library family with a functional API, TypeScript implementation, WASM backend package, benchmarks, tests, and package exports.",
+    "summary": "Foundation TypeScript numerical computing library family moving toward a NumPy-compatible public contract with TypeScript, native, and WASM backend paths, benchmarks, tests, and package exports.",
     "goals": [
       "Provide a typed, functional-first numerical computing API for JavaScript and TypeScript consumers.",
-      "Keep TypeScript and WASM backend behavior coherent through package exports, tests, and benchmarks.",
+      "Move the package family toward the @sylphx/numpy public contract with NumPy-compatible spelling, array semantics, and explicit backend boundaries.",
+      "Keep TypeScript, native, and WASM backend behavior coherent through package exports, tests, and benchmarks.",
       "Publish only documented package exports and performance claims that can be reproduced by repository-local evidence."
     ],
     "nonGoals": [
@@ -26,6 +27,10 @@
       {
         "name": "tsnum-wasm-backend",
         "description": "Rust/WASM backend package and compatibility expectations for accelerated numerical operations."
+      },
+      {
+        "name": "tsnum-native-backend-path",
+        "description": "Native BLAS backend integration point and compatibility expectations for Python parity hot paths."
       },
       {
         "name": "tsnum-benchmark-evidence",
@@ -52,6 +57,11 @@
         "type": "package-export",
         "name": "tsnum package exports",
         "location": "packages/tsnum/package.json"
+      },
+      {
+        "type": "api",
+        "name": "Backend implementations",
+        "location": "packages/tsnum/src/backend/"
       },
       {
         "type": "package-export",

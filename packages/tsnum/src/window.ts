@@ -2,7 +2,6 @@
 
 import type { DType } from './core/types'
 import { createTypedArray } from './core/utils'
-import type { NDArray } from './ndarray'
 import { NDArray } from './ndarray'
 
 /**
@@ -129,9 +128,7 @@ export function blackman<T extends DType = 'float64'>(M: number): NDArray<T> {
 
   for (let n = 0; n < M; n++) {
     buffer[n] =
-      a0 -
-      a1 * Math.cos((2 * Math.PI * n) / (M - 1)) +
-      a2 * Math.cos((4 * Math.PI * n) / (M - 1))
+      a0 - a1 * Math.cos((2 * Math.PI * n) / (M - 1)) + a2 * Math.cos((4 * Math.PI * n) / (M - 1))
   }
 
   return new NDArray({
@@ -223,7 +220,7 @@ export function kaiser<T extends DType = 'float64'>(M: number, beta = 0.0): NDAr
   const i0Beta = besselI0(beta)
 
   for (let n = 0; n < M; n++) {
-    const x = beta * Math.sqrt(1 - Math.pow((n - alpha) / alpha, 2))
+    const x = beta * Math.sqrt(1 - ((n - alpha) / alpha) ** 2)
     buffer[n] = besselI0(x) / i0Beta
   }
 

@@ -9,7 +9,8 @@ TypeScript NumPy alternative (tsnum): High-performance n-dimensional array libra
 - Tree-shakeable functional API
 - Browser + Node.js support
 
-**Target:** TypeScript developers needing NumPy functionality without Python
+**Target:** TypeScript developers needing NumPy-compatible functionality and
+NumPy-class speed without a Python runtime.
 
 **Out of scope (v1.0):**
 - GPU acceleration (WebGL/WebGPU)
@@ -35,9 +36,13 @@ TypeScript NumPy alternative (tsnum): High-performance n-dimensional array libra
 - No telemetry (privacy-first)
 
 **Performance:**
-- Pure TS: competitive with lodash/ramda array operations
-- WASM: within 10-20% of NumPy for matrix operations
-- Threshold-based auto-selection (small arrays → TS, large → WASM)
+- Product target: same-speed parity with NumPy for covered operations.
+- Admission gate: tsnum wall time must be <=1.05x NumPy wall time on the same
+  hardware, dtype, shape, and warmup policy before a parity claim is allowed.
+- Benchmark evidence: `bun run bench:python-parity` and
+  `bun run bench:python-parity:enforce`.
+- Threshold-based auto-selection (small arrays -> TS, large -> WASM/native)
+  remains an implementation strategy, not the public performance claim.
 
 ## Boundaries
 **In scope:**
@@ -47,6 +52,7 @@ TypeScript NumPy alternative (tsnum): High-performance n-dimensional array libra
 - Reductions (sum, mean, std, argmax)
 - Pure functional-first design (`add(arr, 5)`, `pipe(arr, fn1, fn2)`)
 - WASM acceleration for performance-critical operations
+- Python parity benchmark contract and local evidence for performance claims
 
 **Out of scope:**
 - Complex numbers (future)

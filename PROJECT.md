@@ -2,8 +2,8 @@
 
 `tsnum` is an active foundation repository for a TypeScript numerical computing
 library family. It owns the `tsnum` package API, TypeScript implementation,
-WASM backend package, benchmarks, tests, and package metadata for NumPy-inspired
-array, math, statistics, FFT, random, and linear-algebra operations.
+native/WASM backend paths, benchmarks, tests, and package metadata for the
+NumPy-compatible public direction.
 
 ## Lifecycle And Layer
 
@@ -14,8 +14,10 @@ array, math, statistics, FFT, random, and linear-algebra operations.
 
 - Provide a typed, functional-first numerical computing API for JavaScript and
   TypeScript consumers.
-- Keep TypeScript and WASM backend behavior coherent through package exports,
-  tests, and benchmarks.
+- Move the package family toward the `@sylphx/numpy` public contract with
+  NumPy-compatible spelling, array semantics, and explicit backend boundaries.
+- Keep TypeScript, native, and WASM backend behavior coherent through package
+  exports, tests, and benchmarks.
 - Publish only documented package exports and performance claims that can be
   reproduced by repository-local evidence.
 
@@ -38,6 +40,7 @@ applications or separate adapter packages.
 - `README.md` and `packages/tsnum/README.md` document the library and API.
 - `packages/tsnum/package.json` defines public package exports.
 - `packages/tsnum/src/` contains the TypeScript implementation.
+- `packages/tsnum/src/backend/` defines TypeScript and native backend behavior.
 - `packages/tsnum-wasm/Cargo.toml` defines the WASM backend package.
 - `PERFORMANCE.md` and benchmark scripts document performance evidence.
 - `package.json`, `turbo.json`, and `biome.json` define workspace commands and
