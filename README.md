@@ -33,7 +33,7 @@ benchmark gate passes on the same machine against Python/NumPy.
 | API direction | NumPy-compatible spelling and behavior are the target. |
 | Benchmarks | `bench/python-parity` compares TypeScript and NumPy on identical inputs. |
 | Native path | Bun/macOS can initialize a native BLAS-backed fast path for float64 hot loops. |
-| Proven today | Checksum parity passes for the covered benchmark cases; `sum`, `mean`, and `transpose` pass the 1.05x speed gate in the latest local run. |
+| Proven today | Checksum parity passes for the covered benchmark cases; speed parity is reported per run and is not complete yet. |
 | Not claimed yet | Full NumPy API coverage, all-op 1.05x performance parity, and npm rename completion. |
 
 **Features:**

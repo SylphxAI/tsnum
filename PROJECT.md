@@ -42,16 +42,18 @@ applications or separate adapter packages.
 - `packages/tsnum/src/` contains the TypeScript implementation.
 - `packages/tsnum/src/backend/` defines TypeScript and native backend behavior.
 - `packages/tsnum-wasm/Cargo.toml` defines the WASM backend package.
-- `PERFORMANCE.md` and benchmark scripts document performance evidence.
+- `packages/tsnum/PERFORMANCE.md` and `bench/python-parity/` document
+  performance evidence.
 - `package.json`, `turbo.json`, and `biome.json` define workspace commands and
   tool configuration.
 - `.doctrine/project.json` is the machine-readable project manifest.
 
 ## Delivery
 
-No repo-local CI workflow is currently declared. Package changes must be proved
-with local build, lint, typecheck, test, and benchmark evidence until central
-admission is added. Published package changes require package readback or
+The repo-local GitHub Actions CI workflow runs install, build, tests, and the
+Python parity benchmark on pull requests and `main` pushes. Package changes
+still require local evidence plus CI evidence before merge. Published package
+changes require a documented release path, package registry readback, and
 consumer smoke evidence because source revert alone does not undo a release.
 
 The authoritative control-plane record is `.doctrine/project.json`.

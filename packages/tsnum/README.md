@@ -19,8 +19,7 @@ Current truth:
 - Target package: `@sylphx/numpy` after the rename/publish migration.
 - Acceleration: TypeScript fallback plus WASM and native BLAS paths.
 - Latest benchmark evidence: checksum parity passes for covered operations;
-  native-backed `sum`, `mean`, and `transpose` pass the 1.05x speed gate in the
-  latest local run.
+  speed parity is reported per benchmark run and is not complete yet.
 - Claim boundary: full NumPy parity is the target, not a completed claim.
 
 ## Features
@@ -435,10 +434,10 @@ bun run bench:python-parity:enforce
 Current local evidence after the native reduction path:
 
 - Checksum parity: all covered benchmark cases pass.
-- Speed parity at 1.05x: `sum`, `mean`, and `transpose` pass in the latest
-  local run.
-- Remaining speed work: array add, scalar add/mul, and 128x128 matmul still miss
-  the 1.05x target.
+- Speed parity at 1.05x: reported per run in
+  `bench/python-parity/results/latest.json`.
+- Remaining speed work: covered operations still miss the 1.05x target in some
+  local runs, so full speed parity is not marketed yet.
 
 See [PERFORMANCE.md](./PERFORMANCE.md) for detailed benchmarks and methodology.
 

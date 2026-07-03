@@ -71,7 +71,17 @@
       {
         "type": "documentation",
         "name": "Performance evidence",
-        "location": "PERFORMANCE.md"
+        "location": "packages/tsnum/PERFORMANCE.md"
+      },
+      {
+        "type": "workflow",
+        "name": "Pull request and main validation",
+        "location": ".github/workflows/ci.yml"
+      },
+      {
+        "type": "status-context",
+        "name": "Build, test, and benchmark",
+        "location": "GitHub Actions CI"
       },
       {
         "type": "manifest",
@@ -112,7 +122,7 @@
       "status": "present"
     },
     "runbooks": {
-      "path": "PERFORMANCE.md",
+      "path": "packages/tsnum/PERFORMANCE.md",
       "status": "present"
     },
     "generatedReferences": {
@@ -121,18 +131,31 @@
     }
   },
   "delivery": {
-    "ciModel": "none",
-    "requiredContexts": [],
-    "deployPath": "No repo-local CI or release workflow is declared; package changes currently rely on local Bun/Turbo, TypeScript, test, benchmark, and changeset evidence before publish.",
-    "productionProof": "Published package changes require build/test evidence, benchmark evidence for performance-sensitive changes, npm/package readback after release, and consumer smoke proof for affected exports.",
-    "recoveryClass": "forward-fix-only"
+    "ciModel": "legacy-ci",
+    "requiredContexts": ["Build, test, and benchmark"],
+    "deployPath": "Repo-local GitHub Actions CI validates pull requests and main pushes with Bun install, build, tests, and the Python parity benchmark. Package publication is not yet declared and must be added through release intent, bot-owned versioning, protected workflow publication, and registry readback before publish.",
+    "productionProof": "Merged package changes require green CI on the PR and main push. Published package changes additionally require benchmark evidence for performance-sensitive claims, package registry readback after release, and consumer smoke proof for affected exports.",
+    "recoveryClass": "forward-fix-only",
+    "packageRelease": {
+      "publishesPackages": true,
+      "ecosystems": ["npm"],
+      "releaseIntent": "Changesets under .changeset/ are the intended release-intent source. Direct root release is disabled; package publication must go through a protected workflow.",
+      "versionPr": "Missing: bot-owned Changesets version PR workflow is not declared yet.",
+      "publisher": "Missing: protected npm trusted-publishing/OIDC workflow identity is not declared yet.",
+      "requiredContexts": [
+        "Build, test, and benchmark",
+        "release-evidence/pass (planned; producer not declared yet)",
+        "supply-chain/provenance (planned; producer not declared yet)"
+      ],
+      "publishProof": "Required before publish: registry version/gitHead readback, benchmark evidence for performance claims, changelog evidence, and consumer smoke proof for affected exports."
+    }
   },
   "adoption": {
     "status": "baseline",
     "gaps": [
       {
-        "id": "ci-not-declared",
-        "description": "Declare pull-request validation for install, lint, typecheck, tests, build, WASM backend compatibility, and benchmark smoke before full adoption.",
+        "id": "ci-admission-not-adr29",
+        "description": "Repo-local CI exists, but full doctrine adoption still needs merge_group support, stable fan-in admission contexts, Sylphx runner profile policy, and workflow sanity checks.",
         "owner": "SylphxAI/tsnum",
         "target": "Before full adoption"
       },
@@ -143,8 +166,8 @@
         "target": "Before commercial-grade library operation"
       },
       {
-        "id": "benchmark-contract-missing",
-        "description": "Turn performance claims and WASM fallback expectations into a stable benchmark contract or generated report.",
+        "id": "benchmark-report-missing",
+        "description": "Turn the Python parity benchmark output into a stable generated report or freshness gate so public performance docs cannot drift from measured evidence.",
         "owner": "SylphxAI/tsnum",
         "target": "Before full package adoption"
       }

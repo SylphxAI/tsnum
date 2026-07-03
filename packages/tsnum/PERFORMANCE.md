@@ -1,6 +1,9 @@
-# Performance Benchmarks
+# Performance Evidence
 
-Performance characteristics of tsnum on Apple M4 (Bun 1.3.2).
+Performance claims for tsnum are admitted by repository-local benchmarks. The
+primary public benchmark is the Python parity suite in `bench/python-parity`,
+which compares tsnum against Python/NumPy on the same machine and always
+enforces checksum parity for covered operations.
 
 ## Bundle Size
 
@@ -20,53 +23,48 @@ ops/reductions.js: 480 bytes
 functional.js:     234 bytes
 ```
 
-## Runtime Performance
+## Python Parity Benchmark
 
-Run benchmarks: `bun run src/benchmark.ts`
+Run from the repository root:
 
-**Latest Results** (Apple M4, Bun 1.3.2):
+```bash
+bun run bench:python-parity
+bun run bench:python-parity:enforce
+```
 
-### Array Creation
-- **1D array (n=1000)**: ~7.0 µs/iter
-- **2D array (100×100)**: ~103.7 µs/iter
+Default runs print and save current ratios. Enforced runs fail when a covered
+operation is slower than NumPy by more than the configured threshold. Checksum
+parity is always enforced.
 
-### Arithmetic Operations (n=10,000)
-| Operation | Time | Throughput |
-|-----------|------|------------|
-| **Scalar addition** | ~6.8 µs | ~1.47 billion ops/s |
-| **Scalar multiplication** | ~7.6 µs | ~1.32 billion ops/s |
-| **Array addition** | ~8.3 µs | ~1.20 billion ops/s |
+Latest local evidence after the native reduction path:
 
-### Reductions (n=10,000)
-| Operation | Time | Throughput |
-|-----------|------|------------|
-| **sum()** | ~3.8 µs ⚡ | ~2.63 billion ops/s |
-| **mean()** | ~3.7 µs ⚡ | ~2.70 billion ops/s |
+- Checksum parity passes for all covered benchmark cases.
+- Speed parity is reported per run in the saved benchmark output. Covered
+  operations still miss the 1.05x target in some local runs, so full speed parity
+  is not marketed yet.
+- Current JSON output is written to `bench/python-parity/results/latest.json`.
 
-### Shape Operations (Zero-Copy!)
-- **reshape()**: ~32 ns/iter ⚡⚡⚡ (metadata-only, shares buffer)
-- **transpose() (100×100)**: ~79.0 µs/iter (stride adjustment only)
+## Backend Evidence
 
-### Composition
-- **pipe() with 4 operations**: ~79.3 µs/iter
-- **Complex pipeline** (reshape → transpose → arithmetic → sum): ~102.3 µs/iter
+- TypeScript backend: always-available reference implementation and fallback.
+- Native BLAS backend: Bun/macOS Accelerate path for covered float64 hot
+  kernels.
+- WASM backend: portable acceleration path for supported operations.
 
 ## Performance Notes
 
-1. **Zero overhead for reshape**: Shape operations are metadata-only, extremely fast
-2. **Efficient reductions**: sum/mean leverage native TypedArray performance
-3. **Pipe composition**: Minimal overhead compared to direct function calls
-4. **Memory efficiency**: TypedArray backend uses native memory layout
-
-## Comparison (Coming Soon)
-
-Future benchmarks will compare with:
-- NumPy (via Pyodide)
-- numpy.js
-- ndarray packages
+1. Public speed claims must cite the Python parity benchmark, not isolated local
+   microbenchmarks.
+2. Native-backed reductions reduce the measured gap, but full
+   covered-operation speed parity is not complete.
+3. The benchmark compares identical inputs and records Python and tsnum
+   checksums to guard against fast-but-wrong kernels.
+4. macOS native acceleration depends on Bun FFI and Accelerate; unsupported
+   platforms fall back to other backends.
 
 ## Future Optimizations (Roadmap)
 
-- **v0.3**: WASM acceleration for large arrays (>1000 elements)
-- **v0.4**: SIMD operations for arithmetic
-- **v0.5**: Lazy evaluation for complex pipelines
+- Close the remaining add/mul/matmul speed gaps against NumPy.
+- Produce a generated benchmark report or freshness gate for README claims.
+- Add a release workflow that publishes packages only after CI, benchmark, and
+  registry-readback proof.
