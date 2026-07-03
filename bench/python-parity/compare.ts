@@ -18,6 +18,13 @@ const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))))
 const enforce = process.argv.includes('--enforce')
 const python = process.env.PYTHON ?? 'python3'
 const maxSlowdown = Number(process.env.PYTHON_PARITY_MAX_SLOWDOWN ?? '1.05')
+const checksumAtol = Number(process.env.PYTHON_PARITY_CHECKSUM_ATOL ?? '1e-6')
+const checksumRtol = Number(process.env.PYTHON_PARITY_CHECKSUM_RTOL ?? '1e-9')
+
+function checksumMatches(actual: number, expected: number): boolean {
+  const tolerance = Math.max(checksumAtol, Math.abs(expected) * checksumRtol)
+  return Math.abs(actual - expected) <= tolerance
+}
 
 function runJson(command: string[], cwd: string): BenchReport {
   const result = Bun.spawnSync(command, {
@@ -54,16 +61,22 @@ const rows = Object.keys(pythonReport.benchmarks).map((name) => {
   }
 
   const slowdown = tsCase.time_ms / pythonCase.time_ms
+  const checksum_pass = checksumMatches(tsCase.checksum, pythonCase.checksum)
   return {
     name,
     python_ms: pythonCase.time_ms,
     ts_ms: tsCase.time_ms,
     slowdown,
-    pass: slowdown <= maxSlowdown,
+    speed_pass: slowdown <= maxSlowdown,
+    checksum_pass,
+    pass: slowdown <= maxSlowdown && checksum_pass,
     python_checksum: pythonCase.checksum,
     ts_checksum: tsCase.checksum,
+    checksum_delta: tsCase.checksum - pythonCase.checksum,
   }
 })
+
+const checksumsPassed = rows.every((row) => row.checksum_pass)
 
 const output = {
   timestamp: new Date().toISOString(),
@@ -72,6 +85,7 @@ const output = {
   python: pythonReport,
   ts: tsReport,
   rows,
+  checksums_passed: checksumsPassed,
   passed: rows.every((row) => row.pass),
 }
 
@@ -80,16 +94,18 @@ mkdirSync(dirname(resultPath), { recursive: true })
 writeFileSync(resultPath, `${JSON.stringify(output, null, 2)}\n`)
 
 console.log(`Python parity benchmark: max slowdown ${maxSlowdown.toFixed(2)}x`)
-console.log('case                 python ms   tsnum ms   slowdown   status')
+console.log('case                 python ms   tsnum ms   slowdown   speed   checksum')
 for (const row of rows) {
   console.log(
     `${row.name.padEnd(20)} ${row.python_ms.toFixed(4).padStart(9)} ${row.ts_ms
       .toFixed(4)
-      .padStart(10)} ${row.slowdown.toFixed(2).padStart(9)}x   ${row.pass ? 'pass' : 'fail'}`,
+      .padStart(10)} ${row.slowdown.toFixed(2).padStart(9)}x   ${
+      row.speed_pass ? 'pass' : 'fail'
+    }   ${row.checksum_pass ? 'pass' : 'fail'}`,
   )
 }
 console.log(`Result: ${output.passed ? 'pass' : 'fail'} (${resultPath})`)
 
-if (enforce && !output.passed) {
+if (!checksumsPassed || (enforce && !output.passed)) {
   process.exit(1)
 }

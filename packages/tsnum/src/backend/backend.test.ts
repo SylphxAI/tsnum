@@ -75,6 +75,8 @@ describe('Native BLAS backend', () => {
     expect(Array.from(backend.add(a, b).buffer)).toEqual([5, 7, 9])
     expect(Array.from(backend.add(a, 10).buffer)).toEqual([11, 12, 13])
     expect(Array.from(backend.mul(a, 2).buffer)).toEqual([2, 4, 6])
+    expect(backend.sum(a)).toBe(6)
+    expect(backend.mean(a)).toBe(2)
   })
 
   nativeBLASTest('Accelerate matmul and transpose match row-major outputs', async () => {
