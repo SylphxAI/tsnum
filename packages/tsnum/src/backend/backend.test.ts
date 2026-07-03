@@ -60,3 +60,49 @@ describe('Backend Info', () => {
     expect(typeof info.usingWASM).toBe('boolean')
   })
 })
+
+const nativeBLASTest =
+  typeof Bun !== 'undefined' && process.platform === 'darwin' ? test : test.skip
+
+describe('Native BLAS backend', () => {
+  nativeBLASTest('Accelerate kernels preserve float64 operation semantics', async () => {
+    const { NativeBLASBackend } = await import('./native-blas')
+    const backend = new NativeBLASBackend()
+
+    const a = array([1, 2, 3], { dtype: 'float64' }).getData()
+    const b = array([4, 5, 6], { dtype: 'float64' }).getData()
+
+    expect(Array.from(backend.add(a, b).buffer)).toEqual([5, 7, 9])
+    expect(Array.from(backend.add(a, 10).buffer)).toEqual([11, 12, 13])
+    expect(Array.from(backend.mul(a, 2).buffer)).toEqual([2, 4, 6])
+  })
+
+  nativeBLASTest('Accelerate matmul and transpose match row-major outputs', async () => {
+    const { NativeBLASBackend } = await import('./native-blas')
+    const backend = new NativeBLASBackend()
+
+    const a = array(
+      [
+        [1, 2, 3],
+        [4, 5, 6],
+      ],
+      { dtype: 'float64' },
+    ).getData()
+    const b = array(
+      [
+        [7, 8],
+        [9, 10],
+        [11, 12],
+      ],
+      { dtype: 'float64' },
+    ).getData()
+
+    const product = backend.matmul(a, b)
+    expect(product.shape).toEqual([2, 2])
+    expect(Array.from(product.buffer)).toEqual([58, 64, 139, 154])
+
+    const transposed = backend.transpose(a)
+    expect(transposed.shape).toEqual([3, 2])
+    expect(Array.from(transposed.buffer)).toEqual([1, 4, 2, 5, 3, 6])
+  })
+})

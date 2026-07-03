@@ -5,6 +5,10 @@ import { FFIType, dlopen, ptr } from 'bun:ffi'
 import type { NDArrayData } from '../core/types'
 import { TypeScriptBackend } from './typescript'
 
+declare const Buffer: {
+  allocUnsafe(length: number): Uint8Array
+}
+
 const CBLAS_ROW_MAJOR = 101
 const CBLAS_NO_TRANS = 111
 
@@ -48,9 +52,32 @@ const accelerate = dlopen('/System/Library/Frameworks/Accelerate.framework/Accel
     args: [FFIType.ptr, FFIType.i32, FFIType.ptr, FFIType.ptr, FFIType.i32, FFIType.u64],
     returns: FFIType.void,
   },
+  vDSP_mtransD: {
+    args: [FFIType.ptr, FFIType.i32, FFIType.ptr, FFIType.i32, FFIType.u64, FFIType.u64],
+    returns: FFIType.void,
+  },
 })
 
 const scalarBuffer = new Float64Array(1)
+const scalarPointer = ptr(scalarBuffer)
+const pointerCache = new WeakMap<Float64Array, ReturnType<typeof ptr>>()
+
+function pointerFor(buffer: Float64Array): ReturnType<typeof ptr> {
+  let pointer = pointerCache.get(buffer)
+  if (!pointer) {
+    pointer = ptr(buffer)
+    pointerCache.set(buffer, pointer)
+  }
+  return pointer
+}
+
+function createNativeOutput(length: number): Float64Array {
+  const bytes = Buffer.allocUnsafe(length * Float64Array.BYTES_PER_ELEMENT)
+  if (bytes.byteOffset % Float64Array.BYTES_PER_ELEMENT !== 0) {
+    return new Float64Array(length)
+  }
+  return new Float64Array(bytes.buffer, bytes.byteOffset, length)
+}
 
 /**
  * Native BLAS backend.
@@ -68,12 +95,12 @@ export class NativeBLASBackend extends TypeScriptBackend {
     }
 
     if (typeof b === 'number') {
-      const output = new Float64Array(a.buffer.length)
+      const output = createNativeOutput(a.buffer.length)
       scalarBuffer[0] = b
       accelerate.symbols.vDSP_vsaddD(
-        ptr(a.buffer),
+        pointerFor(a.buffer),
         1,
-        ptr(scalarBuffer),
+        scalarPointer,
         ptr(output),
         1,
         a.buffer.length,
@@ -90,11 +117,11 @@ export class NativeBLASBackend extends TypeScriptBackend {
       return super.add(a, b)
     }
 
-    const output = new Float64Array(a.buffer.length)
+    const output = createNativeOutput(a.buffer.length)
     accelerate.symbols.vDSP_vaddD(
-      ptr(a.buffer),
+      pointerFor(a.buffer),
       1,
-      ptr(b.buffer),
+      pointerFor(b.buffer),
       1,
       ptr(output),
       1,
@@ -114,12 +141,12 @@ export class NativeBLASBackend extends TypeScriptBackend {
     }
 
     if (typeof b === 'number') {
-      const output = new Float64Array(a.buffer.length)
+      const output = createNativeOutput(a.buffer.length)
       scalarBuffer[0] = b
       accelerate.symbols.vDSP_vsmulD(
-        ptr(a.buffer),
+        pointerFor(a.buffer),
         1,
-        ptr(scalarBuffer),
+        scalarPointer,
         ptr(output),
         1,
         a.buffer.length,
@@ -156,7 +183,7 @@ export class NativeBLASBackend extends TypeScriptBackend {
       throw new Error(`Shape mismatch: (${m}, ${k}) and (${b.shape[0]}, ${n})`)
     }
 
-    const output = new Float64Array(m * n)
+    const output = createNativeOutput(m * n)
     accelerate.symbols.cblas_dgemm(
       CBLAS_ROW_MAJOR,
       CBLAS_NO_TRANS,
@@ -165,9 +192,9 @@ export class NativeBLASBackend extends TypeScriptBackend {
       n,
       k,
       1.0,
-      ptr(a.buffer),
+      pointerFor(a.buffer),
       k,
-      ptr(b.buffer),
+      pointerFor(b.buffer),
       n,
       0.0,
       ptr(output),
@@ -178,6 +205,29 @@ export class NativeBLASBackend extends TypeScriptBackend {
       buffer: output,
       shape: [m, n],
       strides: [n, 1],
+      dtype: 'float64',
+    }
+  }
+
+  transpose(a: NDArrayData): NDArrayData {
+    if (a.dtype !== 'float64' || !(a.buffer instanceof Float64Array)) {
+      return super.transpose(a)
+    }
+
+    if (a.shape.length !== 2) {
+      throw new Error('transpose requires 2D array')
+    }
+
+    const rows = a.shape[0]
+    const cols = a.shape[1]
+    const output = createNativeOutput(a.buffer.length)
+
+    accelerate.symbols.vDSP_mtransD(pointerFor(a.buffer), 1, ptr(output), 1, cols, rows)
+
+    return {
+      buffer: output,
+      shape: [cols, rows],
+      strides: [rows, 1],
       dtype: 'float64',
     }
   }
