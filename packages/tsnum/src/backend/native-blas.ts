@@ -56,6 +56,14 @@ const accelerate = dlopen('/System/Library/Frameworks/Accelerate.framework/Accel
     args: [FFIType.ptr, FFIType.i32, FFIType.ptr, FFIType.i32, FFIType.u64, FFIType.u64],
     returns: FFIType.void,
   },
+  vDSP_sveD: {
+    args: [FFIType.ptr, FFIType.i32, FFIType.ptr, FFIType.u64],
+    returns: FFIType.void,
+  },
+  vDSP_meanvD: {
+    args: [FFIType.ptr, FFIType.i32, FFIType.ptr, FFIType.u64],
+    returns: FFIType.void,
+  },
 })
 
 const scalarBuffer = new Float64Array(1)
@@ -160,6 +168,24 @@ export class NativeBLASBackend extends TypeScriptBackend {
     }
 
     return super.mul(a, b)
+  }
+
+  sum(a: NDArrayData): number {
+    if (a.dtype !== 'float64' || !(a.buffer instanceof Float64Array) || a.buffer.length === 0) {
+      return super.sum(a)
+    }
+
+    accelerate.symbols.vDSP_sveD(pointerFor(a.buffer), 1, scalarPointer, a.buffer.length)
+    return scalarBuffer[0]
+  }
+
+  mean(a: NDArrayData): number {
+    if (a.dtype !== 'float64' || !(a.buffer instanceof Float64Array) || a.buffer.length === 0) {
+      return super.mean(a)
+    }
+
+    accelerate.symbols.vDSP_meanvD(pointerFor(a.buffer), 1, scalarPointer, a.buffer.length)
+    return scalarBuffer[0]
   }
 
   matmul(a: NDArrayData, b: NDArrayData): NDArrayData {
