@@ -7,7 +7,7 @@ import type { DType, NDArrayData } from '../core/types'
  * Backend interface - implemented by both WASM and TS
  */
 export interface Backend {
-  readonly name: 'wasm' | 'typescript'
+  readonly name: 'native-blas' | 'wasm' | 'typescript'
   readonly isReady: boolean
 
   // Arithmetic operations

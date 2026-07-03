@@ -1,13 +1,29 @@
-# tsnum
+# NumPy for TypeScript
 
-> High-performance TypeScript numerical computing library with pragmatic functional design
+> NumPy-compatible TypeScript numerical engine with a Python parity performance gate
 
-A TypeScript library that brings NumPy's powerful array operations to JavaScript/TypeScript with near-native performance through WebAssembly.
+`tsnum` is the current implementation codename. The target public package name is
+`@sylphx/numpy`, with `np` as the canonical import alias.
+
+## Public Direction
+
+This package is being shaped as the NumPy migration path for TypeScript: Python
+function names, Python-like array semantics, and native-backed performance
+where JavaScript hot loops are not enough. Performance claims are admitted by
+`bun run bench:python-parity:enforce`, which compares the same operations
+against Python/NumPy on the same machine.
+
+Current truth:
+
+- Target API: NumPy-compatible `np` namespace.
+- Target package: `@sylphx/numpy` after the rename/publish migration.
+- Acceleration: TypeScript fallback plus WASM and native BLAS paths.
+- Claim boundary: full NumPy parity is the target, not a completed claim.
 
 ## Features
 
-- 🚀 **High Performance** - WASM-accelerated operations with optimized TypeScript fallback
-- 🎯 **NumPy-Inspired** - Familiar functional API for array operations (~42% feature parity with NumPy)
+- 🚀 **Python Parity Target** - NumPy benchmark evidence is required before parity claims
+- 🎯 **NumPy-Compatible** - Python function spelling, argument order, dtype, shape, and broadcasting behavior are the target
 - 📦 **Type Safe** - Full TypeScript support with generic types
 - 🔢 **Multiple Data Types** - Support for int32, float32, float64, uint8
 - 🧮 **Comprehensive** - 251+ functions covering linear algebra, statistics, FFT, and more
@@ -22,26 +38,26 @@ npm install tsnum
 ## Quick Start
 
 ```typescript
-import { array, add, dot, fft, mean, matmul } from 'tsnum'
+import * as np from 'tsnum'
 
 // Create arrays
-const a = array([1, 2, 3, 4])
-const b = array([5, 6, 7, 8])
+const a = np.array([1, 2, 3, 4])
+const b = np.array([5, 6, 7, 8])
 
 // Mathematical operations (functional API)
-const sum = add(a, b)  // [6, 8, 10, 12]
-const product = dot(a, b)  // 70
+const sum = np.add(a, b)  // [6, 8, 10, 12]
+const product = np.dot(a, b)  // 70
 
 // Statistics
-const avg = mean(a)  // 2.5
+const avg = np.mean(a)  // 2.5
 
 // FFT
-const freq = fft(a)
+const freq = np.fft(a)
 
 // Linear algebra
-const A = array([[1, 2], [3, 4]])
-const B = array([[5, 6], [7, 8]])
-const C = matmul(A, B)  // Matrix multiplication
+const A = np.array([[1, 2], [3, 4]])
+const B = np.array([[5, 6], [7, 8]])
+const C = np.matmul(A, B)  // Matrix multiplication
 
 // Convenience: .T property for transpose
 const AT = A.T  // Transpose of A
@@ -49,7 +65,7 @@ const AT = A.T  // Transpose of A
 
 ## Design Philosophy
 
-**Pragmatic Functional Programming + Dual Backend Architecture**
+**Pragmatic Functional Programming + Native/WASM Backend Architecture**
 
 tsnum follows a pragmatic functional approach that balances purity with performance:
 
@@ -57,7 +73,7 @@ tsnum follows a pragmatic functional approach that balances purity with performa
 - **Optimized Internals**: Hot loops use mutable operations for maximum performance
 - **Zero-Copy Operations**: Views (reshape, transpose) share underlying buffers when possible
 - **Functional Core**: Pure functions for all computations - same input always produces same output
-- **Dual Backend System**: TypeScript (always available) + WASM (automatic acceleration when available)
+- **Backend System**: TypeScript (always available), WASM, and native BLAS acceleration paths
 
 ```typescript
 // ✅ Immutable API - inputs never change
@@ -218,7 +234,7 @@ Complete tracking table for all operations with backend implementation status.
 |----------|:-----:|:-----------:|:----------:|:------------:|:------:|
 | **Core Ops** | 251 | 251 ✅ | 251 🟦 | 63 🟧 | 251 ✅ |
 | **WASM Coverage** | 69/251 | **27.5%** | - | - | - |
-| **Test Coverage** | 415 tests | **100%** | - | - | - |
+| **Test Evidence** | 415 tests | Package suite | - | - | - |
 
 ### WASM Implementation Priority
 

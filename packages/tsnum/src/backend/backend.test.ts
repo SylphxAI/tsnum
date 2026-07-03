@@ -51,10 +51,12 @@ describe('Backend Info', () => {
 
     expect(info).toHaveProperty('name')
     expect(info).toHaveProperty('ready')
+    expect(info).toHaveProperty('usingNativeBLAS')
     expect(info).toHaveProperty('usingWASM')
 
-    expect(['wasm', 'typescript']).toContain(info.name)
+    expect(['native-blas', 'wasm', 'typescript']).toContain(info.name)
     expect(typeof info.ready).toBe('boolean')
+    expect(typeof info.usingNativeBLAS).toBe('boolean')
     expect(typeof info.usingWASM).toBe('boolean')
   })
 })

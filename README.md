@@ -1,17 +1,51 @@
-# tsnum
+# NumPy for TypeScript
 
-High-performance TypeScript NumPy alternative with **functional-first** API.
+`tsnum` is the current implementation codename for the NumPy-compatible
+TypeScript engine. The target public DX is `@sylphx/numpy` with `np` as the
+canonical import alias.
+
+The mission is direct: make Python-grade numerical computing available inside
+TypeScript without forcing teams to run a Python sidecar for every model,
+agent, dashboard, or server workflow. The API target is NumPy spelling and
+semantics; the performance target is NumPy-class native execution, admitted by
+repository-local Python parity benchmarks.
+
+## Why Star This
+
+- **Python ecosystem migration path** - Python users should recognize the API,
+  shapes, dtypes, broadcasting, and numerical vocabulary immediately.
+- **Native-speed target, not JavaScript-only ambition** - TypeScript is the
+  public language surface; hot operations can run through native BLAS, WASM, or
+  GPU backends when the workload demands it.
+- **Evidence-gated marketing** - this repo now carries a NumPy comparison gate
+  (`bun run bench:python-parity:enforce`) so public performance claims are tied
+  to reproducible local measurements instead of README optimism.
+- **Commercial package direction** - `tsnum` is the implementation codename; the
+  intended public package/DX is `@sylphx/numpy` imported as `np`.
+
+## Python Parity Status
+
+The contract is strict: operations are only described as Python-parity when the
+benchmark gate passes on the same machine against Python/NumPy.
+
+| Area | Current state |
+| --- | --- |
+| API direction | NumPy-compatible spelling and behavior are the target. |
+| Benchmarks | `bench/python-parity` compares TypeScript and NumPy on identical inputs. |
+| Native path | Bun/macOS can initialize a native BLAS-backed fast path for float64 hot loops. |
+| Proven today | Some reductions already pass the 1.05x parity gate on local evidence. |
+| Not claimed yet | Full NumPy API coverage, all-op 1.05x performance parity, and npm rename completion. |
 
 **Features:**
-- 🎯 **Functional-first design** - Pure functions, composable operations
-- 🚀 **100% NumPy core functionality parity** - Complete feature set
+- 🎯 **NumPy-compatible DX** - Python spelling and behavior are the target
+- 🚀 **Python parity gate** - Performance claims require NumPy benchmark evidence
 - 📊 **Broadcasting** - NumPy-style array broadcasting
 - 🔍 **Indexing & Slicing** - Element access, slicing, fancy indexing
 - 🧮 **Math & Logic** - 20+ math functions, logical operations
 - 📈 **Linear Algebra** - Matrix ops, decompositions (QR, SVD, Cholesky)
 - 🎲 **Random & Stats** - Seedable RNG, distributions, statistics
 - 🌊 **FFT Operations** - Fast Fourier Transform (Cooley-Tukey)
-- ⚡ **WASM-first backend** - Automatic WASM acceleration with TS fallback
+- ⚡ **Native/WASM backend path** - Native BLAS and WASM acceleration with TS fallback
 - 🌳 Tree-shakeable - import only what you need
 - 📦 Lightweight core (~20KB gzipped)
 - 🔒 Full TypeScript type safety
@@ -26,34 +60,35 @@ bun add tsnum
 npm install tsnum
 ```
 
-## Quick Start (Functional-First)
+Target package after rename migration:
+
+```bash
+bun add @sylphx/numpy
+```
+
+## Quick Start
 
 ```typescript
-import * as tn from 'tsnum'
-import { pipe } from 'tsnum'
+import * as np from 'tsnum'
 
-// ===== NumPy-style: Functional API =====
-const a = tn.array([1, 2, 3])
-const b = tn.add(a, 5)           // [6, 7, 8]
-const result = tn.sum(b)         // 21
+const a = np.array([1, 2, 3])
+const b = np.add(a, 5)           // [6, 7, 8]
+const result = np.sum(b)         // 21
+```
 
-// ===== Elegant pipe composition =====
-const result = pipe(
-  tn.array([[1, 2], [3, 4]]),
-  d => tn.reshape(d, [4]),
-  d => tn.add(d, 10),
-  d => tn.mul(d, 2),
-  tn.sum
-)  // 100
+Target accelerated backend DX after the backend migration uses one async
+boundary, not `await` on every operation:
 
-// ===== Complex transformations =====
-const normalize = (data: NDArray) => pipe(
-  data,
-  d => tn.sub(d, tn.mean(d)),
-  d => tn.div(d, tn.std(d))
-)
+```typescript
+import * as np from 'tsnum'
 
-const normalized = normalize(myData)
+await np.use('webgpu') // target API
+
+const a = np.array([[1, 2], [3, 4]], { device: 'webgpu' })
+const b = np.matmul(a, a.T)
+
+await np.sync()
+const values = await b.tolist()
 ```
 
 ## API Overview
@@ -464,8 +499,10 @@ console.log(info.usingWASM)  // true if WASM loaded
 - ⚡ **Lazy loading**: WASM loads on first operation (or manually with `initWASM()`)
 
 **Performance:**
-- **WASM backend**: Near-native performance, SIMD support
-- **TypeScript backend**: Competitive with NumPy.js, zero overhead
+- **Native/WASM backend paths**: Accelerated execution for covered hot paths
+- **TypeScript backend**: Always-available fallback with tuned hot loops
+- **Python parity gate**: Run `bun run bench:python-parity:enforce` before
+  publishing NumPy-speed claims
 - **Tree-shakeable**: Only bundle what you use
 - **No OOP overhead**: Pure functions throughout
 
@@ -498,9 +535,12 @@ bun run lint
 - [x] v0.9: Advanced statistics (median, percentile, correlation, covariance)
 - [x] v1.0: FFT operations (fft, ifft, rfft, irfft)
 
-**Status: ✅ Feature complete! 100% NumPy core functionality parity**
+**Status:** Broad NumPy-compatible surface with 251+ implemented operations and
+an explicit Python parity performance gate. Full NumPy API coverage and all-op
+1.05x speed parity remain launch gates, not completed claims.
 
-Next: Performance optimizations, GPU acceleration, more decompositions (LU, eigendecomposition)
+Next: package rename, Python parity closure, GPU acceleration, more
+decompositions (LU, eigendecomposition)
 
 ## Why tsnum?
 

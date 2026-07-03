@@ -2,19 +2,14 @@
 
 import type { DType } from './core/types'
 import { createTypedArray } from './core/utils'
-import type { NDArray } from './ndarray'
-import { NDArray } from './ndarray'
 import { lstsq } from './linalg'
+import { NDArray } from './ndarray'
 
 /**
  * Least squares polynomial fit
  * Fit a polynomial p(x) = p[0] * x^deg + ... + p[deg] of degree deg to points (x, y)
  */
-export function polyfit<T extends DType>(
-  x: NDArray<T>,
-  y: NDArray<T>,
-  deg: number,
-): NDArray<T> {
+export function polyfit<T extends DType>(x: NDArray<T>, y: NDArray<T>, deg: number): NDArray<T> {
   const xData = x.getData()
   const yData = y.getData()
 
@@ -38,7 +33,7 @@ export function polyfit<T extends DType>(
   for (let i = 0; i < n; i++) {
     const xi = xData.buffer[i]
     for (let j = 0; j <= deg; j++) {
-      vBuffer[i * (deg + 1) + j] = Math.pow(xi, deg - j)
+      vBuffer[i * (deg + 1) + j] = xi ** (deg - j)
     }
   }
 
@@ -147,16 +142,16 @@ export function roots<T extends DType>(p: NDArray<T>): NDArray<'float64'> {
         strides: [1],
         dtype: 'float64',
       })
-    } else {
-      // Complex roots - return real parts only for now
-      const realPart = -b / (2 * a)
-      return new NDArray({
-        buffer: Float64Array.from([realPart, realPart]),
-        shape: [2],
-        strides: [1],
-        dtype: 'float64',
-      })
     }
+
+    // Complex roots - return real parts only for now
+    const realPart = -b / (2 * a)
+    return new NDArray({
+      buffer: Float64Array.from([realPart, realPart]),
+      shape: [2],
+      strides: [1],
+      dtype: 'float64',
+    })
   }
 
   // For higher degree polynomials, we need eigenvalues of companion matrix
@@ -236,7 +231,11 @@ export function polyder<T extends DType>(p: NDArray<T>, m = 1): NDArray<T> {
  * For p(x) = p[0] * x^n + p[1] * x^(n-1) + ... + p[n]
  * Returns ∫p(x)dx = p[0]/(n+1) * x^(n+1) + p[1]/n * x^n + ... + k
  */
-export function polyint<T extends DType>(p: NDArray<T>, m = 1, k: number | number[] = 0): NDArray<T> {
+export function polyint<T extends DType>(
+  p: NDArray<T>,
+  m = 1,
+  k: number | number[] = 0,
+): NDArray<T> {
   const pData = p.getData()
 
   if (pData.shape.length !== 1) {
