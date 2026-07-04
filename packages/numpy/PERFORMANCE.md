@@ -44,8 +44,11 @@ uploads both files as the `python-parity-report` artifact.
 The comparison harness runs paired Python and `@sylphx/numpy` samples with
 alternating runtime order, records the exact Python and TS commands, and reports
 raw samples plus median, p95, and relative standard deviation for every row.
-That evidence separates true backend gaps from process-order or runner variance
-without relaxing the checksum or speed gates.
+Each sample uses one Python process and one Bun process, while cases keep
+per-case setup, warmup, and timed iterations inside that runtime. That measures
+steady-state library performance for numerical loops, separates true backend
+gaps from process-order or runner variance, and does not relax the checksum or
+speed gates.
 
 The release path uses `bench:python-parity:repeatability`, which runs the
 enforced benchmark multiple times and fails unless every attempt passes. This

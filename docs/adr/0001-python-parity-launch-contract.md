@@ -141,6 +141,12 @@ bun run release:preflight
 default and fails unless every attempt passes. Override the release proof count
 with `PYTHON_PARITY_REPEAT_ATTEMPTS=5`.
 
+The benchmark uses sample-level runtime isolation: each sample launches one
+Python process and one Bun process, alternates runtime order, and measures all
+covered cases with per-case setup and warmup inside that runtime. Single-case
+debug runs still use `PYTHON_PARITY_CASE`. The speed threshold remains 1.05x and
+checksum parity remains mandatory.
+
 After publish, release completion also requires:
 
 - npm registry readback for `@sylphx/numpy`;

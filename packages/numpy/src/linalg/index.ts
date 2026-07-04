@@ -76,6 +76,18 @@ export function matmul<T extends DType>(
 
   // Delegate to backend (WASM if available, TS fallback)
   const backend = getBackend()
+  if (!options && backend.matmulFloat64 && isNativeMatmul2dFloat64(aData, bData)) {
+    return new NDArray(
+      backend.matmulFloat64(
+        aData.buffer as Float64Array,
+        bData.buffer as Float64Array,
+        aData.shape[0],
+        aData.shape[1],
+        bData.shape[1],
+      ),
+    )
+  }
+
   if (options?.out) {
     const outData = options.out.getData()
     if (backend.matmulInto) {
@@ -91,6 +103,18 @@ export function matmul<T extends DType>(
   const resultData = backend.matmul(aData, bData)
 
   return new NDArray(resultData)
+}
+
+function isNativeMatmul2dFloat64(a: NDArrayData, b: NDArrayData): boolean {
+  return (
+    a.dtype === 'float64' &&
+    b.dtype === 'float64' &&
+    a.buffer instanceof Float64Array &&
+    b.buffer instanceof Float64Array &&
+    a.shape.length === 2 &&
+    b.shape.length === 2 &&
+    a.shape[1] === b.shape[0]
+  )
 }
 
 function copyMatmulResultIntoOut(result: NDArrayData, out: NDArrayData): void {

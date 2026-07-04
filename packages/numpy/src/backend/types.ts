@@ -13,9 +13,12 @@ export interface Backend {
   // Arithmetic operations
   add(a: NDArrayData, b: NDArrayData | number): NDArrayData
   addInto?(a: NDArrayData, b: NDArrayData | number, out: NDArrayData): NDArrayData
+  addFloat64Into?(a: Float64Array, b: Float64Array, out: Float64Array): void
+  addScalarFloat64Into?(a: Float64Array, scalar: number, out: Float64Array): void
   sub(a: NDArrayData, b: NDArrayData | number): NDArrayData
   mul(a: NDArrayData, b: NDArrayData | number): NDArrayData
   mulInto?(a: NDArrayData, b: NDArrayData | number, out: NDArrayData): NDArrayData
+  mulScalarFloat64Into?(a: Float64Array, scalar: number, out: Float64Array): void
   div(a: NDArrayData, b: NDArrayData | number): NDArrayData
   pow(a: NDArrayData, exponent: number): NDArrayData
 
@@ -41,6 +44,7 @@ export interface Backend {
   // Linear algebra operations
   matmul(a: NDArrayData, b: NDArrayData): NDArrayData
   matmulInto?(a: NDArrayData, b: NDArrayData, out: NDArrayData): NDArrayData
+  matmulFloat64?(a: Float64Array, b: Float64Array, m: number, k: number, n: number): NDArrayData
   dot(a: NDArrayData, b: NDArrayData): number
 
   // FFT operations (complex numbers as [real, imag] interleaved)

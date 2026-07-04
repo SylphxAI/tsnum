@@ -36,12 +36,14 @@ PYTHON_PARITY_CASE=matmul_128 python bench/python-parity/python_bench.py
 PYTHON_PARITY_CASE=matmul_128 bun run bench/python-parity/ts_bench.ts
 ```
 
-Default runs print and save median ratios across multiple samples. Each
-runtime/case/sample is executed in a fresh process so tiny kernels are not
-contaminated by allocator or garbage-collector state from earlier cases.
-Checksum parity is always enforced across every sample. Enforcement runs
-additionally fail when any covered operation is slower than NumPy by more than
-the configured threshold.
+Default runs print and save median ratios across multiple samples. Each sample
+executes Python and Bun in separate runtime processes with alternating runtime
+order. Cases share that runtime process and still keep per-case setup, warmup,
+and timed iterations. This measures steady-state library behavior for training
+and numerical loops without charging Bun native-backend initialization or JIT
+warmup to every individual case. Checksum parity is always enforced across every
+sample. Enforcement runs additionally fail when any covered operation is slower
+than NumPy by more than the configured threshold.
 
 Each run writes:
 
@@ -92,8 +94,10 @@ iteration.
 
 - Reference runtime: Python with NumPy.
 - Native backend: Bun/macOS runs attempt `initNativeBLAS()` before measuring.
-- Case isolation: default runs spawn a fresh Python or Bun process per
-  runtime/case/sample using `PYTHON_PARITY_CASE`.
+- Process isolation: default runs spawn a fresh Python or Bun process per
+  runtime/sample. Cases share that runtime process with per-case warmups.
+- Single-case debug: use `PYTHON_PARITY_CASE` to run one case in a fresh
+  runtime process.
 - `*_out` cases preallocate the output array and TypeScript options object
   before timed iterations.
 - Slowdown metric: `@sylphx/numpy` median time divided by Python median time.
