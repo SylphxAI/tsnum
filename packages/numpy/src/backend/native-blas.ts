@@ -72,14 +72,8 @@ const scalarPointer = ptr(scalarBuffer)
 const pointerCache = new WeakMap<Float64Array, ReturnType<typeof ptr>>()
 
 type NativeKernelModule = {
-  addF64?: (left: Float64Array, right: Float64Array) => Float64Array
-  addF64Buffer?: (left: Float64Array, right: Float64Array, output: Uint8Array) => Uint8Array
-  addF64Buffers?: (left: Uint8Array, right: Uint8Array, output: Uint8Array) => Uint8Array
-  addScalarF64?: (input: Float64Array, scalar: number) => Float64Array
   addScalarF64Buffer?: (input: Float64Array, scalar: number, output: Uint8Array) => Uint8Array
   addScalarF64Buffers?: (input: Uint8Array, scalar: number, output: Uint8Array) => Uint8Array
-  mulScalarF64?: (input: Float64Array, scalar: number) => Float64Array
-  mulScalarF64Buffers?: (input: Uint8Array, scalar: number, output: Uint8Array) => Uint8Array
   transposeF64Buffer?: (
     input: Float64Array,
     rows: number,
@@ -140,6 +134,54 @@ function bytesFor(buffer: Float64Array): Uint8Array {
   return bytes
 }
 
+function writeVdspScalarAdd(
+  input: Float64Array,
+  scalar: number,
+  outputPointer: ReturnType<typeof ptr>,
+): void {
+  scalarBuffer[0] = scalar
+  accelerate.symbols.vDSP_vsaddD(
+    pointerFor(input),
+    1,
+    scalarPointer,
+    outputPointer,
+    1,
+    input.length,
+  )
+}
+
+function writeVdspScalarMul(
+  input: Float64Array,
+  scalar: number,
+  outputPointer: ReturnType<typeof ptr>,
+): void {
+  scalarBuffer[0] = scalar
+  accelerate.symbols.vDSP_vsmulD(
+    pointerFor(input),
+    1,
+    scalarPointer,
+    outputPointer,
+    1,
+    input.length,
+  )
+}
+
+function writeVdspAdd(
+  left: Float64Array,
+  right: Float64Array,
+  outputPointer: ReturnType<typeof ptr>,
+): void {
+  accelerate.symbols.vDSP_vaddD(
+    pointerFor(left),
+    1,
+    pointerFor(right),
+    1,
+    outputPointer,
+    1,
+    left.length,
+  )
+}
+
 /**
  * Native BLAS backend.
  *
@@ -156,6 +198,8 @@ export class NativeBLASBackend extends TypeScriptBackend {
     }
 
     if (typeof b === 'number') {
+      // CI native-dispatch evidence shows the Rust buffer bridge is faster
+      // than vDSP_vsaddD when scalar-add output allocation is included.
       const native = getNativeKernels()
       if (native?.addScalarF64Buffers) {
         const output = createNativeOutputBuffer(a.buffer.length)
@@ -180,15 +224,7 @@ export class NativeBLASBackend extends TypeScriptBackend {
       }
 
       const output = createNativeOutput(a.buffer.length)
-      scalarBuffer[0] = b
-      accelerate.symbols.vDSP_vsaddD(
-        pointerFor(a.buffer),
-        1,
-        scalarPointer,
-        ptr(output),
-        1,
-        a.buffer.length,
-      )
+      writeVdspScalarAdd(a.buffer, b, ptr(output))
       return {
         buffer: output,
         shape: a.shape,
@@ -201,39 +237,8 @@ export class NativeBLASBackend extends TypeScriptBackend {
       return super.add(a, b)
     }
 
-    const native = getNativeKernels()
-    if (native?.addF64Buffer) {
-      const output = createNativeOutputBuffer(a.buffer.length)
-      native.addF64Buffer(a.buffer, b.buffer, output.bytes)
-      return {
-        buffer: output.array,
-        shape: a.shape,
-        strides: a.strides,
-        dtype: 'float64',
-      }
-    }
-
-    if (native?.addF64Buffers) {
-      const output = createNativeOutputBuffer(a.buffer.length)
-      native.addF64Buffers(bytesFor(a.buffer), bytesFor(b.buffer), output.bytes)
-      return {
-        buffer: output.array,
-        shape: a.shape,
-        strides: a.strides,
-        dtype: 'float64',
-      }
-    }
-
     const output = createNativeOutput(a.buffer.length)
-    accelerate.symbols.vDSP_vaddD(
-      pointerFor(a.buffer),
-      1,
-      pointerFor(b.buffer),
-      1,
-      ptr(output),
-      1,
-      a.buffer.length,
-    )
+    writeVdspAdd(a.buffer, b.buffer, ptr(output))
     return {
       buffer: output,
       shape: a.shape,
@@ -260,15 +265,7 @@ export class NativeBLASBackend extends TypeScriptBackend {
         return out
       }
 
-      scalarBuffer[0] = b
-      accelerate.symbols.vDSP_vsaddD(
-        pointerFor(a.buffer),
-        1,
-        scalarPointer,
-        pointerFor(out.buffer),
-        1,
-        a.buffer.length,
-      )
+      writeVdspScalarAdd(a.buffer, b, pointerFor(out.buffer))
       return out
     }
 
@@ -277,15 +274,7 @@ export class NativeBLASBackend extends TypeScriptBackend {
     }
 
     this.validateElementwiseOutput(out, 'float64', a.shape, a.buffer.length)
-    accelerate.symbols.vDSP_vaddD(
-      pointerFor(a.buffer),
-      1,
-      pointerFor(b.buffer),
-      1,
-      pointerFor(out.buffer),
-      1,
-      a.buffer.length,
-    )
+    writeVdspAdd(a.buffer, b.buffer, pointerFor(out.buffer))
     return out
   }
 
@@ -295,28 +284,8 @@ export class NativeBLASBackend extends TypeScriptBackend {
     }
 
     if (typeof b === 'number') {
-      const native = getNativeKernels()
-      if (native?.mulScalarF64Buffers) {
-        const output = createNativeOutputBuffer(a.buffer.length)
-        native.mulScalarF64Buffers(bytesFor(a.buffer), b, output.bytes)
-        return {
-          buffer: output.array,
-          shape: a.shape,
-          strides: a.strides,
-          dtype: 'float64',
-        }
-      }
-
       const output = createNativeOutput(a.buffer.length)
-      scalarBuffer[0] = b
-      accelerate.symbols.vDSP_vsmulD(
-        pointerFor(a.buffer),
-        1,
-        scalarPointer,
-        ptr(output),
-        1,
-        a.buffer.length,
-      )
+      writeVdspScalarMul(a.buffer, b, ptr(output))
       return {
         buffer: output,
         shape: a.shape,
@@ -340,15 +309,7 @@ export class NativeBLASBackend extends TypeScriptBackend {
 
     if (typeof b === 'number') {
       this.validateElementwiseOutput(out, 'float64', a.shape, a.buffer.length)
-      scalarBuffer[0] = b
-      accelerate.symbols.vDSP_vsmulD(
-        pointerFor(a.buffer),
-        1,
-        scalarPointer,
-        pointerFor(out.buffer),
-        1,
-        a.buffer.length,
-      )
+      writeVdspScalarMul(a.buffer, b, pointerFor(out.buffer))
       return out
     }
 
