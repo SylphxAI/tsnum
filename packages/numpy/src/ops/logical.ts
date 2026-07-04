@@ -56,6 +56,10 @@ export function logicalAnd<T extends DType>(a: NDArray<T>, b: NDArray<T>): NDArr
   })
 }
 
+export function logical_and<T extends DType>(a: NDArray<T>, b: NDArray<T>): NDArray<T> {
+  return logicalAnd(a, b)
+}
+
 /**
  * Element-wise logical OR
  */
@@ -81,6 +85,10 @@ export function logicalOr<T extends DType>(a: NDArray<T>, b: NDArray<T>): NDArra
   })
 }
 
+export function logical_or<T extends DType>(a: NDArray<T>, b: NDArray<T>): NDArray<T> {
+  return logicalOr(a, b)
+}
+
 /**
  * Element-wise logical NOT
  */
@@ -98,6 +106,10 @@ export function logicalNot<T extends DType>(a: NDArray<T>): NDArray<T> {
     strides: data.strides,
     dtype: data.dtype,
   })
+}
+
+export function logical_not<T extends DType>(a: NDArray<T>): NDArray<T> {
+  return logicalNot(a)
 }
 
 /**
@@ -125,6 +137,10 @@ export function logicalXor<T extends DType>(a: NDArray<T>, b: NDArray<T>): NDArr
     strides: aData.strides,
     dtype: aData.dtype,
   })
+}
+
+export function logical_xor<T extends DType>(a: NDArray<T>, b: NDArray<T>): NDArray<T> {
+  return logicalXor(a, b)
 }
 
 /**

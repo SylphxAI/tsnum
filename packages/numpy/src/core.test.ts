@@ -9,6 +9,7 @@ import {
   divide,
   empty_like,
   equal,
+  expand_dims,
   eye,
   flatten,
   full_like,
@@ -210,6 +211,11 @@ describe('Reduction Operations (Functional)', () => {
     const result = variance(a)
     expect(result).toBe(5) // Variance of [2,4,6,8] is exactly 5
   })
+
+  test('namespace var aliases variance semantics', () => {
+    const a = array([2, 4, 6, 8])
+    expect(np.var(a)).toBe(5)
+  })
 })
 
 describe('Shape Operations (Functional)', () => {
@@ -248,6 +254,25 @@ describe('Shape Operations (Functional)', () => {
     const b = a.T
     expect(b.shape).toEqual([2, 2])
     expect(sum(b)).toBe(10)
+  })
+
+  test('NumPy canonical expand_dims alias', () => {
+    const a = array([1, 2, 3])
+    const b = expand_dims(a, 0)
+    expect(b.shape).toEqual([1, 3])
+    expect(sum(b)).toBe(6)
+  })
+})
+
+describe('NumPy Canonical Logical Aliases', () => {
+  test('snake_case logical aliases match camelCase semantics', () => {
+    const a = array([1, 0, 1])
+    const b = array([1, 1, 0])
+
+    expect(sum(np.logical_and(a, b))).toBe(1)
+    expect(sum(np.logical_or(a, b))).toBe(3)
+    expect(sum(np.logical_not(a))).toBe(1)
+    expect(sum(np.logical_xor(a, b))).toBe(2)
   })
 })
 
