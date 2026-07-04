@@ -223,27 +223,10 @@ export class NativeBLASBackend extends TypeScriptBackend {
   }
 
   addScalarFloat64Into(a: Float64Array, scalar: number, out: Float64Array): void {
-    const native = getNativeKernels()
-    if (native?.addScalarF64BuffersInto) {
-      native.addScalarF64BuffersInto(bytesFor(a), scalar, bytesFor(out))
-      return
-    }
-
-    if (native?.addScalarF64Buffers) {
-      native.addScalarF64Buffers(bytesFor(a), scalar, bytesFor(out))
-      return
-    }
-
     writeVdspScalarAdd(a, scalar, pointerFor(out))
   }
 
   mulScalarFloat64Into(a: Float64Array, scalar: number, out: Float64Array): void {
-    const native = getNativeKernels()
-    if (native?.mulScalarF64BuffersInto) {
-      native.mulScalarF64BuffersInto(bytesFor(a), scalar, bytesFor(out))
-      return
-    }
-
     writeVdspScalarMul(a, scalar, pointerFor(out))
   }
 
