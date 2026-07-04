@@ -46,21 +46,23 @@ raw samples plus median, p95, and relative standard deviation for every row.
 That evidence separates true backend gaps from process-order or runner variance
 without relaxing the checksum or speed gates.
 
-Recent main CI evidence:
+Recent accepted main CI evidence as of 2026-07-04. The latest uploaded
+`python-parity-report` and `native-dispatch-report` artifacts remain canonical
+when this dated snapshot drifts.
 
-- Main CI run `28697134621` on macOS arm64 uploaded `python-parity-report`.
-- Commit: `9889114` (`bench: stabilize native dispatch matmul probe`).
+- Main CI run `28697576618` on macOS arm64 uploaded `python-parity-report`.
+- Commit: `98afc30` (`docs: define python parity launch contract`).
 - Runtime: Python 3.12.10, NumPy 2.5.0, Bun 1.3.14,
   `@sylphx/numpy` backend `native-blas`.
 - Checksum parity passed for every covered row.
-- Speed rows passed for `add_arrays_1m` (`0.69x`), `add_scalar_1m` (`0.63x`),
-  `mean_1m` (`0.55x`), `mul_scalar_1m` (`0.55x`), `sum_1m` (`0.61x`), and
-  `transpose_512` (`0.78x`).
-- `matmul_128` failed the 1.05x speed target at `1.08x` slowdown, with paired
-  slowdown p95 at `1.25x`.
+- Speed rows passed for `add_arrays_1m` (`0.73x`), `add_scalar_1m` (`0.85x`),
+  `mean_1m` (`0.66x`), `mul_scalar_1m` (`0.66x`), `sum_1m` (`0.66x`), and
+  `transpose_512` (`0.75x`).
+- `matmul_128` failed the 1.05x speed target at `1.19x` slowdown, with paired
+  slowdown p95 at `1.30x`.
 - The same run's native dispatch artifact measured `public.matmul128` at
-  `0.0976ms`, `backend.native-blas.matmul128` at `0.0959ms`, and
-  `backend.typescript.matmul128` at `0.7513ms`, which supports the native BLAS
+  `0.2337ms`, `backend.native-blas.matmul128` at `0.1981ms`, and
+  `backend.typescript.matmul128` at `0.9590ms`, which supports the native BLAS
   direction while keeping the same-machine NumPy comparison as the release
   blocker.
 - Full speed parity is therefore not claimed.
