@@ -44,8 +44,8 @@ benchmark gate passes on the same machine against Python/NumPy.
 | Benchmarks | `bench/python-parity` compares TypeScript and NumPy on identical inputs. |
 | Native path | Bun/macOS can initialize Rust/N-API and native BLAS fast paths for float64 hot loops. |
 | Dispatch evidence | `bun run bench:native-dispatch` separates kernel, backend, and public API overhead before performance changes are promoted. |
-| Proven today | Checksum parity passes for the covered benchmark cases; CI uploads the generated Python parity report; speed parity is not complete yet. |
-| Not claimed yet | Full NumPy API coverage, all-op 1.05x performance parity, and npm publication. |
+| Proven today | Main CI run `28693429159` at `0187bbc` reports checksum parity and 6 of 7 covered speed rows passing on macOS arm64 native BLAS: add arrays, add scalar, multiply scalar, sum, mean, and transpose. |
+| Not claimed yet | `matmul_128` remains above the 1.05x target in that CI artifact, so full NumPy API coverage, all-op speed parity, and npm publication are still launch gates. |
 
 **Features:**
 - 🎯 **NumPy-compatible DX** - Python spelling and behavior are the target
@@ -552,11 +552,12 @@ bun run lint
 
 **Status:** Broad NumPy-compatible surface with 251+ implemented operations and
 an explicit Python parity performance gate, native dispatch diagnostics, and
-release readback wiring. Full NumPy API coverage, all-op 1.05x speed parity,
+release readback wiring. The latest main CI parity artifact passes checksum
+parity and 6 of 7 covered speed rows; `matmul_128`, full NumPy API coverage,
 and first npm publication remain launch gates, not completed claims.
 
-Next: Python parity closure for output-producing operations, GPU acceleration
-contract, and more decompositions (LU, eigendecomposition).
+Next: close the remaining small-matrix `matmul` speed gap, harden GPU
+acceleration contract, and add more decompositions (LU, eigendecomposition).
 
 ## Why @sylphx/numpy?
 

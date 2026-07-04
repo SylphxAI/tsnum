@@ -40,14 +40,17 @@ parity is always enforced. Each run writes JSON and Markdown evidence under
 `bench/python-parity/results/`; CI checks the generated Markdown report and
 uploads both files as the `python-parity-report` artifact.
 
-Latest local evidence after the Rust/N-API native vector path and scalar-add
-dispatch cleanup:
+Latest main CI evidence after the Rust/N-API unrolled vector kernels and native
+add-buffer dispatch path:
 
+- CI run `28693429159` at `0187bbc` uploaded `python-parity-report` artifact
+  `8077861115`.
 - Checksum parity passes for all covered benchmark cases.
-- Native-backed reductions pass the speed target in current local runs.
-- Rust/N-API buffer kernels reduce the output-producing vector gap, but
-  add/mul/matmul/transpose are still not consistently under the 1.05x target in
-  enforced local benchmark runs.
+- 6 of 7 covered speed rows pass the 1.05x target on macOS arm64 native BLAS:
+  add arrays, add scalar, multiply scalar, sum, mean, and transpose.
+- `matmul_128` remains above the speed target in that artifact, so
+  `bench:python-parity:enforce` and release preflight are still expected to
+  block publication until the matrix path closes.
 - Current JSON output is written to `bench/python-parity/results/latest.json`.
 - Current Markdown output is written to `bench/python-parity/results/latest.md`.
 
@@ -80,8 +83,8 @@ publish readiness still depends on `bench:python-parity:enforce`.
 
 1. Public speed claims must cite the Python parity benchmark, not isolated local
    microbenchmarks.
-2. Native-backed reductions and Rust/N-API vector kernels reduce the measured
-   gap, but full covered-operation speed parity is not complete.
+2. Native-backed reductions, transpose, and Rust/N-API vector kernels now pass
+   the covered CI speed rows; small-matrix matmul remains the blocker.
 3. The benchmark compares identical inputs and records Python and
    `@sylphx/numpy` checksums to guard against fast-but-wrong kernels.
 4. macOS native acceleration depends on Bun FFI and Accelerate; unsupported
@@ -89,8 +92,8 @@ publish readiness still depends on `bench:python-parity:enforce`.
 
 ## Future Optimizations (Roadmap)
 
-- Close the remaining add/mul/matmul/transpose speed gaps against NumPy by
-  reducing output allocation, N-API wrapper, and small-matrix dispatch overhead.
+- Close the remaining small-matrix matmul speed gap against NumPy by reducing
+  BLAS dispatch overhead or moving that path behind a faster native kernel.
 - Promote only optimizations that improve the Python parity gate or are backed
   by the native dispatch probe; negative microbench experiments should not
   become public API.

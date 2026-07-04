@@ -184,7 +184,7 @@
       },
       {
         "id": "native-output-speed-parity-incomplete",
-        "description": "Native-backed reductions pass the speed target, and Rust/N-API vector kernels reduce output-producing gaps, but add/mul/matmul/transpose cases still do not consistently pass the 1.05x Python speed target in the generated parity report.",
+        "description": "Latest main CI evidence passes checksum parity and 6 of 7 covered speed rows on macOS arm64 native BLAS, but matmul_128 remains above the 1.05x Python speed target and release preflight remains intentionally blocked until covered-operation speed parity passes.",
         "owner": "SylphxAI/tsnum",
         "target": "Before package publication or full Python-speed marketing"
       }
