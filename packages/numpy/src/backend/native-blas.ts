@@ -238,12 +238,6 @@ export class NativeBLASBackend extends TypeScriptBackend {
   }
 
   mulScalarFloat64Into(a: Float64Array, scalar: number, out: Float64Array): void {
-    const native = getNativeKernels()
-    if (native?.mulScalarF64BuffersInto) {
-      native.mulScalarF64BuffersInto(bytesFor(a), scalar, bytesFor(out))
-      return
-    }
-
     writeVdspScalarMul(a, scalar, pointerFor(out))
   }
 
@@ -411,12 +405,6 @@ export class NativeBLASBackend extends TypeScriptBackend {
 
     if (typeof b === 'number') {
       this.validateElementwiseOutput(out, 'float64', a.shape, a.buffer.length)
-      const native = getNativeKernels()
-      if (native?.mulScalarF64BuffersInto) {
-        native.mulScalarF64BuffersInto(bytesFor(a.buffer), b, bytesFor(out.buffer))
-        return out
-      }
-
       writeVdspScalarMul(a.buffer, b, pointerFor(out.buffer))
       return out
     }
