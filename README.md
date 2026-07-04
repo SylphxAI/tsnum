@@ -55,7 +55,7 @@ benchmark gate passes on the same machine against Python/NumPy.
 | Benchmarks | `bench/python-parity` compares TypeScript and NumPy on identical inputs. |
 | Native path | Bun/macOS can initialize Rust/N-API and native BLAS fast paths for float64 hot loops. |
 | Dispatch evidence | `bun run bench:native-dispatch` separates kernel, backend, and public API overhead before performance changes are promoted. |
-| Proven today | Recent accepted main CI snapshots pass checksum parity for every covered row and pass the 1.05x speed target on seven to nine of ten covered rows. |
+| Proven today | Recent accepted main CI snapshots pass checksum parity for every covered row and show native-backed speed wins on many covered rows. |
 | Not claimed yet | Recorded accepted main artifacts still have near-threshold speed misses; full NumPy API coverage, repeatable all-op speed parity, and npm publication are still launch gates. |
 
 Recorded accepted main CI snapshot as of 2026-07-04. The latest uploaded
@@ -81,16 +81,15 @@ All covered checksums passed in that run. The same run's native dispatch probe
 measured `public.addScalar.out` at `0.2121ms`, `public.addArrays.out` at
 `0.4782ms`, `public.mulScalar.out` at `0.1846ms`, `public.matmul128` at
 `0.0843ms`, and `public.matmul128.out` at `0.0763ms`. Recent accepted main
-snapshots have ranged from seven to nine speed-passing rows: run `28700645799`
-passed eight of ten, and run `28700015980` passed nine of ten. That is useful
-evidence but not enough for a release claim. The accepted direction remains
-native-backed execution with preallocated output support, while same-machine
-NumPy comparison still blocks release until the result is repeatable. PR #45
-was closed after rerun evidence failed `matmul_128` at `1.28x`; PR #59 was
-closed after repeat artifacts failed to support merging a native output
-micro-optimization. The release rule stays stricter than the marketing copy:
-no full-speed claim and no npm publish until the enforced gate passes
-repeatably on the release path.
+snapshots show volatile near-threshold misses across output-buffer and
+small-matmul rows. That is useful evidence but not enough for a release claim.
+The accepted direction remains native-backed execution with preallocated
+output support, while same-machine NumPy comparison still blocks release until
+the result is repeatable. PR #45 was closed after rerun evidence failed
+`matmul_128` at `1.28x`; PR #59 was closed after repeat artifacts failed to
+support merging a native output micro-optimization. The release rule stays
+stricter than the marketing copy: no full-speed claim and no npm publish until
+the enforced gate passes repeatably on the release path.
 
 ## Python-To-TypeScript Contract
 
