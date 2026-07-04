@@ -48,23 +48,28 @@ without relaxing the checksum or speed gates.
 
 Recent main CI evidence:
 
-- Main CI run `28695468644` on macOS arm64 uploaded `python-parity-report`.
+- Main CI run `28697134621` on macOS arm64 uploaded `python-parity-report`.
+- Commit: `9889114` (`bench: stabilize native dispatch matmul probe`).
 - Runtime: Python 3.12.10, NumPy 2.5.0, Bun 1.3.14,
   `@sylphx/numpy` backend `native-blas`.
 - Checksum parity passed for every covered row.
-- Speed rows passed for `add_arrays_1m` (`0.90x`), `add_scalar_1m` (`0.75x`),
-  `mean_1m` (`0.59x`), `mul_scalar_1m` (`0.71x`), and `sum_1m` (`0.60x`).
-- `matmul_128` failed the 1.05x speed target at `1.12x` slowdown, with paired
-  slowdown p95 at `1.40x`.
-- `transpose_512` failed the 1.05x speed target at `1.11x` slowdown, with
-  paired slowdown p95 at `1.29x`.
-- The prior main run `28695393008` passed six of seven rows and failed
-  `matmul_128` at `1.23x`; this volatility is why the latest CI artifact and
-  the enforced release gate are canonical, not any single README table.
+- Speed rows passed for `add_arrays_1m` (`0.69x`), `add_scalar_1m` (`0.63x`),
+  `mean_1m` (`0.55x`), `mul_scalar_1m` (`0.55x`), `sum_1m` (`0.61x`), and
+  `transpose_512` (`0.78x`).
+- `matmul_128` failed the 1.05x speed target at `1.08x` slowdown, with paired
+  slowdown p95 at `1.25x`.
+- The same run's native dispatch artifact measured `public.matmul128` at
+  `0.0976ms`, `backend.native-blas.matmul128` at `0.0959ms`, and
+  `backend.typescript.matmul128` at `0.7513ms`, which supports the native BLAS
+  direction while keeping the same-machine NumPy comparison as the release
+  blocker.
 - Full speed parity is therefore not claimed.
 - PR #36's native-addon Accelerate matmul bridge regressed `matmul_128` to
   `1.50x` on main CI run `28695093346`; PR #37 reverted that path and restored
   the column-major native BLAS route.
+- PR #45's direct C ABI dgemm wrapper was closed after rerun `28697320118`
+  failed `matmul_128` at `1.28x` and measured `public.matmul128` at
+  `0.2322ms`; negative performance experiments should not become public API.
 - `bench:python-parity:enforce` and release preflight remain publication
   blockers until covered-operation speed parity is repeatable.
 - Current JSON output is written to `bench/python-parity/results/latest.json`.
@@ -114,8 +119,8 @@ small-matrix native overhead from runner noise.
 ## Future Optimizations (Roadmap)
 
 - Close the remaining enforced-gate gaps against NumPy by reducing vector
-  output overhead, BLAS dispatch overhead, and transpose variance on the release
-  runner.
+  output overhead, BLAS dispatch overhead, and `matmul_128` runner variance on
+  the release runner.
 - Promote only optimizations that improve the Python parity gate or are backed
   by the native dispatch probe; negative microbench experiments should not
   become public API.
