@@ -40,17 +40,17 @@ parity is always enforced. Each run writes JSON and Markdown evidence under
 `bench/python-parity/results/`; CI checks the generated Markdown report and
 uploads both files as the `python-parity-report` artifact.
 
-Recorded main CI evidence after the Rust/N-API unrolled vector kernels and native
+Recorded CI evidence after the Rust/N-API unrolled vector kernels and native
 add-buffer dispatch path:
 
-- CI run `28693429159` at `0187bbc` uploaded `python-parity-report` artifact
-  `8077861115`.
-- Checksum parity passes for all covered benchmark cases.
-- 6 of 7 covered speed rows pass the 1.05x target on macOS arm64 native BLAS:
-  add arrays, add scalar, multiply scalar, sum, mean, and transpose.
-- `matmul_128` remains above the speed target in that artifact, so
-  `bench:python-parity:enforce` and release preflight are still expected to
-  block publication until the matrix path closes.
+- Main CI run `28693587707` at `6c3d481` uploaded `python-parity-report`
+  artifact `8077906004`; reporting mode passed checksum parity and all covered
+  speed rows on macOS arm64 native BLAS.
+- PR #28 run `28693698365` uploaded `python-parity-report` artifact
+  `8077937938`; enforced mode still failed add arrays, `matmul_128`, and
+  transpose while checksum parity passed.
+- `bench:python-parity:enforce` and release preflight remain publication
+  blockers until enforced covered-operation speed parity is repeatable.
 - Current JSON output is written to `bench/python-parity/results/latest.json`.
 - Current Markdown output is written to `bench/python-parity/results/latest.md`.
 
@@ -83,8 +83,8 @@ publish readiness still depends on `bench:python-parity:enforce`.
 
 1. Public speed claims must cite the Python parity benchmark, not isolated local
    microbenchmarks.
-2. Native-backed reductions, transpose, and Rust/N-API vector kernels now pass
-   the covered CI speed rows; small-matrix matmul remains the blocker.
+2. Native-backed reductions and Rust/N-API vector kernels can pass the reporting
+   CI rows, but release proof requires enforced parity to pass repeatably.
 3. The benchmark compares identical inputs and records Python and
    `@sylphx/numpy` checksums to guard against fast-but-wrong kernels.
 4. macOS native acceleration depends on Bun FFI and Accelerate; unsupported
@@ -92,8 +92,9 @@ publish readiness still depends on `bench:python-parity:enforce`.
 
 ## Future Optimizations (Roadmap)
 
-- Close the remaining small-matrix matmul speed gap against NumPy by reducing
-  BLAS dispatch overhead or moving that path behind a faster native kernel.
+- Close the remaining enforced-gate gaps against NumPy by reducing vector
+  output overhead, BLAS dispatch overhead, and transpose variance on the release
+  runner.
 - Promote only optimizations that improve the Python parity gate or are backed
   by the native dispatch probe; negative microbench experiments should not
   become public API.
