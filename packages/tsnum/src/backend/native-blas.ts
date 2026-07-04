@@ -7,6 +7,7 @@ import { TypeScriptBackend } from './typescript'
 
 declare const Buffer: {
   allocUnsafe(length: number): Uint8Array
+  from(buffer: ArrayBufferLike, byteOffset?: number, length?: number): Uint8Array
 }
 
 const CBLAS_ROW_MAJOR = 101
@@ -70,6 +71,34 @@ const scalarBuffer = new Float64Array(1)
 const scalarPointer = ptr(scalarBuffer)
 const pointerCache = new WeakMap<Float64Array, ReturnType<typeof ptr>>()
 
+type NativeKernelModule = {
+  addF64?: (left: Float64Array, right: Float64Array) => Float64Array
+  addF64Buffer?: (left: Float64Array, right: Float64Array, output: Uint8Array) => Uint8Array
+  addF64Buffers?: (left: Uint8Array, right: Uint8Array, output: Uint8Array) => Uint8Array
+  addScalarF64?: (input: Float64Array, scalar: number) => Float64Array
+  addScalarF64Buffer?: (input: Float64Array, scalar: number, output: Uint8Array) => Uint8Array
+  addScalarF64Buffers?: (input: Uint8Array, scalar: number, output: Uint8Array) => Uint8Array
+  mulScalarF64?: (input: Float64Array, scalar: number) => Float64Array
+  mulScalarF64Buffers?: (input: Uint8Array, scalar: number, output: Uint8Array) => Uint8Array
+}
+
+let nativeKernelModule: NativeKernelModule | null | undefined
+const byteViewCache = new WeakMap<Float64Array, Uint8Array>()
+
+function getNativeKernels(): NativeKernelModule | null {
+  if (nativeKernelModule !== undefined) {
+    return nativeKernelModule
+  }
+
+  try {
+    nativeKernelModule = require('@sylphx/numpy-native') as NativeKernelModule
+  } catch {
+    nativeKernelModule = null
+  }
+
+  return nativeKernelModule
+}
+
 function pointerFor(buffer: Float64Array): ReturnType<typeof ptr> {
   let pointer = pointerCache.get(buffer)
   if (!pointer) {
@@ -85,6 +114,19 @@ function createNativeOutput(length: number): Float64Array {
     return new Float64Array(length)
   }
   return new Float64Array(bytes.buffer, bytes.byteOffset, length)
+}
+
+function outputBytes(output: Float64Array): Uint8Array {
+  return Buffer.from(output.buffer, output.byteOffset, output.byteLength)
+}
+
+function bytesFor(buffer: Float64Array): Uint8Array {
+  let bytes = byteViewCache.get(buffer)
+  if (!bytes) {
+    bytes = Buffer.from(buffer.buffer, buffer.byteOffset, buffer.byteLength)
+    byteViewCache.set(buffer, bytes)
+  }
+  return bytes
 }
 
 /**
@@ -103,6 +145,18 @@ export class NativeBLASBackend extends TypeScriptBackend {
     }
 
     if (typeof b === 'number') {
+      const native = getNativeKernels()
+      if (native?.addScalarF64Buffers) {
+        const output = createNativeOutput(a.buffer.length)
+        native.addScalarF64Buffers(bytesFor(a.buffer), b, outputBytes(output))
+        return {
+          buffer: output,
+          shape: a.shape,
+          strides: a.strides,
+          dtype: 'float64',
+        }
+      }
+
       const output = createNativeOutput(a.buffer.length)
       scalarBuffer[0] = b
       accelerate.symbols.vDSP_vsaddD(
@@ -123,6 +177,18 @@ export class NativeBLASBackend extends TypeScriptBackend {
 
     if (b.dtype !== 'float64' || !(b.buffer instanceof Float64Array) || !this.hasSameShape(a, b)) {
       return super.add(a, b)
+    }
+
+    const native = getNativeKernels()
+    if (native?.addF64Buffers) {
+      const output = createNativeOutput(a.buffer.length)
+      native.addF64Buffers(bytesFor(a.buffer), bytesFor(b.buffer), outputBytes(output))
+      return {
+        buffer: output,
+        shape: a.shape,
+        strides: a.strides,
+        dtype: 'float64',
+      }
     }
 
     const output = createNativeOutput(a.buffer.length)
@@ -149,6 +215,18 @@ export class NativeBLASBackend extends TypeScriptBackend {
     }
 
     if (typeof b === 'number') {
+      const native = getNativeKernels()
+      if (native?.mulScalarF64Buffers) {
+        const output = createNativeOutput(a.buffer.length)
+        native.mulScalarF64Buffers(bytesFor(a.buffer), b, outputBytes(output))
+        return {
+          buffer: output,
+          shape: a.shape,
+          strides: a.strides,
+          dtype: 'float64',
+        }
+      }
+
       const output = createNativeOutput(a.buffer.length)
       scalarBuffer[0] = b
       accelerate.symbols.vDSP_vsmulD(

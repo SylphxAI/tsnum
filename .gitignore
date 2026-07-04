@@ -12,3 +12,4 @@ bench/python-parity/results/
 # Rust
 target/
 Cargo.lock
+*.node

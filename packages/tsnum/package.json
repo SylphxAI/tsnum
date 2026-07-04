@@ -21,9 +21,7 @@
       "types": "./dist/linalg/index.d.ts"
     }
   },
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "scripts": {
     "build": "tsc",
     "test": "bun test",
@@ -31,17 +29,13 @@
     "bench": "bun run src/benchmark.ts",
     "format": "biome format --write ."
   },
-  "keywords": [
-    "numpy",
-    "ndarray",
-    "matrix",
-    "linear-algebra",
-    "wasm",
-    "typescript"
-  ],
+  "keywords": ["numpy", "ndarray", "matrix", "linear-algebra", "wasm", "typescript"],
   "license": "MIT",
   "devDependencies": {
     "@types/bun": "^1.1.14",
     "typescript": "^5.7.2"
+  },
+  "optionalDependencies": {
+    "@sylphx/numpy-native": "0.0.0"
   }
 }
