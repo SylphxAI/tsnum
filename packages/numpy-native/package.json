@@ -9,7 +9,17 @@
     "type": "git",
     "url": "git+https://github.com/SylphxAI/tsnum.git"
   },
-  "keywords": ["numpy", "typescript", "native", "tensor", "napi-rs", "rust"],
+  "keywords": [
+    "numpy",
+    "numpy-compatible",
+    "python",
+    "typescript",
+    "native",
+    "blas",
+    "tensor",
+    "napi-rs",
+    "rust"
+  ],
   "engines": {
     "node": ">=18.0.0"
   },

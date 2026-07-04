@@ -46,21 +46,20 @@ raw samples plus median, p95, and relative standard deviation for every row.
 That evidence separates true backend gaps from process-order or runner variance
 without relaxing the checksum or speed gates.
 
-Recorded CI evidence after the Rust/N-API unrolled vector kernels and native
-add-buffer dispatch path:
+Current main CI evidence after PR #37:
 
-- Main CI run `28693587707` at `6c3d481` uploaded `python-parity-report`
-  artifact `8077906004`; reporting mode passed checksum parity and all covered
-  speed rows on macOS arm64 native BLAS.
-- Main CI run `28693839561` at `c4d2f67` uploaded `python-parity-report`
-  artifact `8077977328`; reporting mode passed checksum parity but failed
-  `matmul_128` and transpose speed rows.
-- PR #28 run `28693698365` uploaded `python-parity-report` artifact
-  `8077937938`; enforced mode still failed add arrays, `matmul_128`, and
-  transpose while checksum parity passed.
-- Main CI run `28694558172` at `e2d79cb` uploaded `python-parity-report`;
-  reporting mode passed checksum parity but failed `transpose_512` at the
-  configured 1.05x speed target.
+- Main CI run `28695180293` on macOS arm64 uploaded `python-parity-report`.
+- Runtime: Python 3.12.10, NumPy 2.5.0, Bun 1.3.14,
+  `@sylphx/numpy` backend `native-blas`.
+- Checksum parity passed for every covered row.
+- Speed rows passed for `add_arrays_1m` (`0.67x`), `add_scalar_1m` (`0.66x`),
+  `mean_1m` (`0.52x`), `mul_scalar_1m` (`0.64x`), `sum_1m` (`0.62x`), and
+  `transpose_512` (`0.81x`).
+- `matmul_128` failed the 1.05x speed target at `1.18x` slowdown, with paired
+  slowdown p95 at `1.66x`; full speed parity is therefore not claimed.
+- PR #36's native-addon Accelerate matmul bridge regressed `matmul_128` to
+  `1.50x` on main CI run `28695093346`; PR #37 reverted that path and restored
+  the column-major native BLAS route.
 - `bench:python-parity:enforce` and release preflight remain publication
   blockers until covered-operation speed parity is repeatable.
 - Current JSON output is written to `bench/python-parity/results/latest.json`.
