@@ -124,6 +124,7 @@ spelling tracks NumPy's `subtract`, `multiply`, `divide`, and `power`.
 ### Reductions
 ```typescript
 import { sum, mean, max, min, std, variance } from '@sylphx/numpy'
+import * as np from '@sylphx/numpy'
 
 const a = array([1, 2, 3, 4, 5])
 
@@ -133,15 +134,17 @@ max(a)                            // 5
 min(a)                            // 1
 std(a)                            // standard deviation
 variance(a)                       // variance
+np.var(a)                         // NumPy namespace spelling
 ```
 
 ### Shape Operations
 ```typescript
-import { reshape, transpose, flatten } from '@sylphx/numpy'
+import { expand_dims, reshape, transpose, flatten } from '@sylphx/numpy'
 
 const a = array([[1, 2], [3, 4]])
 
 reshape(a, [4])                   // [1, 2, 3, 4]
+expand_dims(reshape(a, [4]), 0)    // shape [1, 4]
 transpose(a)                      // [[1, 3], [2, 4]]
 flatten(a)                        // [1, 2, 3, 4]
 
@@ -207,7 +210,7 @@ ceil(vals)                        // [2, 3, 4]
 
 ### Logical Operations
 ```typescript
-import { all, any, logicalAnd, logicalOr, logicalNot, where } from '@sylphx/numpy'
+import { all, any, logical_and, logical_or, logical_not, where } from '@sylphx/numpy'
 
 const a = array([1, 0, 1])
 const b = array([1, 1, 0])
@@ -215,9 +218,9 @@ const b = array([1, 1, 0])
 all(a)                            // false (not all elements truthy)
 any(a)                            // true (at least one truthy)
 
-logicalAnd(a, b)                  // [1, 0, 0]
-logicalOr(a, b)                   // [1, 1, 1]
-logicalNot(a)                     // [0, 1, 0]
+logical_and(a, b)                 // [1, 0, 0]
+logical_or(a, b)                  // [1, 1, 1]
+logical_not(a)                    // [0, 1, 0]
 
 // Conditional selection
 const cond = array([1, 0, 1])

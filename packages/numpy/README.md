@@ -260,7 +260,7 @@ Complete tracking table for all operations with backend implementation status.
 
 **✅ Dual Backend** (63 operations):
 - Arithmetic: add, sub, mul, div, pow (5)
-- Reductions: sum, mean, max, min, std, variance, prod, argmax, argmin (9)
+- Reductions: sum, mean, max, min, std, variance/var, prod, argmax, argmin (9)
 - Linear Algebra: matmul, dot, inv, det, transpose, trace, outer, inner, norm (9)
 - FFT: fft, ifft (2)
 - Math: abs, sign, sqrt, cbrt, square, reciprocal, exp, exp2, expm1, log, log2, log10, log1p, round, floor, ceil, trunc, maximum, minimum, clip, mod, fmod, deg2rad, rad2deg, hypot, sin, cos, tan, sinh, cosh, tanh, arcsin, arccos, arctan, arctan2, asinh, acosh, atanh (38)
@@ -274,7 +274,7 @@ Complete tracking table for all operations with backend implementation status.
 - **Copy**: `asarray`, `copy`
 
 #### Array Manipulation (45 functions)
-- **Shape**: `reshape`, `flatten`, `squeeze`, `expandDims`, `transpose`, `swapaxes`, `moveaxis`
+- **Shape**: `reshape`, `flatten`, `squeeze`, `expand_dims`, `expandDims`, `transpose`, `swapaxes`, `moveaxis`
 - **Join/Split**: `concatenate`, `concat`, `stack`, `vstack`, `hstack`, `dstack`, `split`, `hsplit`, `vsplit`, `array_split`
 - **Rearrange**: `flip`, `rot90`, `roll`, `repeat`, `tile`
 - **Modify**: `delete`, `deleteArr`, `insert`, `append`, `resize`, `pad`
@@ -307,14 +307,14 @@ Complete tracking table for all operations with backend implementation status.
 - **Utilities**: `fftfreq`, `rfftfreq`, `fftshift`, `ifftshift`
 
 #### Statistics (33 functions)
-- **Basic**: `mean`, `median`, `std`, `variance`, `sum`, `prod`, `min`, `max`, `ptp`
+- **Basic**: `mean`, `median`, `std`, `var`, `variance`, `sum`, `prod`, `min`, `max`, `ptp`
 - **Advanced**: `average`, `percentile`, `quantile`, `corrcoef`, `cov`, `histogram`, `bincount`
 - **NaN-aware**: `nanmean`, `nansum`, `nanmin`, `nanmax`, `nanstd`, `nanmedian`, `nanvar`, `nanpercentile`, `nanquantile`, `nanprod`
 - **Search**: `argmin`, `argmax`, `argwhere`, `digitize`
 
 #### Logical Operations (12 functions)
-- **Element-wise**: `all`, `any`, `logicalAnd`, `logicalOr`, `logicalNot`, `logicalXor`
-- **Comparison**: `equal`, `less`, `greater`, `lessEqual`, `greaterEqual`, `not_equal`
+- **Element-wise**: `all`, `any`, `logical_and`, `logical_or`, `logical_not`, `logical_xor`, `logicalAnd`, `logicalOr`, `logicalNot`, `logicalXor`
+- **Comparison**: `equal`, `less`, `greater`, `less_equal`, `greater_equal`, `lessEqual`, `greaterEqual`, `not_equal`
 
 #### Set Operations (6 functions)
 `unique`, `isin`, `intersect1d`, `union1d`, `setdiff1d`, `setxor1d`
@@ -487,9 +487,12 @@ const e = exp(a)
 ```
 
 NumPy canonical names `subtract`, `multiply`, `divide`, `power`,
-`concatenate`, `delete`, `less_equal`, and `greater_equal` are exported.
+`concatenate`, `delete`, `expand_dims`, `var`, `logical_and`, `logical_or`,
+`logical_not`, `logical_xor`, `less_equal`, and `greater_equal` are exported.
 Existing short aliases such as `sub`, `mul`, `div`, `pow`, `concat`,
-`deleteArr`, `lessEqual`, and `greaterEqual` remain available for compatibility.
+`deleteArr`, `expandDims`, `variance`, `logicalAnd`, `logicalOr`,
+`logicalNot`, `logicalXor`, `lessEqual`, and `greaterEqual` remain available
+for compatibility.
 
 ### Linear Algebra
 

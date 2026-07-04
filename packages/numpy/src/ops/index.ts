@@ -18,10 +18,21 @@ export {
 } from './comparison'
 
 // Reductions
-export { sum, mean, max, min, std, variance, prod, nanprod, count_nonzero } from './reductions'
+export {
+  sum,
+  mean,
+  max,
+  min,
+  std,
+  variance,
+  variance as var,
+  prod,
+  nanprod,
+  count_nonzero,
+} from './reductions'
 
 // Shape
-export { expandDims, flatten, reshape, squeeze, swapaxes, transpose } from './shape'
+export { expandDims, expand_dims, flatten, reshape, squeeze, swapaxes, transpose } from './shape'
 
 // Indexing
 export { at, slice, take, flatnonzero } from './indexing'
@@ -90,7 +101,19 @@ export {
 } from './math-convenience'
 
 // Logical operations
-export { all, any, logicalAnd, logicalNot, logicalOr, logicalXor, where } from './logical'
+export {
+  all,
+  any,
+  logicalAnd,
+  logical_and,
+  logicalNot,
+  logical_not,
+  logicalOr,
+  logical_or,
+  logicalXor,
+  logical_xor,
+  where,
+} from './logical'
 
 // Sorting
 export { argmax, argmin, argsort, sort } from './sorting'

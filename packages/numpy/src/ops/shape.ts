@@ -92,6 +92,10 @@ export function expandDims<T extends DType>(a: NDArray<T>, axis: number): NDArra
   return reshape(a, newShape)
 }
 
+export function expand_dims<T extends DType>(a: NDArray<T>, axis: number): NDArray<T> {
+  return expandDims(a, axis)
+}
+
 /**
  * Swap two axes of an array
  */
