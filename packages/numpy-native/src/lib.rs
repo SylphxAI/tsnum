@@ -204,6 +204,17 @@ fn ensure_equal_len(left_len: usize, right_len: usize) -> Result<()> {
 fn add_scalar_into(input: &[f64], scalar: f64, output: &mut [f64]) {
     debug_assert_eq!(input.len(), output.len());
 
+    #[cfg(target_arch = "aarch64")]
+    unsafe {
+        add_scalar_into_neon(input, scalar, output);
+    }
+
+    #[cfg(not(target_arch = "aarch64"))]
+    add_scalar_into_unrolled(input, scalar, output);
+}
+
+#[cfg(not(target_arch = "aarch64"))]
+fn add_scalar_into_unrolled(input: &[f64], scalar: f64, output: &mut [f64]) {
     let len = input.len();
     let unrolled_len = len - (len % 4);
     let mut i = 0;
@@ -225,6 +236,17 @@ fn add_scalar_into(input: &[f64], scalar: f64, output: &mut [f64]) {
 fn mul_scalar_into(input: &[f64], scalar: f64, output: &mut [f64]) {
     debug_assert_eq!(input.len(), output.len());
 
+    #[cfg(target_arch = "aarch64")]
+    unsafe {
+        mul_scalar_into_neon(input, scalar, output);
+    }
+
+    #[cfg(not(target_arch = "aarch64"))]
+    mul_scalar_into_unrolled(input, scalar, output);
+}
+
+#[cfg(not(target_arch = "aarch64"))]
+fn mul_scalar_into_unrolled(input: &[f64], scalar: f64, output: &mut [f64]) {
     let len = input.len();
     let unrolled_len = len - (len % 4);
     let mut i = 0;
@@ -239,6 +261,70 @@ fn mul_scalar_into(input: &[f64], scalar: f64, output: &mut [f64]) {
 
     while i < len {
         output[i] = input[i] * scalar;
+        i += 1;
+    }
+}
+
+#[cfg(target_arch = "aarch64")]
+unsafe fn add_scalar_into_neon(input: &[f64], scalar: f64, output: &mut [f64]) {
+    use std::arch::aarch64::{vaddq_f64, vdupq_n_f64, vld1q_f64, vst1q_f64};
+
+    // The public wrappers validate equal input/output lengths before reaching this hot loop.
+    let len = input.len();
+    let vector_len = len - (len % 8);
+    let scalar_vector = vdupq_n_f64(scalar);
+    let input_ptr = input.as_ptr();
+    let output_ptr = output.as_mut_ptr();
+    let mut i = 0;
+
+    while i < vector_len {
+        let left0 = vld1q_f64(input_ptr.add(i));
+        let left1 = vld1q_f64(input_ptr.add(i + 2));
+        let left2 = vld1q_f64(input_ptr.add(i + 4));
+        let left3 = vld1q_f64(input_ptr.add(i + 6));
+
+        vst1q_f64(output_ptr.add(i), vaddq_f64(left0, scalar_vector));
+        vst1q_f64(output_ptr.add(i + 2), vaddq_f64(left1, scalar_vector));
+        vst1q_f64(output_ptr.add(i + 4), vaddq_f64(left2, scalar_vector));
+        vst1q_f64(output_ptr.add(i + 6), vaddq_f64(left3, scalar_vector));
+
+        i += 8;
+    }
+
+    while i < len {
+        *output_ptr.add(i) = *input_ptr.add(i) + scalar;
+        i += 1;
+    }
+}
+
+#[cfg(target_arch = "aarch64")]
+unsafe fn mul_scalar_into_neon(input: &[f64], scalar: f64, output: &mut [f64]) {
+    use std::arch::aarch64::{vdupq_n_f64, vld1q_f64, vmulq_f64, vst1q_f64};
+
+    // The public wrappers validate equal input/output lengths before reaching this hot loop.
+    let len = input.len();
+    let vector_len = len - (len % 8);
+    let scalar_vector = vdupq_n_f64(scalar);
+    let input_ptr = input.as_ptr();
+    let output_ptr = output.as_mut_ptr();
+    let mut i = 0;
+
+    while i < vector_len {
+        let left0 = vld1q_f64(input_ptr.add(i));
+        let left1 = vld1q_f64(input_ptr.add(i + 2));
+        let left2 = vld1q_f64(input_ptr.add(i + 4));
+        let left3 = vld1q_f64(input_ptr.add(i + 6));
+
+        vst1q_f64(output_ptr.add(i), vmulq_f64(left0, scalar_vector));
+        vst1q_f64(output_ptr.add(i + 2), vmulq_f64(left1, scalar_vector));
+        vst1q_f64(output_ptr.add(i + 4), vmulq_f64(left2, scalar_vector));
+        vst1q_f64(output_ptr.add(i + 6), vmulq_f64(left3, scalar_vector));
+
+        i += 8;
+    }
+
+    while i < len {
+        *output_ptr.add(i) = *input_ptr.add(i) * scalar;
         i += 1;
     }
 }

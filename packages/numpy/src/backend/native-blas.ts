@@ -67,8 +67,12 @@ const accelerate = dlopen('/System/Library/Frameworks/Accelerate.framework/Accel
   },
 })
 
-const scalarBuffer = new Float64Array(1)
-const scalarPointer = ptr(scalarBuffer)
+const scalarInputBuffer = new Float64Array(1)
+const scalarInputPointer = ptr(scalarInputBuffer)
+const sumOutputBuffer = new Float64Array(1)
+const sumOutputPointer = ptr(sumOutputBuffer)
+const meanOutputBuffer = new Float64Array(1)
+const meanOutputPointer = ptr(meanOutputBuffer)
 const pointerCache = new WeakMap<Float64Array, ReturnType<typeof ptr>>()
 const matmulLayoutCache = new Map<
   string,
@@ -161,11 +165,11 @@ function writeVdspScalarAdd(
   scalar: number,
   outputPointer: ReturnType<typeof ptr>,
 ): void {
-  scalarBuffer[0] = scalar
+  scalarInputBuffer[0] = scalar
   accelerate.symbols.vDSP_vsaddD(
     pointerFor(input),
     1,
-    scalarPointer,
+    scalarInputPointer,
     outputPointer,
     1,
     input.length,
@@ -177,11 +181,11 @@ function writeVdspScalarMul(
   scalar: number,
   outputPointer: ReturnType<typeof ptr>,
 ): void {
-  scalarBuffer[0] = scalar
+  scalarInputBuffer[0] = scalar
   accelerate.symbols.vDSP_vsmulD(
     pointerFor(input),
     1,
-    scalarPointer,
+    scalarInputPointer,
     outputPointer,
     1,
     input.length,
@@ -213,6 +217,35 @@ function writeVdspAdd(
 export class NativeBLASBackend extends TypeScriptBackend {
   readonly name = 'native-blas' as const
   readonly isReady = true
+
+  addFloat64Into(a: Float64Array, b: Float64Array, out: Float64Array): void {
+    writeVdspAdd(a, b, pointerFor(out))
+  }
+
+  addScalarFloat64Into(a: Float64Array, scalar: number, out: Float64Array): void {
+    const native = getNativeKernels()
+    if (native?.addScalarF64BuffersInto) {
+      native.addScalarF64BuffersInto(bytesFor(a), scalar, bytesFor(out))
+      return
+    }
+
+    if (native?.addScalarF64Buffers) {
+      native.addScalarF64Buffers(bytesFor(a), scalar, bytesFor(out))
+      return
+    }
+
+    writeVdspScalarAdd(a, scalar, pointerFor(out))
+  }
+
+  mulScalarFloat64Into(a: Float64Array, scalar: number, out: Float64Array): void {
+    const native = getNativeKernels()
+    if (native?.mulScalarF64BuffersInto) {
+      native.mulScalarF64BuffersInto(bytesFor(a), scalar, bytesFor(out))
+      return
+    }
+
+    writeVdspScalarMul(a, scalar, pointerFor(out))
+  }
 
   add(a: NDArrayData, b: NDArrayData | number): NDArrayData {
     if (a.dtype !== 'float64' || !(a.buffer instanceof Float64Array)) {
@@ -396,8 +429,8 @@ export class NativeBLASBackend extends TypeScriptBackend {
       return super.sum(a)
     }
 
-    accelerate.symbols.vDSP_sveD(pointerFor(a.buffer), 1, scalarPointer, a.buffer.length)
-    return scalarBuffer[0]
+    accelerate.symbols.vDSP_sveD(pointerFor(a.buffer), 1, sumOutputPointer, a.buffer.length)
+    return sumOutputBuffer[0]
   }
 
   mean(a: NDArrayData): number {
@@ -405,8 +438,8 @@ export class NativeBLASBackend extends TypeScriptBackend {
       return super.mean(a)
     }
 
-    accelerate.symbols.vDSP_meanvD(pointerFor(a.buffer), 1, scalarPointer, a.buffer.length)
-    return scalarBuffer[0]
+    accelerate.symbols.vDSP_meanvD(pointerFor(a.buffer), 1, meanOutputPointer, a.buffer.length)
+    return meanOutputBuffer[0]
   }
 
   matmul(a: NDArrayData, b: NDArrayData): NDArrayData {
@@ -430,8 +463,12 @@ export class NativeBLASBackend extends TypeScriptBackend {
       throw new Error(`Shape mismatch: (${m}, ${k}) and (${b.shape[0]}, ${n})`)
     }
 
+    return this.matmulFloat64(a.buffer, b.buffer, m, k, n)
+  }
+
+  matmulFloat64(a: Float64Array, b: Float64Array, m: number, k: number, n: number): NDArrayData {
     const output = new Float64Array(m * n)
-    this.writeNativeMatmul(a.buffer, b.buffer, m, k, n, ptr(output))
+    this.writeNativeMatmul(a, b, m, k, n, ptr(output))
     const layout = getMatmulLayout(m, n)
 
     return {

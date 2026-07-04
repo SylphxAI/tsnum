@@ -46,7 +46,7 @@ const configuredSampleCount = Number(process.env.PYTHON_PARITY_RUNS ?? '7')
 const sampleCount = Number.isFinite(configuredSampleCount)
   ? Math.max(1, Math.trunc(configuredSampleCount))
   : 7
-const benchmarkCaseNames = [
+const allBenchmarkCaseNames = [
   'add_arrays_1m',
   'add_arrays_1m_out',
   'add_scalar_1m',
@@ -58,6 +58,11 @@ const benchmarkCaseNames = [
   'sum_1m',
   'transpose_512',
 ]
+const selectedCase = process.env.PYTHON_PARITY_CASE
+if (selectedCase && !allBenchmarkCaseNames.includes(selectedCase)) {
+  throw new Error(`Unknown PYTHON_PARITY_CASE: ${selectedCase}`)
+}
+const benchmarkCaseNames = selectedCase ? [selectedCase] : allBenchmarkCaseNames
 
 function checksumMatches(actual: number, expected: number): boolean {
   const tolerance = Math.max(checksumAtol, Math.abs(expected) * checksumRtol)
@@ -139,36 +144,8 @@ function runJson(command: string[], cwd: string, env: Record<string, string> = {
   return JSON.parse(new TextDecoder().decode(result.stdout)) as BenchReport
 }
 
-function mergeCaseReport(
-  sample: BenchReport | undefined,
-  caseName: string,
-  caseReport: BenchReport,
-): BenchReport {
-  const benchmark = caseReport.benchmarks[caseName]
-  if (!benchmark) {
-    throw new Error(`Runtime ${caseReport.runtime} did not report benchmark case: ${caseName}`)
-  }
-
-  if (!sample) {
-    return {
-      ...caseReport,
-      benchmarks: {
-        [caseName]: benchmark,
-      },
-    }
-  }
-
-  return {
-    ...sample,
-    benchmarks: {
-      ...sample.benchmarks,
-      [caseName]: benchmark,
-    },
-  }
-}
-
-function runRuntimeCase(runtime: RuntimeName, caseName: string): BenchReport {
-  const env = { PYTHON_PARITY_CASE: caseName }
+function runRuntimeSample(runtime: RuntimeName): BenchReport {
+  const env = selectedCase ? { PYTHON_PARITY_CASE: selectedCase } : {}
   if (runtime === 'python') {
     return runJson([python, 'bench/python-parity/python_bench.py'], root, env)
   }
@@ -214,14 +191,20 @@ for (let i = 0; i < sampleCount; i++) {
   let pythonSample: BenchReport | undefined
   let tsSample: BenchReport | undefined
 
-  for (const caseName of benchmarkCaseNames) {
-    for (const runtime of order) {
-      const caseReport = runRuntimeCase(runtime, caseName)
-      if (runtime === 'python') {
-        pythonSample = mergeCaseReport(pythonSample, caseName, caseReport)
-      } else {
-        tsSample = mergeCaseReport(tsSample, caseName, caseReport)
+  for (const runtime of order) {
+    const runtimeReport = runRuntimeSample(runtime)
+    for (const caseName of benchmarkCaseNames) {
+      if (!runtimeReport.benchmarks[caseName]) {
+        throw new Error(
+          `Runtime ${runtimeReport.runtime} did not report benchmark case: ${caseName}`,
+        )
       }
+    }
+
+    if (runtime === 'python') {
+      pythonSample = runtimeReport
+    } else {
+      tsSample = runtimeReport
     }
   }
 
@@ -242,7 +225,7 @@ const tsSamples = samplePairs.map((pair) => pair.ts)
 const pythonReport = aggregateReport(pythonSamples)
 const tsReport = aggregateReport(tsSamples)
 
-const rows = Object.keys(pythonReport.benchmarks).map((name) => {
+const rows = benchmarkCaseNames.map((name) => {
   const pythonCase = pythonReport.benchmarks[name]
   const tsCase = tsReport.benchmarks[name]
   if (!tsCase) {
@@ -296,8 +279,8 @@ const output = {
   max_slowdown: maxSlowdown,
   sample_count: sampleCount,
   sampling: {
-    strategy: 'paired-alternating-runtime-order-with-case-process-isolation',
-    case_isolation: 'fresh process per runtime/case/sample',
+    strategy: 'paired-alternating-runtime-order-with-sample-process-isolation',
+    case_isolation: 'cases share one runtime process per sample with per-case warmups',
     cases: benchmarkCaseNames,
     python_command: python,
     ts_command: `${process.execPath} run bench/python-parity/ts_bench.ts`,

@@ -95,6 +95,18 @@ describe('Native BLAS backend', () => {
     expect(backend.mean(a)).toBe(2)
   })
 
+  nativeBLASTest('Native reductions keep sum and mean output state isolated', async () => {
+    const { NativeBLASBackend } = await import('./native-blas')
+    const backend = new NativeBLASBackend()
+    const data = array([1, 2, 3, 4], { dtype: 'float64' }).getData()
+
+    for (let i = 0; i < 400; i++) {
+      expect(backend.sum(data)).toBe(10)
+    }
+
+    expect(backend.mean(data)).toBe(2.5)
+  })
+
   nativeBLASTest('Accelerate matmul and transpose match row-major outputs', async () => {
     const { NativeBLASBackend } = await import('./native-blas')
     const backend = new NativeBLASBackend()
