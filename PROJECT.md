@@ -62,15 +62,21 @@ Markdown report freshness and uploads both files as the `python-parity-report`
 artifact. Package changes still require local evidence plus CI evidence before
 merge.
 
-Publishing is manually triggered through `.github/workflows/release.yml`, which
-delegates to the central Sylphx release workflow and its `changesets/action`
-versioning path. The release workflow runs `release:preflight` before publish,
-and that preflight runs install, build, tests, and
+Publishing is manually triggered through `.github/workflows/release.yml`. The
+repo-local release workflow first runs `release:preflight` on macOS so the
+Python parity gate uses the native BLAS backend it is designed to validate.
+Only after that preflight passes does the workflow delegate to the central
+Sylphx release workflow and its `changesets/action` versioning/publishing path.
+The central publish job still builds the workspace before publishing, and
+postpublish runs `release:readback`.
+
+`release:preflight` runs install, build, tests, and
 `bench:python-parity:enforce`. Current speed gaps intentionally block
-publication until the enforced benchmark passes. After publish, `release:readback`
-must verify every public workspace npm package, and release evidence must
-include provenance/attestation, changelog, and consumer smoke proof because
-source revert alone does not undo a release.
+publication until the enforced benchmark passes repeatably on the release
+preflight runner. After publish, `release:readback` must verify every public
+workspace npm package, and release evidence must include provenance/attestation,
+changelog, and consumer smoke proof because source revert alone does not undo a
+release.
 
 The first `@sylphx/numpy` npm publication is not complete yet. Public docs may
 show the final package contract, but release status must continue to say that
