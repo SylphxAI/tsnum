@@ -56,8 +56,8 @@ marketing copy.
 Accepted main evidence as of 2026-07-04. The latest uploaded CI artifacts are
 canonical when this dated snapshot drifts.
 
-- GitHub Actions run: `28699887631`
-- Commit: `436637f` (`docs: sync parity evidence after out validation`)
+- GitHub Actions run: `28700015980`
+- Commit: `145deb1` (`docs: sync latest main parity artifact`)
 - Platform: macOS arm64
 - Python: 3.12.10
 - NumPy: 2.5.0
@@ -68,24 +68,24 @@ canonical when this dated snapshot drifts.
 
 | Case | Speed vs NumPy | Status |
 | --- | ---: | --- |
-| `add_arrays_1m` | `0.71x` | pass |
-| `add_arrays_1m_out` | `1.06x` | fail |
-| `add_scalar_1m` | `0.65x` | pass |
-| `add_scalar_1m_out` | `1.04x` | pass |
-| `matmul_128` | `1.11x` | fail |
+| `add_arrays_1m` | `0.68x` | pass |
+| `add_arrays_1m_out` | `1.04x` | pass |
+| `add_scalar_1m` | `0.59x` | pass |
+| `add_scalar_1m_out` | `1.05x` | pass |
+| `matmul_128` | `0.87x` | pass |
 | `mean_1m` | `0.56x` | pass |
-| `mul_scalar_1m` | `0.64x` | pass |
-| `mul_scalar_1m_out` | `1.06x` | fail |
-| `sum_1m` | `0.57x` | pass |
-| `transpose_512` | `0.73x` | pass |
+| `mul_scalar_1m` | `0.50x` | pass |
+| `mul_scalar_1m_out` | `1.07x` | fail |
+| `sum_1m` | `0.56x` | pass |
+| `transpose_512` | `0.62x` | pass |
 
 Current truthful public statement:
 
 `@sylphx/numpy` has checksum parity on the covered benchmark set and passes the
-speed target on seven of ten covered rows in the dated accepted main CI
+speed target on nine of ten covered rows in the dated accepted main CI
 artifact. Full covered-operation speed parity is not claimed because
-`add_arrays_1m_out`, `matmul_128`, and `mul_scalar_1m_out` remain over the
-`1.05x` release threshold.
+`mul_scalar_1m_out` remains over the `1.05x` release threshold and repeatability
+still has to be proven on the release path.
 
 ## Native Dispatch Evidence
 
@@ -93,11 +93,11 @@ The same main run uploaded `native-dispatch-report`:
 
 | Layer | Median ms |
 | --- | ---: |
-| `public.addScalar.out` | `0.1888` |
-| `public.addArrays.out` | `0.3409` |
-| `public.mulScalar.out` | `0.1895` |
-| `public.matmul128` | `0.0835` |
-| `public.matmul128.out` | `0.0797` |
+| `public.addScalar.out` | `0.2685` |
+| `public.addArrays.out` | `0.5183` |
+| `public.mulScalar.out` | `0.2716` |
+| `public.matmul128` | `0.0826` |
+| `public.matmul128.out` | `0.0703` |
 
 This supports the current technical direction: native-backed dispatch and
 preallocated output buffers are the right hot-path shape. The remaining release
@@ -113,6 +113,11 @@ Example: PR #45 (`perf: route matmul through native ffi wrapper`) exposed a C
 ABI `dgemm` symbol and looked promising locally, but the rerun artifact
 `28697320118` still failed `matmul_128` at `1.28x` slowdown and showed
 `public.matmul128` at `0.2322ms`. That PR was closed instead of merged.
+
+Example: PR #59 (`perf: fast path native 1d out validation`) lowered
+steady-state native dispatch overhead, but repeat CI artifacts did not support
+merging: attempt 1 passed seven of ten rows and attempt 2 passed six of ten rows
+against the strict `1.05x` target. That PR was closed instead of merged.
 
 This is intentional. Benchmark-shaped changes that do not improve accepted
 evidence should stay out of `main`, even when CI itself is green.
@@ -141,7 +146,7 @@ After publish, release completion also requires:
 - `@sylphx/numpy` is the public NumPy-compatible TypeScript package contract.
 - The API target is Python/NumPy spelling and semantics.
 - Covered benchmark checksums pass in the dated accepted main CI artifact.
-- Seven of ten covered speed rows pass the current `1.05x` NumPy comparison
+- Nine of ten covered speed rows pass the current `1.05x` NumPy comparison
   target in the dated accepted main CI artifact.
 - Native-backed public hot paths and preallocated output buffers are measured in
   the accepted native dispatch probe.
@@ -157,8 +162,8 @@ After publish, release completion also requires:
 
 ## Next Launch Work
 
-1. Close the `add_arrays_1m_out`, `matmul_128`, and `mul_scalar_1m_out` gaps
-   without weakening the `1.05x` release target.
+1. Close the `mul_scalar_1m_out` gap and prove `add_arrays_1m_out` plus
+   `matmul_128` stay repeatably inside the `1.05x` release target.
 2. Expand API compatibility tests around NumPy spelling, dtype behavior,
    broadcasting, shape semantics, and numerical edge cases.
 3. Keep public docs tied to dated accepted CI artifacts and treat the latest
