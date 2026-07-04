@@ -275,13 +275,13 @@ Complete tracking table for all operations with backend implementation status.
 
 #### Array Manipulation (45 functions)
 - **Shape**: `reshape`, `flatten`, `squeeze`, `expandDims`, `transpose`, `swapaxes`, `moveaxis`
-- **Join/Split**: `concat`, `stack`, `vstack`, `hstack`, `dstack`, `split`, `hsplit`, `vsplit`, `array_split`
+- **Join/Split**: `concatenate`, `concat`, `stack`, `vstack`, `hstack`, `dstack`, `split`, `hsplit`, `vsplit`, `array_split`
 - **Rearrange**: `flip`, `rot90`, `roll`, `repeat`, `tile`
-- **Modify**: `deleteArr`, `insert`, `append`, `resize`, `pad`
+- **Modify**: `delete`, `deleteArr`, `insert`, `append`, `resize`, `pad`
 - **Assembly**: `block`, `column_stack`
 
 #### Mathematical Functions (35 functions)
-- **Arithmetic**: `add`, `sub`, `mul`, `div`, `pow`, `mod`, `fmod`, `divmod`
+- **Arithmetic**: `add`, `subtract`, `multiply`, `divide`, `power`, `sub`, `mul`, `div`, `pow`, `mod`, `fmod`, `divmod`
 - **Trigonometric**: `sin`, `cos`, `tan`, `arcsin`, `arccos`, `arctan`, `arctan2`
 - **Hyperbolic**: `sinh`, `cosh`, `tanh`, `asinh`, `acosh`, `atanh`
 - **Exponential**: `exp`, `exp2`, `log`, `log2`, `log10`, `log1p`, `expm1`
@@ -486,9 +486,10 @@ const s = sin(a)
 const e = exp(a)
 ```
 
-NumPy canonical names `subtract`, `multiply`, `divide`, `less_equal`, and
-`greater_equal` are exported. Existing short aliases such as `sub`, `mul`,
-`div`, `lessEqual`, and `greaterEqual` remain available for compatibility.
+NumPy canonical names `subtract`, `multiply`, `divide`, `power`,
+`concatenate`, `delete`, `less_equal`, and `greater_equal` are exported.
+Existing short aliases such as `sub`, `mul`, `div`, `pow`, `concat`,
+`deleteArr`, `lessEqual`, and `greaterEqual` remain available for compatibility.
 
 ### Linear Algebra
 

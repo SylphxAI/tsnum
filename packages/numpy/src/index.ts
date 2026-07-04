@@ -45,6 +45,7 @@ export {
   divide,
   div,
   pow,
+  power,
   // Comparison
   equal,
   less,
@@ -146,6 +147,7 @@ export {
   argmin,
   // Manipulation
   concat,
+  concatenate,
   stack,
   vstack,
   hstack,
@@ -158,6 +160,7 @@ export {
   rot90,
   pad,
   moveaxis,
+  deleteArr as delete,
   deleteArr,
   insert,
   append,
