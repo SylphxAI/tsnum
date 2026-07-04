@@ -74,7 +74,7 @@ const cases: Record<string, BenchCaseFactory> = {
     const vectorB = array(range(1_000_000, 0.002), { dtype: 'float64' })
     const out = empty([1_000_000], { dtype: 'float64' })
     const options = { out }
-    return [100, 20, () => add(vector, vectorB, options)]
+    return [2000, 100, () => add(vector, vectorB, options)]
   },
   mul_scalar_1m: () => {
     const vector = array(range(1_000_000, 0.001), { dtype: 'float64' })
@@ -101,7 +101,7 @@ const cases: Record<string, BenchCaseFactory> = {
   matmul_128: () => {
     const left = array(matrix(128, 128, 0.001), { dtype: 'float64' })
     const right = array(matrix(128, 128, 0.002), { dtype: 'float64' })
-    return [1000, 100, () => matmul(left, right)]
+    return [5000, 500, () => matmul(left, right)]
   },
 }
 

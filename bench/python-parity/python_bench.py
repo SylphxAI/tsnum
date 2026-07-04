@@ -59,7 +59,7 @@ def main() -> None:
         left = vector()
         right = vector_b()
         out = np.empty_like(left)
-        return 100, 20, lambda: np.add(left, right, out=out)
+        return 2000, 100, lambda: np.add(left, right, out=out)
 
     def mul_scalar_1m() -> tuple[int, int, Callable[[], object]]:
         data = vector()
@@ -84,7 +84,7 @@ def main() -> None:
 
     def matmul_128() -> tuple[int, int, Callable[[], object]]:
         left, right = matmul_input()
-        return 1000, 100, lambda: left @ right
+        return 5000, 500, lambda: left @ right
 
     cases: dict[str, Callable[[], tuple[int, int, Callable[[], object]]]] = {
         "add_scalar_1m": add_scalar_1m,
