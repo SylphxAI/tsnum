@@ -43,7 +43,7 @@ type NativeKernelModule = {
   addF64BuffersInto: (left: Buffer, right: Buffer, output: Buffer) => void
 }
 
-const CBLAS_ROW_MAJOR = 101
+const CBLAS_COLUMN_MAJOR = 102
 const CBLAS_NO_TRANS = 111
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))))
@@ -279,8 +279,9 @@ const matmulRightPointer = ptr(matmulRight)
 const matmulOutputPointer = ptr(matmulOutput)
 
 function cblasDgemm128(output: Float64Array, outputPointer = ptr(output)): Float64Array {
+  // Row-major C = A x B has the same memory layout as column-major C^T = B^T x A^T.
   accelerate.symbols.cblas_dgemm(
-    CBLAS_ROW_MAJOR,
+    CBLAS_COLUMN_MAJOR,
     CBLAS_NO_TRANS,
     CBLAS_NO_TRANS,
     matmulSize,
