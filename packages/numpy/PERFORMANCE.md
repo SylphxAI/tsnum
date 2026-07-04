@@ -50,21 +50,21 @@ Recent accepted main CI evidence as of 2026-07-04. The latest uploaded
 `python-parity-report` and `native-dispatch-report` artifacts remain canonical
 when this dated snapshot drifts.
 
-- Main CI run `28697576618` on macOS arm64 uploaded `python-parity-report`.
-- Commit: `98afc30` (`docs: define python parity launch contract`).
+- Main CI run `28699144963` on macOS arm64 uploaded `python-parity-report`.
+- Commit: `d675426` (`bench: add ufunc out parity diagnostics`).
 - Runtime: Python 3.12.10, NumPy 2.5.0, Bun 1.3.14,
   `@sylphx/numpy` backend `native-blas`.
 - Checksum parity passed for every covered row.
-- Speed rows passed for `add_arrays_1m` (`0.73x`), `add_scalar_1m` (`0.85x`),
-  `mean_1m` (`0.66x`), `mul_scalar_1m` (`0.66x`), `sum_1m` (`0.66x`), and
-  `transpose_512` (`0.75x`).
-- `matmul_128` failed the 1.05x speed target at `1.19x` slowdown, with paired
-  slowdown p95 at `1.30x`.
-- The same run's native dispatch artifact measured `public.matmul128` at
-  `0.2337ms`, `backend.native-blas.matmul128` at `0.1981ms`, and
-  `backend.typescript.matmul128` at `0.9590ms`, which supports the native BLAS
-  direction while keeping the same-machine NumPy comparison as the release
-  blocker.
+- Speed rows passed for `add_arrays_1m` (`0.74x`), `add_scalar_1m` (`0.57x`),
+  `mean_1m` (`0.59x`), `mul_scalar_1m` (`0.52x`), `mul_scalar_1m_out`
+  (`1.05x`), `sum_1m` (`0.60x`), and `transpose_512` (`0.59x`).
+- `add_arrays_1m_out` failed the 1.05x speed target at `1.07x`,
+  `add_scalar_1m_out` failed at `1.11x`, and `matmul_128` failed at `1.17x`.
+- The same run's native dispatch artifact measured `public.addScalar.out` at
+  `0.2320ms`, `public.addArrays.out` at `0.4306ms`, `public.mulScalar.out` at
+  `0.2063ms`, `public.matmul128` at `0.0829ms`, and `public.matmul128.out` at
+  `0.0705ms`, which supports the native output-buffer direction while keeping
+  the same-machine NumPy comparison as the release blocker.
 - Full speed parity is therefore not claimed.
 - PR #36's native-addon Accelerate matmul bridge regressed `matmul_128` to
   `1.50x` on main CI run `28695093346`; PR #37 reverted that path and restored
@@ -73,7 +73,8 @@ when this dated snapshot drifts.
   failed `matmul_128` at `1.28x` and measured `public.matmul128` at
   `0.2322ms`; negative performance experiments should not become public API.
 - `bench:python-parity:enforce` and release preflight remain publication
-  blockers until covered-operation speed parity is repeatable.
+  blockers until covered-operation speed parity is repeatable across the
+  expanded covered row set.
 - Current JSON output is written to `bench/python-parity/results/latest.json`.
 - Current Markdown output is written to `bench/python-parity/results/latest.md`.
 

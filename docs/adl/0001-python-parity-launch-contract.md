@@ -56,8 +56,8 @@ marketing copy.
 Accepted main evidence as of 2026-07-04. The latest uploaded CI artifacts are
 canonical when this dated snapshot drifts.
 
-- GitHub Actions run: `28697576618`
-- Commit: `98afc30` (`docs: define python parity launch contract`)
+- GitHub Actions run: `28699144963`
+- Commit: `d675426` (`bench: add ufunc out parity diagnostics`)
 - Platform: macOS arm64
 - Python: 3.12.10
 - NumPy: 2.5.0
@@ -68,20 +68,24 @@ canonical when this dated snapshot drifts.
 
 | Case | Speed vs NumPy | Status |
 | --- | ---: | --- |
-| `add_arrays_1m` | `0.73x` | pass |
-| `add_scalar_1m` | `0.85x` | pass |
-| `matmul_128` | `1.19x` | fail |
-| `mean_1m` | `0.66x` | pass |
-| `mul_scalar_1m` | `0.66x` | pass |
-| `sum_1m` | `0.66x` | pass |
-| `transpose_512` | `0.75x` | pass |
+| `add_arrays_1m` | `0.74x` | pass |
+| `add_arrays_1m_out` | `1.07x` | fail |
+| `add_scalar_1m` | `0.57x` | pass |
+| `add_scalar_1m_out` | `1.11x` | fail |
+| `matmul_128` | `1.17x` | fail |
+| `mean_1m` | `0.59x` | pass |
+| `mul_scalar_1m` | `0.52x` | pass |
+| `mul_scalar_1m_out` | `1.05x` | pass |
+| `sum_1m` | `0.60x` | pass |
+| `transpose_512` | `0.59x` | pass |
 
 Current truthful public statement:
 
 `@sylphx/numpy` has checksum parity on the covered benchmark set and passes the
-speed target on six of seven covered rows in the dated accepted main CI
+speed target on seven of ten covered rows in the dated accepted main CI
 artifact. Full covered-operation speed parity is not claimed because
-`matmul_128` remains over the `1.05x` release threshold.
+`add_arrays_1m_out`, `add_scalar_1m_out`, and `matmul_128` remain over the
+`1.05x` release threshold.
 
 ## Native Dispatch Evidence
 
@@ -89,14 +93,16 @@ The same main run uploaded `native-dispatch-report`:
 
 | Layer | Median ms |
 | --- | ---: |
-| `backend.typescript.matmul128` | `0.9590` |
-| `backend.native-blas.matmul128` | `0.1981` |
-| `public.matmul128` | `0.2337` |
+| `public.addScalar.out` | `0.2320` |
+| `public.addArrays.out` | `0.4306` |
+| `public.mulScalar.out` | `0.2063` |
+| `public.matmul128` | `0.0829` |
+| `public.matmul128.out` | `0.0705` |
 
-This supports the current technical direction: native BLAS dispatch is
-materially faster than the TypeScript fallback, and the public wrapper overhead
-is small in the accepted main artifact. The remaining release blocker is the
-same-machine NumPy comparison for `matmul_128`, not a missing native path.
+This supports the current technical direction: native-backed dispatch and
+preallocated output buffers are the right hot-path shape. The remaining release
+blocker is the same-machine NumPy comparison for every covered row, not merely
+the existence of a native path.
 
 ## Negative Experiment Policy
 
@@ -135,10 +141,10 @@ After publish, release completion also requires:
 - `@sylphx/numpy` is the public NumPy-compatible TypeScript package contract.
 - The API target is Python/NumPy spelling and semantics.
 - Covered benchmark checksums pass in the dated accepted main CI artifact.
-- Six of seven covered speed rows pass the current `1.05x` NumPy comparison
+- Seven of ten covered speed rows pass the current `1.05x` NumPy comparison
   target in the dated accepted main CI artifact.
-- Native BLAS materially improves covered matmul dispatch over the TypeScript
-  fallback in the accepted native dispatch probe.
+- Native-backed public hot paths and preallocated output buffers are measured in
+  the accepted native dispatch probe.
 
 ## Claims Not Allowed Yet
 
@@ -151,7 +157,8 @@ After publish, release completion also requires:
 
 ## Next Launch Work
 
-1. Close the `matmul_128` gap without weakening the `1.05x` release target.
+1. Close the `add_arrays_1m_out`, `add_scalar_1m_out`, and `matmul_128` gaps
+   without weakening the `1.05x` release target.
 2. Expand API compatibility tests around NumPy spelling, dtype behavior,
    broadcasting, shape semantics, and numerical edge cases.
 3. Keep public docs tied to dated accepted CI artifacts and treat the latest

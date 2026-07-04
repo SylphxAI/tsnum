@@ -38,18 +38,21 @@ Current truth:
   paths.
 - Evidence tools: Python parity benchmark plus native dispatch probe for
   kernel/wrapper/public-API timing.
-- Recorded benchmark evidence: accepted main CI run `28697576618` passes
+- Recorded benchmark evidence: accepted main CI run `28699144963` passes
   checksum parity for every covered row and passes the 1.05x speed target on
-  six of seven covered rows. The latest uploaded `python-parity-report`
+  seven of ten covered rows. The latest uploaded `python-parity-report`
   artifact is canonical when this dated snapshot drifts.
-- Recent main CI: `add_arrays_1m` (`0.73x`), `add_scalar_1m` (`0.85x`),
-  `mean_1m` (`0.66x`), `mul_scalar_1m` (`0.66x`), `sum_1m` (`0.66x`), and
-  `transpose_512` (`0.75x`) pass the speed target. `matmul_128` remains the
-  release blocker at `1.19x`. Full speed parity is not claimed.
-- Native dispatch evidence: the same run measured `public.matmul128` at
-  `0.2337ms` versus the TypeScript backend at `0.9590ms`, confirming that the
-  native BLAS path remains the right performance direction while `matmul_128`
-  still needs to clear the NumPy release threshold.
+- Recent main CI: `add_arrays_1m` (`0.74x`), `add_scalar_1m` (`0.57x`),
+  `mean_1m` (`0.59x`), `mul_scalar_1m` (`0.52x`), `mul_scalar_1m_out`
+  (`1.05x`), `sum_1m` (`0.60x`), and `transpose_512` (`0.59x`) pass the speed
+  target. `add_arrays_1m_out` (`1.07x`), `add_scalar_1m_out` (`1.11x`), and
+  `matmul_128` (`1.17x`) remain release blockers. Full speed parity is not
+  claimed.
+- Native dispatch evidence: the same run measured `public.addScalar.out` at
+  `0.2320ms`, `public.addArrays.out` at `0.4306ms`, `public.mulScalar.out` at
+  `0.2063ms`, and `public.matmul128.out` at `0.0705ms`, confirming that native
+  output-buffer paths are the right direction while the NumPy release threshold
+  still needs to clear for every covered row.
 - Release gate evidence: `bench:python-parity:enforce` and `release:preflight`
   remain admission blockers until every covered speed row passes repeatably, so
   npm publication remains blocked.
@@ -495,11 +498,9 @@ bun run bench:native-dispatch
 Recent CI evidence:
 
 - Checksum parity: all covered benchmark cases pass.
-- Reporting-mode speed evidence: main CI run `28695468644` passed five of seven
-  covered speed rows, failed `matmul_128` at `1.12x`, and failed
-  `transpose_512` at `1.11x` against the strict `1.05x` target. The prior main
-  run `28695393008` passed six of seven rows and failed `matmul_128` at
-  `1.23x`.
+- Reporting-mode speed evidence: main CI run `28699144963` passed seven of ten
+  covered speed rows. `add_arrays_1m_out` (`1.07x`), `add_scalar_1m_out`
+  (`1.11x`), and `matmul_128` (`1.17x`) remain over the strict `1.05x` target.
 - Release gate evidence: `bench:python-parity:enforce` and `release:preflight`
   remain blockers until every covered speed row passes repeatably. Full speed
   parity is not marketed until that release gate passes.
