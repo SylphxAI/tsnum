@@ -39,7 +39,7 @@ def main() -> None:
         "sum_1m": (100, 10, lambda: np.sum(vector)),
         "mean_1m": (100, 10, lambda: np.mean(vector)),
         "transpose_512": (60, 10, lambda: matrix.T.copy()),
-        "matmul_128": (20, 5, lambda: left @ right),
+        "matmul_128": (100, 10, lambda: left @ right),
     }
 
     benchmarks = {}

@@ -63,7 +63,7 @@ const cases: Record<string, [number, number, () => BenchValue]> = {
   sum_1m: [100, 10, () => sum(vector)],
   mean_1m: [100, 10, () => mean(vector)],
   transpose_512: [60, 10, () => transpose(matrix512)],
-  matmul_128: [20, 5, () => matmul(left, right)],
+  matmul_128: [100, 10, () => matmul(left, right)],
 }
 
 const benchmarks: Record<string, unknown> = {}
