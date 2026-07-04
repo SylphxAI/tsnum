@@ -19,6 +19,8 @@ export {
 
 // Reductions
 export {
+  amax,
+  amin,
   sum,
   mean,
   max,
@@ -32,7 +34,16 @@ export {
 } from './reductions'
 
 // Shape
-export { expandDims, expand_dims, flatten, reshape, squeeze, swapaxes, transpose } from './shape'
+export {
+  expandDims,
+  expand_dims,
+  flatten,
+  ravel,
+  reshape,
+  squeeze,
+  swapaxes,
+  transpose,
+} from './shape'
 
 // Indexing
 export { at, slice, take, flatnonzero } from './indexing'
@@ -51,6 +62,7 @@ export {
 
 // Math functions
 export {
+  absolute,
   abs,
   sign,
   sqrt,

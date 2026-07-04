@@ -40,6 +40,10 @@ export function flatten<T extends DType>(a: NDArray<T>): NDArray<T> {
   return reshape(a, [a.size])
 }
 
+export function ravel<T extends DType>(a: NDArray<T>): NDArray<T> {
+  return flatten(a)
+}
+
 /**
  * Remove axes of length one from array
  */

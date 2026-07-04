@@ -29,12 +29,20 @@ export function max(a: NDArray, options?: AxisOptions): number | NDArray {
   throw new Error('Axis reduction not yet implemented')
 }
 
+export function amax(a: NDArray, options?: AxisOptions): number | NDArray {
+  return max(a, options)
+}
+
 export function min(a: NDArray, options?: AxisOptions): number | NDArray {
   if (options?.axis === undefined) {
     const backend = getBackend()
     return backend.min(a.getData())
   }
   throw new Error('Axis reduction not yet implemented')
+}
+
+export function amin(a: NDArray, options?: AxisOptions): number | NDArray {
+  return min(a, options)
 }
 
 export function std(a: NDArray, options?: AxisOptions): number | NDArray {

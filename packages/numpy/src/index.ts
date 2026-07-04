@@ -8,6 +8,7 @@ export {
   ones,
   full,
   eye,
+  identity,
   arange,
   linspace,
   logspace,
@@ -58,6 +59,8 @@ export {
   array_equal,
   array_equiv,
   // Reductions
+  amax,
+  amin,
   sum,
   mean,
   max,
@@ -72,6 +75,7 @@ export {
   reshape,
   transpose,
   flatten,
+  ravel,
   squeeze,
   expandDims,
   expand_dims,
@@ -90,6 +94,7 @@ export {
   booleanIndex,
   integerArrayIndex,
   // Math
+  absolute,
   abs,
   sign,
   sqrt,

@@ -1,7 +1,10 @@
 import { describe, expect, test } from 'bun:test'
 import * as np from './index'
 import {
+  absolute,
   add,
+  amax,
+  amin,
   arange,
   array,
   concatenate,
@@ -15,6 +18,7 @@ import {
   full_like,
   greater,
   greater_equal,
+  identity,
   less,
   less_equal,
   linspace,
@@ -28,6 +32,7 @@ import {
   pipe,
   pow,
   power,
+  ravel,
   reshape,
   std,
   sub,
@@ -86,6 +91,12 @@ describe('Array Creation', () => {
     const a = eye(3)
     expect(a.shape).toEqual([3, 3])
     expect(sum(a)).toBe(3) // diagonal 1s
+  })
+
+  test('NumPy canonical identity alias', () => {
+    const a = identity(3)
+    expect(a.shape).toEqual([3, 3])
+    expect(sum(a)).toBe(3)
   })
 
   test('NumPy canonical like-creation aliases', () => {
@@ -179,6 +190,13 @@ describe('Comparison Operations (Functional)', () => {
   })
 })
 
+describe('Math Operations (Functional)', () => {
+  test('NumPy canonical absolute alias', () => {
+    const a = array([-1, 0, 3])
+    expect(sum(absolute(a))).toBe(4)
+  })
+})
+
 describe('Reduction Operations (Functional)', () => {
   test('sum all elements', () => {
     const a = array([1, 2, 3, 4])
@@ -198,6 +216,12 @@ describe('Reduction Operations (Functional)', () => {
   test('min element', () => {
     const a = array([3, 7, 2, 9, 1])
     expect(min(a)).toBe(1)
+  })
+
+  test('NumPy canonical amax and amin aliases', () => {
+    const a = array([3, 7, 2, 9, 1])
+    expect(amax(a)).toBe(9)
+    expect(amin(a)).toBe(1)
   })
 
   test('std (standard deviation)', () => {
@@ -232,6 +256,16 @@ describe('Shape Operations (Functional)', () => {
       [3, 4],
     ])
     const b = flatten(a)
+    expect(b.shape).toEqual([4])
+    expect(sum(b)).toBe(10)
+  })
+
+  test('NumPy canonical ravel alias', () => {
+    const a = array([
+      [1, 2],
+      [3, 4],
+    ])
+    const b = ravel(a)
     expect(b.shape).toEqual([4])
     expect(sum(b)).toBe(10)
   })

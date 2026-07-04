@@ -270,11 +270,11 @@ Complete tracking table for all operations with backend implementation status.
 #### Array Creation (28 functions)
 - **Basic**: `array`, `zeros`, `ones`, `full`, `empty`, `arange`, `linspace`, `logspace`, `geomspace`
 - **Like functions**: `zeros_like`, `ones_like`, `full_like`, `empty_like` plus `zerosLike`, `onesLike`, `fullLike`, `emptyLike` aliases
-- **Special**: `eye`, `diag`, `diagflat`, `tri`, `tril`, `triu`, `meshgrid`, `fromfunction`, `indices`, `vander`
+- **Special**: `eye`, `identity`, `diag`, `diagflat`, `tri`, `tril`, `triu`, `meshgrid`, `fromfunction`, `indices`, `vander`
 - **Copy**: `asarray`, `copy`
 
 #### Array Manipulation (45 functions)
-- **Shape**: `reshape`, `flatten`, `squeeze`, `expand_dims`, `expandDims`, `transpose`, `swapaxes`, `moveaxis`
+- **Shape**: `reshape`, `flatten`, `ravel`, `squeeze`, `expand_dims`, `expandDims`, `transpose`, `swapaxes`, `moveaxis`
 - **Join/Split**: `concatenate`, `concat`, `stack`, `vstack`, `hstack`, `dstack`, `split`, `hsplit`, `vsplit`, `array_split`
 - **Rearrange**: `flip`, `rot90`, `roll`, `repeat`, `tile`
 - **Modify**: `delete`, `deleteArr`, `insert`, `append`, `resize`, `pad`
@@ -286,7 +286,7 @@ Complete tracking table for all operations with backend implementation status.
 - **Hyperbolic**: `sinh`, `cosh`, `tanh`, `asinh`, `acosh`, `atanh`
 - **Exponential**: `exp`, `exp2`, `log`, `log2`, `log10`, `log1p`, `expm1`
 - **Rounding**: `round`, `floor`, `ceil`, `trunc`
-- **Other**: `abs`, `sign`, `sqrt`, `cbrt`, `square`, `reciprocal`, `clip`, `maximum`, `minimum`
+- **Other**: `abs`, `absolute`, `sign`, `sqrt`, `cbrt`, `square`, `reciprocal`, `clip`, `maximum`, `minimum`
 
 #### Math Convenience (11 functions)
 - **Angles**: `deg2rad`, `rad2deg`
@@ -307,7 +307,7 @@ Complete tracking table for all operations with backend implementation status.
 - **Utilities**: `fftfreq`, `rfftfreq`, `fftshift`, `ifftshift`
 
 #### Statistics (33 functions)
-- **Basic**: `mean`, `median`, `std`, `var`, `variance`, `sum`, `prod`, `min`, `max`, `ptp`
+- **Basic**: `mean`, `median`, `std`, `var`, `variance`, `sum`, `prod`, `amin`, `amax`, `min`, `max`, `ptp`
 - **Advanced**: `average`, `percentile`, `quantile`, `corrcoef`, `cov`, `histogram`, `bincount`
 - **NaN-aware**: `nanmean`, `nansum`, `nanmin`, `nanmax`, `nanstd`, `nanmedian`, `nanvar`, `nanpercentile`, `nanquantile`, `nanprod`
 - **Search**: `argmin`, `argmax`, `argwhere`, `digitize`
@@ -383,7 +383,7 @@ Complete tracking table for all operations with backend implementation status.
 - [ ] **String Operations**: Full `numpy.char.*` module (~30 functions)
 - [ ] **More Random Distributions**: `chisquare`, `dirichlet`, `f`, `laplace`, `lognormal`, `multinomial`, `multivariate_normal`, etc. (~30 distributions)
 - [ ] **Advanced Linear Algebra**: `eigh`, `eigvals`, `svdvals`, `tensorsolve`, `tensorinv`
-- [ ] **Array Type Conversion**: `asanyarray`, `asfortranarray`, `asmatrix`, `ravel`
+- [ ] **Array Type Conversion**: `asanyarray`, `asfortranarray`, `asmatrix`
 
 #### Medium Priority
 - [ ] **Datetime Operations**: `datetime64`, `timedelta64`, business day functions
@@ -487,8 +487,9 @@ const e = exp(a)
 ```
 
 NumPy canonical names `subtract`, `multiply`, `divide`, `power`,
-`concatenate`, `delete`, `expand_dims`, `var`, `logical_and`, `logical_or`,
-`logical_not`, `logical_xor`, `less_equal`, and `greater_equal` are exported.
+`identity`, `absolute`, `amax`, `amin`, `ravel`, `concatenate`, `delete`,
+`expand_dims`, `var`, `logical_and`, `logical_or`, `logical_not`,
+`logical_xor`, `less_equal`, and `greater_equal` are exported.
 Existing short aliases such as `sub`, `mul`, `div`, `pow`, `concat`,
 `deleteArr`, `expandDims`, `variance`, `logicalAnd`, `logicalOr`,
 `logicalNot`, `logicalXor`, `lessEqual`, and `greaterEqual` remain available

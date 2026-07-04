@@ -86,7 +86,7 @@ const result = np.sum(b)         // 21
 
 ### Creation (Functional-only)
 ```typescript
-import { array, zeros, ones, arange, linspace, eye } from '@sylphx/numpy'
+import { array, zeros, ones, arange, linspace, eye, identity } from '@sylphx/numpy'
 
 const a = array([1, 2, 3])
 const b = zeros([3, 3])
@@ -94,6 +94,7 @@ const c = ones([2, 2], { dtype: 'float32' })
 const d = arange(0, 10, 2)        // [0, 2, 4, 6, 8]
 const e = linspace(0, 1, 5)       // [0, 0.25, 0.5, 0.75, 1]
 const f = eye(3)                  // 3x3 identity matrix
+const g = identity(3)             // NumPy identity spelling
 ```
 
 NumPy snake_case helpers such as `zeros_like`, `ones_like`, `full_like`, and
@@ -123,7 +124,7 @@ spelling tracks NumPy's `subtract`, `multiply`, `divide`, and `power`.
 
 ### Reductions
 ```typescript
-import { sum, mean, max, min, std, variance } from '@sylphx/numpy'
+import { amax, amin, sum, mean, max, min, std, variance } from '@sylphx/numpy'
 import * as np from '@sylphx/numpy'
 
 const a = array([1, 2, 3, 4, 5])
@@ -131,7 +132,9 @@ const a = array([1, 2, 3, 4, 5])
 sum(a)                            // 15
 mean(a)                           // 3
 max(a)                            // 5
+amax(a)                           // 5
 min(a)                            // 1
+amin(a)                           // 1
 std(a)                            // standard deviation
 variance(a)                       // variance
 np.var(a)                         // NumPy namespace spelling
@@ -139,7 +142,7 @@ np.var(a)                         // NumPy namespace spelling
 
 ### Shape Operations
 ```typescript
-import { expand_dims, reshape, transpose, flatten } from '@sylphx/numpy'
+import { expand_dims, ravel, reshape, transpose, flatten } from '@sylphx/numpy'
 
 const a = array([[1, 2], [3, 4]])
 
@@ -147,6 +150,7 @@ reshape(a, [4])                   // [1, 2, 3, 4]
 expand_dims(reshape(a, [4]), 0)    // shape [1, 4]
 transpose(a)                      // [[1, 3], [2, 4]]
 flatten(a)                        // [1, 2, 3, 4]
+ravel(a)                          // [1, 2, 3, 4]
 
 // Special property: .T for transpose
 a.T                               // [[1, 3], [2, 4]]
@@ -188,10 +192,11 @@ take(c, [0, 2, 4])                // [10, 30, 50]
 
 ### Math Functions
 ```typescript
-import { abs, sign, sqrt, exp, log, sin, cos, tan, round, floor, ceil } from '@sylphx/numpy'
+import { abs, absolute, sign, sqrt, exp, log, sin, cos, tan, round, floor, ceil } from '@sylphx/numpy'
 
 const a = array([1, 4, 9])
 
+absolute(array([-1, 0, 3]))       // [1, 0, 3]
 sqrt(a)                           // [1, 2, 3]
 exp(a)                            // [e^1, e^4, e^9]
 log(a)                            // [0, 1.386, 2.197]
