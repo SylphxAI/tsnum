@@ -80,6 +80,12 @@ type NativeKernelModule = {
   addScalarF64Buffers?: (input: Uint8Array, scalar: number, output: Uint8Array) => Uint8Array
   mulScalarF64?: (input: Float64Array, scalar: number) => Float64Array
   mulScalarF64Buffers?: (input: Uint8Array, scalar: number, output: Uint8Array) => Uint8Array
+  transposeF64Buffer?: (
+    input: Float64Array,
+    rows: number,
+    cols: number,
+    output: Uint8Array,
+  ) => Uint8Array
 }
 
 let nativeKernelModule: NativeKernelModule | null | undefined
@@ -351,6 +357,19 @@ export class NativeBLASBackend extends TypeScriptBackend {
 
     const rows = a.shape[0]
     const cols = a.shape[1]
+    const native = getNativeKernels()
+
+    if (native?.transposeF64Buffer) {
+      const output = createNativeOutputBuffer(a.buffer.length)
+      native.transposeF64Buffer(a.buffer, rows, cols, output.bytes)
+      return {
+        buffer: output.array,
+        shape: [cols, rows],
+        strides: [rows, 1],
+        dtype: 'float64',
+      }
+    }
+
     const output = createNativeOutput(a.buffer.length)
 
     accelerate.symbols.vDSP_mtransD(pointerFor(a.buffer), 1, ptr(output), 1, cols, rows)

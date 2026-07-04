@@ -9,6 +9,7 @@ import {
   mulScalarF64,
   mulScalarF64Buffer,
   mulScalarF64Buffers,
+  transposeF64Buffer,
 } from '../index.js'
 
 test('native float64 scalar and vector kernels match NumPy-style outputs', () => {
@@ -64,4 +65,20 @@ test('native buffer kernels reject mismatched output lengths', () => {
   expect(() =>
     addScalarF64Buffer(new Float64Array([1, 2]), 10, bytes(new Float64Array(1))),
   ).toThrow('Expected output byte length')
+})
+
+test('native transpose buffer kernel matches row-major NumPy output', () => {
+  const input = new Float64Array([1, 2, 3, 4, 5, 6])
+  const output = new Float64Array(6)
+
+  transposeF64Buffer(input, 2, 3, bytes(output))
+
+  expect(Array.from(output)).toEqual([1, 4, 2, 5, 3, 6])
+})
+
+test('native transpose buffer kernel rejects invalid dimensions', () => {
+  const input = new Float64Array([1, 2, 3])
+  const output = new Float64Array(3)
+
+  expect(() => transposeF64Buffer(input, 2, 2, bytes(output))).toThrow('Expected input length')
 })
