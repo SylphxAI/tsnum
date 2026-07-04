@@ -6,7 +6,14 @@ import { performance } from 'node:perf_hooks'
 import { fileURLToPath } from 'node:url'
 import { NativeBLASBackend } from '../../packages/numpy/src/backend/native-blas'
 import { TypeScriptBackend } from '../../packages/numpy/src/backend/typescript'
-import { add, array, getBackendInfo, initNativeBLAS, mul } from '../../packages/numpy/src/index'
+import {
+  add,
+  array,
+  getBackendInfo,
+  initNativeBLAS,
+  matmul,
+  mul,
+} from '../../packages/numpy/src/index'
 
 type BenchResult = {
   name: string
@@ -131,8 +138,11 @@ const matrixSize = 512
 const matrixLength = matrixSize * matrixSize
 const matrix = range(matrixLength, 0.001)
 const matrixOutput = new Float64Array(matrixLength)
-const matrixBytes = bytes(matrix)
 const matrixOutputBytes = bytes(matrixOutput)
+const matmulSize = 128
+const matmulLength = matmulSize * matmulSize
+const matmulLeft = range(matmulLength, 0.001)
+const matmulRight = range(matmulLength, 0.002)
 
 const leftArray = array(Array.from(left), { dtype: 'float64' })
 const rightArray = array(Array.from(right), { dtype: 'float64' })
@@ -142,9 +152,23 @@ const matrixArray = array(
   ),
   { dtype: 'float64' },
 )
+const matmulLeftArray = array(
+  Array.from({ length: matmulSize }, (_, row) =>
+    Array.from(matmulLeft.subarray(row * matmulSize, (row + 1) * matmulSize)),
+  ),
+  { dtype: 'float64' },
+)
+const matmulRightArray = array(
+  Array.from({ length: matmulSize }, (_, row) =>
+    Array.from(matmulRight.subarray(row * matmulSize, (row + 1) * matmulSize)),
+  ),
+  { dtype: 'float64' },
+)
 const leftData = leftArray.getData()
 const rightData = rightArray.getData()
 const matrixData = matrixArray.getData()
+const matmulLeftData = matmulLeftArray.getData()
+const matmulRightData = matmulRightArray.getData()
 const tsBackend = new TypeScriptBackend()
 const nativeBackendInit = await initNativeBLAS()
 const nativeBackend = new NativeBLASBackend()
@@ -185,13 +209,18 @@ const results = [
   measure('backend.typescript.addArrays', () => tsBackend.add(leftData, rightData)),
   measure('backend.typescript.mulScalar', () => tsBackend.mul(leftData, 2)),
   measure('backend.typescript.transpose512', () => tsBackend.transpose(matrixData)),
+  measure('backend.typescript.matmul128', () => tsBackend.matmul(matmulLeftData, matmulRightData)),
   measure('backend.native-blas.addScalar', () => nativeBackend.add(leftData, 5)),
   measure('backend.native-blas.addArrays', () => nativeBackend.add(leftData, rightData)),
   measure('backend.native-blas.mulScalar', () => nativeBackend.mul(leftData, 2)),
   measure('backend.native-blas.transpose512', () => nativeBackend.transpose(matrixData)),
+  measure('backend.native-blas.matmul128', () =>
+    nativeBackend.matmul(matmulLeftData, matmulRightData),
+  ),
   measure('public.addScalar', () => add(leftArray, 5)),
   measure('public.addArrays', () => add(leftArray, rightArray)),
   measure('public.mulScalar', () => mul(leftArray, 2)),
+  measure('public.matmul128', () => matmul(matmulLeftArray, matmulRightArray)),
 ]
 
 const report = {
