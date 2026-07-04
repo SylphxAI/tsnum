@@ -38,6 +38,7 @@ export interface Backend {
 
   // Linear algebra operations
   matmul(a: NDArrayData, b: NDArrayData): NDArrayData
+  matmulInto?(a: NDArrayData, b: NDArrayData, out: NDArrayData): NDArrayData
   dot(a: NDArrayData, b: NDArrayData): number
 
   // FFT operations (complex numbers as [real, imag] interleaved)

@@ -308,19 +308,46 @@ export class NativeBLASBackend extends TypeScriptBackend {
       return super.matmul(a, b)
     }
 
-    if (a.shape.length !== 2 || b.shape.length !== 2) {
-      throw new Error('matmul requires 2D arrays')
-    }
-
-    const m = a.shape[0]
-    const k = a.shape[1]
-    const n = b.shape[1]
-
-    if (k !== b.shape[0]) {
-      throw new Error(`Shape mismatch: (${m}, ${k}) and (${b.shape[0]}, ${n})`)
-    }
+    const { m, k, n } = this.validateMatmulOperands(a, b)
 
     const output = createNativeOutput(m * n)
+    this.writeNativeMatmul(a.buffer, b.buffer, m, k, n, ptr(output))
+
+    return {
+      buffer: output,
+      shape: [m, n],
+      strides: [n, 1],
+      dtype: 'float64',
+    }
+  }
+
+  matmulInto(a: NDArrayData, b: NDArrayData, out: NDArrayData): NDArrayData {
+    if (
+      a.dtype !== 'float64' ||
+      b.dtype !== 'float64' ||
+      out.dtype !== 'float64' ||
+      !(a.buffer instanceof Float64Array) ||
+      !(b.buffer instanceof Float64Array) ||
+      !(out.buffer instanceof Float64Array)
+    ) {
+      return super.matmulInto(a, b, out)
+    }
+
+    const { m, k, n } = this.validateMatmulOperands(a, b)
+    this.validateMatmulOutput(out, 'float64', m, n)
+    this.writeNativeMatmul(a.buffer, b.buffer, m, k, n, pointerFor(out.buffer))
+
+    return out
+  }
+
+  private writeNativeMatmul(
+    aBuffer: Float64Array,
+    bBuffer: Float64Array,
+    m: number,
+    k: number,
+    n: number,
+    outPointer: ReturnType<typeof ptr>,
+  ): void {
     // Row-major C = A x B has the same memory layout as column-major
     // C^T = B^T x A^T, which avoids the cblas row-major adapter path.
     accelerate.symbols.cblas_dgemm(
@@ -331,21 +358,14 @@ export class NativeBLASBackend extends TypeScriptBackend {
       m,
       k,
       1.0,
-      pointerFor(b.buffer),
+      pointerFor(bBuffer),
       n,
-      pointerFor(a.buffer),
+      pointerFor(aBuffer),
       k,
       0.0,
-      ptr(output),
+      outPointer,
       n,
     )
-
-    return {
-      buffer: output,
-      shape: [m, n],
-      strides: [n, 1],
-      dtype: 'float64',
-    }
   }
 
   transpose(a: NDArrayData): NDArrayData {

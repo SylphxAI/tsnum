@@ -107,6 +107,14 @@ Where JavaScript syntax cannot match Python operators directly, the contract is
 NumPy function spelling (`np.matmul`, `np.multiply`, `np.reshape`,
 `np.zeros_like`) and Python-style array semantics.
 
+Allocation-sensitive code can also use NumPy-style output buffers for supported
+hot paths:
+
+```typescript
+const out = np.empty([128, 128], { dtype: 'float64' })
+np.matmul(A, B, { out })          // returns out
+```
+
 **Features:**
 - 🎯 **NumPy-compatible DX** - Python spelling and behavior are the target
 - 🚀 **Python parity gate** - Performance claims require NumPy benchmark evidence

@@ -10,6 +10,7 @@ import { TypeScriptBackend } from '../../packages/numpy/src/backend/typescript'
 import {
   add,
   array,
+  empty,
   getBackendInfo,
   initNativeBLAS,
   matmul,
@@ -279,6 +280,7 @@ const matmulRightArray = array(
   ),
   { dtype: 'float64' },
 )
+const matmulOutputArray = empty([matmulSize, matmulSize], { dtype: 'float64' })
 const leftData = leftArray.getData()
 const rightData = rightArray.getData()
 const matrixData = matrixArray.getData()
@@ -359,6 +361,11 @@ const results = [
   measure(
     'public.matmul128',
     () => matmul(matmulLeftArray, matmulRightArray),
+    matmulMeasureOptions,
+  ),
+  measure(
+    'public.matmul128.out',
+    () => matmul(matmulLeftArray, matmulRightArray, { out: matmulOutputArray }),
     matmulMeasureOptions,
   ),
 ]

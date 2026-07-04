@@ -1,7 +1,7 @@
 // ===== Linear Algebra =====
 
 import { getBackend } from '../backend'
-import type { DType } from '../core/types'
+import type { DType, NDArrayData } from '../core/types'
 import { computeStrides, createTypedArray } from '../core/utils'
 import { eye } from '../creation'
 import { NDArray } from '../ndarray'
@@ -62,15 +62,62 @@ export function dot<T extends DType>(a: NDArray<T>, b: NDArray<T>): NDArray<T> |
 /**
  * Matrix multiplication (delegates to backend for performance)
  */
-export function matmul<T extends DType>(a: NDArray<T>, b: NDArray<T>): NDArray<T> {
+export type MatmulOptions<T extends DType = DType> = {
+  out?: NDArray<T>
+}
+
+export function matmul<T extends DType>(
+  a: NDArray<T>,
+  b: NDArray<T>,
+  options?: MatmulOptions<T>,
+): NDArray<T> {
   const aData = a.getData()
   const bData = b.getData()
 
   // Delegate to backend (WASM if available, TS fallback)
   const backend = getBackend()
+  if (options?.out) {
+    const outData = options.out.getData()
+    if (backend.matmulInto) {
+      backend.matmulInto(aData, bData, outData)
+      return options.out
+    }
+
+    const resultData = backend.matmul(aData, bData)
+    copyMatmulResultIntoOut(resultData, outData)
+    return options.out
+  }
+
   const resultData = backend.matmul(aData, bData)
 
   return new NDArray(resultData)
+}
+
+function copyMatmulResultIntoOut(result: NDArrayData, out: NDArrayData): void {
+  if (
+    out.shape.length !== result.shape.length ||
+    out.shape.some((dimension, index) => dimension !== result.shape[index])
+  ) {
+    throw new Error(
+      `matmul out shape mismatch: expected (${result.shape.join(', ')}), got (${out.shape.join(', ')})`,
+    )
+  }
+
+  if (out.dtype !== result.dtype) {
+    throw new Error(`matmul out dtype mismatch: expected ${result.dtype}, got ${out.dtype}`)
+  }
+
+  if (out.buffer.length !== result.buffer.length) {
+    throw new Error(
+      `matmul out buffer length mismatch: expected ${result.buffer.length}, got ${out.buffer.length}`,
+    )
+  }
+
+  if (out.strides.length !== 2 || out.strides[0] !== result.shape[1] || out.strides[1] !== 1) {
+    throw new Error('matmul out must be C-contiguous')
+  }
+
+  out.buffer.set(result.buffer)
 }
 
 /**

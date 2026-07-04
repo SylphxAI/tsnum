@@ -273,6 +273,33 @@ export class TypeScriptBackend implements Backend {
   // ===== Linear Algebra Operations =====
 
   matmul(a: NDArrayData, b: NDArrayData): NDArrayData {
+    const { m, k, n } = this.validateMatmulOperands(a, b)
+
+    const newBuffer = createTypedArray(m * n, a.dtype)
+    this.writeMatmulIntoBuffer(a.buffer, b.buffer, newBuffer, m, k, n)
+
+    return {
+      buffer: newBuffer,
+      shape: [m, n],
+      strides: [n, 1],
+      dtype: a.dtype,
+    }
+  }
+
+  matmulInto(a: NDArrayData, b: NDArrayData, out: NDArrayData): NDArrayData {
+    const { m, k, n } = this.validateMatmulOperands(a, b)
+    this.validateMatmulOutput(out, a.dtype, m, n)
+
+    out.buffer.fill(0)
+    this.writeMatmulIntoBuffer(a.buffer, b.buffer, out.buffer, m, k, n)
+
+    return out
+  }
+
+  protected validateMatmulOperands(
+    a: NDArrayData,
+    b: NDArrayData,
+  ): { m: number; k: number; n: number } {
     if (a.shape.length !== 2 || b.shape.length !== 2) {
       throw new Error('matmul requires 2D arrays')
     }
@@ -285,10 +312,39 @@ export class TypeScriptBackend implements Backend {
       throw new Error(`Shape mismatch: (${m}, ${k}) and (${b.shape[0]}, ${n})`)
     }
 
-    const newBuffer = createTypedArray(m * n, a.dtype)
-    const aBuffer = a.buffer
-    const bBuffer = b.buffer
+    return { m, k, n }
+  }
 
+  protected validateMatmulOutput(out: NDArrayData, dtype: DType, m: number, n: number): void {
+    if (out.shape.length !== 2 || out.shape[0] !== m || out.shape[1] !== n) {
+      throw new Error(
+        `matmul out shape mismatch: expected (${m}, ${n}), got (${out.shape.join(', ')})`,
+      )
+    }
+
+    if (out.dtype !== dtype) {
+      throw new Error(`matmul out dtype mismatch: expected ${dtype}, got ${out.dtype}`)
+    }
+
+    if (out.buffer.length !== m * n) {
+      throw new Error(
+        `matmul out buffer length mismatch: expected ${m * n}, got ${out.buffer.length}`,
+      )
+    }
+
+    if (out.strides.length !== 2 || out.strides[0] !== n || out.strides[1] !== 1) {
+      throw new Error('matmul out must be C-contiguous')
+    }
+  }
+
+  protected writeMatmulIntoBuffer(
+    aBuffer: NDArrayData['buffer'],
+    bBuffer: NDArrayData['buffer'],
+    outBuffer: NDArrayData['buffer'],
+    m: number,
+    k: number,
+    n: number,
+  ): void {
     // Row-major i-k-j order keeps B and output writes contiguous.
     for (let i = 0; i < m; i++) {
       const aRowOffset = i * k
@@ -301,27 +357,20 @@ export class TypeScriptBackend implements Backend {
         const n8 = n - (n % 8)
 
         for (; j < n8; j += 8) {
-          newBuffer[outRowOffset + j] += aValue * bBuffer[bRowOffset + j]
-          newBuffer[outRowOffset + j + 1] += aValue * bBuffer[bRowOffset + j + 1]
-          newBuffer[outRowOffset + j + 2] += aValue * bBuffer[bRowOffset + j + 2]
-          newBuffer[outRowOffset + j + 3] += aValue * bBuffer[bRowOffset + j + 3]
-          newBuffer[outRowOffset + j + 4] += aValue * bBuffer[bRowOffset + j + 4]
-          newBuffer[outRowOffset + j + 5] += aValue * bBuffer[bRowOffset + j + 5]
-          newBuffer[outRowOffset + j + 6] += aValue * bBuffer[bRowOffset + j + 6]
-          newBuffer[outRowOffset + j + 7] += aValue * bBuffer[bRowOffset + j + 7]
+          outBuffer[outRowOffset + j] += aValue * bBuffer[bRowOffset + j]
+          outBuffer[outRowOffset + j + 1] += aValue * bBuffer[bRowOffset + j + 1]
+          outBuffer[outRowOffset + j + 2] += aValue * bBuffer[bRowOffset + j + 2]
+          outBuffer[outRowOffset + j + 3] += aValue * bBuffer[bRowOffset + j + 3]
+          outBuffer[outRowOffset + j + 4] += aValue * bBuffer[bRowOffset + j + 4]
+          outBuffer[outRowOffset + j + 5] += aValue * bBuffer[bRowOffset + j + 5]
+          outBuffer[outRowOffset + j + 6] += aValue * bBuffer[bRowOffset + j + 6]
+          outBuffer[outRowOffset + j + 7] += aValue * bBuffer[bRowOffset + j + 7]
         }
 
         for (; j < n; j++) {
-          newBuffer[outRowOffset + j] += aValue * bBuffer[bRowOffset + j]
+          outBuffer[outRowOffset + j] += aValue * bBuffer[bRowOffset + j]
         }
       }
-    }
-
-    return {
-      buffer: newBuffer,
-      shape: [m, n],
-      strides: [n, 1],
-      dtype: a.dtype,
     }
   }
 

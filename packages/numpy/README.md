@@ -552,13 +552,17 @@ for compatibility.
 ### Linear Algebra
 
 ```typescript
-import { matmul, dot, inv, eig, svd } from '@sylphx/numpy'
+import { array, empty, matmul, dot, inv, eig, svd } from '@sylphx/numpy'
 
 const A = array([[1, 2], [3, 4]])
 const B = array([[5, 6], [7, 8]])
 
 // Matrix multiplication
 const C = matmul(A, B)
+
+// Preallocated output for allocation-sensitive hot loops
+const out = empty([2, 2], { dtype: 'float64' })
+matmul(A, B, { out })
 
 // Matrix inverse
 const Ainv = inv(A)
