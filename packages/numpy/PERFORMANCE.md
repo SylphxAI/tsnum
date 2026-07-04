@@ -83,8 +83,9 @@ layers:
 
 The probe writes ignored local reports under `bench/python-parity/results/` and
 separates kernel speed from output allocation, wrapper, and public API overhead.
-It is useful for optimization triage, but it is not release evidence by itself:
-publish readiness still depends on `bench:python-parity:enforce`.
+CI uploads the same files as the `native-dispatch-report` artifact. It is useful
+for optimization triage, but it is not release evidence by itself: publish
+readiness still depends on `bench:python-parity:enforce`.
 
 ## Backend Evidence
 

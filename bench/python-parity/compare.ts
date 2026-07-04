@@ -45,7 +45,7 @@ const checksumRtol = Number(process.env.PYTHON_PARITY_CHECKSUM_RTOL ?? '1e-9')
 const configuredSampleCount = Number(process.env.PYTHON_PARITY_RUNS ?? '7')
 const sampleCount = Number.isFinite(configuredSampleCount)
   ? Math.max(1, Math.trunc(configuredSampleCount))
-  : 3
+  : 7
 const benchmarkCaseNames = [
   'add_arrays_1m',
   'add_scalar_1m',
@@ -261,7 +261,7 @@ const rows = Object.keys(pythonReport.benchmarks).map((name) => {
     return typeof pythonMs === 'number' ? tsMs / pythonMs : Number.NaN
   })
   const slowdownStats = summaryStats(pairedSlowdownSamples)
-  const slowdown = slowdownStats.median
+  const slowdown = tsCase.time_ms / pythonCase.time_ms
 
   return {
     name,
