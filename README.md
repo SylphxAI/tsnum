@@ -55,41 +55,34 @@ benchmark gate passes on the same machine against Python/NumPy.
 | Benchmarks | `bench/python-parity` compares TypeScript and NumPy on identical inputs. |
 | Native path | Bun/macOS can initialize Rust/N-API and native BLAS fast paths for float64 hot loops. |
 | Dispatch evidence | `bun run bench:native-dispatch` separates kernel, backend, and public API overhead before performance changes are promoted. |
-| Proven today | Recent accepted main CI snapshots pass checksum parity for every covered row and show native-backed speed wins on many covered rows. |
-| Not claimed yet | Recorded accepted main artifacts still have near-threshold speed misses; full NumPy API coverage, repeatable all-op speed parity, and npm publication are still launch gates. |
+| Proven today | Covered rows can all pass the 1.05x speed target on the GitHub macOS runner; checksum parity passes on every covered row. |
+| Not claimed yet | Merged main still shows near-threshold speed volatility; full NumPy API coverage, repeatable all-op speed parity, and npm publication are still launch gates. |
 
-Recorded accepted main CI snapshot as of 2026-07-04. The latest uploaded
+Best accepted PR snapshot as of 2026-07-04. The latest uploaded
 `python-parity-report` artifact remains the canonical source when this table
-drifts.
-(run `28701383776`, commit `6aec31d`, macOS arm64, Python 3.12.10,
-NumPy 2.5.0, Bun 1.3.14):
+drifts. PR #76 run `28705663337`, commit `6435456`, macOS arm64, Python
+3.12.10, NumPy 2.5.0, Bun 1.3.14:
 
 | Case | Speed vs NumPy | Status |
 | --- | ---: | --- |
-| `add_arrays_1m` | `0.75x` | pass |
-| `add_arrays_1m_out` | `1.25x` | fail |
-| `add_scalar_1m` | `0.59x` | pass |
-| `add_scalar_1m_out` | `1.05x` | fail |
-| `matmul_128` | `1.10x` | fail |
-| `mean_1m` | `0.57x` | pass |
-| `mul_scalar_1m` | `0.55x` | pass |
-| `mul_scalar_1m_out` | `1.04x` | pass |
-| `sum_1m` | `0.57x` | pass |
-| `transpose_512` | `0.72x` | pass |
+| `add_arrays_1m` | `0.71x` | pass |
+| `add_arrays_1m_out` | `0.99x` | pass |
+| `add_scalar_1m` | `0.66x` | pass |
+| `add_scalar_1m_out` | `0.98x` | pass |
+| `matmul_128` | `0.93x` | pass |
+| `mean_1m` | `0.53x` | pass |
+| `mul_scalar_1m` | `0.59x` | pass |
+| `mul_scalar_1m_out` | `0.90x` | pass |
+| `sum_1m` | `0.53x` | pass |
+| `transpose_512` | `0.67x` | pass |
 
-All covered checksums passed in that run. The same run's native dispatch probe
-measured `public.addScalar.out` at `0.2121ms`, `public.addArrays.out` at
-`0.4782ms`, `public.mulScalar.out` at `0.1846ms`, `public.matmul128` at
-`0.0843ms`, and `public.matmul128.out` at `0.0763ms`. Recent accepted main
-snapshots show volatile near-threshold misses across output-buffer and
-small-matmul rows. That is useful evidence but not enough for a release claim.
-The accepted direction remains native-backed execution with preallocated
-output support, while same-machine NumPy comparison still blocks release until
-the result is repeatable. PR #45 was closed after rerun evidence failed
-`matmul_128` at `1.28x`; PR #59 was closed after repeat artifacts failed to
-support merging a native output micro-optimization. The release rule stays
-stricter than the marketing copy: no full-speed claim and no npm publish until
-the enforced gate passes repeatably on the release path.
+All covered checksums passed in that run. The same code on merged main run
+`28705714377` still failed near-threshold rows (`add_arrays_1m_out` at
+`1.06x`, `matmul_128` at `1.07x`, and `mul_scalar_1m_out` at `1.05x`), so the
+release rule stays stricter than the marketing copy: no full-speed claim and no
+npm publish until the enforced gate passes repeatably on the release path.
+Closed follow-up experiments #77 and #78 are recorded as negative evidence
+because their artifacts worsened the release-blocking rows.
 
 ## Python-To-TypeScript Contract
 

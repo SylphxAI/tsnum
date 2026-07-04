@@ -39,22 +39,19 @@ Current truth:
   paths.
 - Evidence tools: Python parity benchmark plus native dispatch probe for
   kernel/wrapper/public-API timing.
-- Recorded benchmark evidence: accepted main CI runs pass checksum parity for
-  every covered row and show native-backed speed wins on many covered rows.
-  The latest uploaded main `python-parity-report` artifact is canonical when
-  this dated snapshot drifts.
-- Recorded main snapshot `28701383776`: `add_arrays_1m` (`0.75x`),
-  `add_scalar_1m` (`0.59x`), `mean_1m` (`0.57x`), `mul_scalar_1m` (`0.55x`),
-  `mul_scalar_1m_out` (`1.04x`), `sum_1m` (`0.57x`), and `transpose_512`
-  (`0.72x`) pass the speed target. `add_arrays_1m_out` (`1.25x`),
-  `add_scalar_1m_out` (`1.05x`), and `matmul_128` (`1.10x`) miss that
-  snapshot's release target. Full speed parity is not claimed.
-- Native dispatch evidence: the same run measured `public.addScalar.out` at
-  `0.2121ms`, `public.addArrays.out` at `0.4782ms`, `public.mulScalar.out` at
-  `0.1846ms`, `public.matmul128` at `0.0843ms`, and `public.matmul128.out` at
-  `0.0763ms`, confirming that native output-buffer paths are the right
-  direction while the NumPy release threshold still needs to clear repeatably
-  for every covered row.
+- Recorded benchmark evidence: PR #76 run `28705663337` passed checksum parity
+  and the 1.05x speed target for every covered row on the GitHub macOS runner.
+  The latest uploaded `python-parity-report` artifact is canonical when this
+  dated snapshot drifts.
+- Merged main truth: the same code on run `28705714377` still failed
+  near-threshold rows: `add_arrays_1m_out` (`1.06x`), `matmul_128` (`1.07x`),
+  and `mul_scalar_1m_out` (`1.05x`). Full speed parity is not claimed until
+  release preflight proves repeatability.
+- Native dispatch evidence: merged main measured `public.addScalar.out` at
+  `0.2210ms`, `public.addArrays.out` at `0.3911ms`, `public.mulScalar.out` at
+  `0.2057ms`, `public.matmul128` at `0.0904ms`, and `public.matmul128.out` at
+  `0.0673ms`, confirming that native output-buffer paths are the right
+  direction while the NumPy release threshold still needs repeatable proof.
 - Release gate evidence: `bench:python-parity:repeatability` and
   `release:preflight` remain admission blockers until every covered speed row
   passes repeatably, so npm publication remains blocked.

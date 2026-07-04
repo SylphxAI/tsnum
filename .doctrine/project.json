@@ -198,7 +198,7 @@
       },
       {
         "id": "release-workflow-unproven",
-        "description": "Manual release workflow, macOS preflight, central publish delegation, and npm readback are declared, but no successful @sylphx/numpy publish/readback has been observed yet. Current Python speed parity gaps intentionally block release:preflight.",
+        "description": "Manual release workflow, macOS preflight, central publish delegation, and npm readback are declared, but no successful @sylphx/numpy publish/readback has been observed yet. Current Python speed parity volatility intentionally blocks release:preflight.",
         "owner": "SylphxAI/tsnum",
         "target": "Before commercial-grade library operation"
       },
@@ -210,7 +210,7 @@
       },
       {
         "id": "native-output-speed-parity-incomplete",
-        "description": "Recent CI evidence consistently passes checksum parity, but 1.05x covered speed parity is volatile across reporting and enforced runs. PR #28 proved bench:python-parity:enforce is not stable enough for admission yet, and release preflight remains intentionally blocked until covered-operation speed parity passes repeatably on the release preflight runner.",
+        "description": "Recent CI evidence consistently passes checksum parity, and PR #76 proved one all-row passing covered-speed artifact. Merged main still shows 1.05x covered speed volatility across output-buffer and small-matmul rows, so release preflight remains intentionally blocked until covered-operation speed parity passes repeatably on the release preflight runner.",
         "owner": "SylphxAI/tsnum",
         "target": "Before package publication or full Python-speed marketing"
       },
