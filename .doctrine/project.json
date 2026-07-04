@@ -148,8 +148,8 @@
   "delivery": {
     "ciModel": "legacy-ci",
     "requiredContexts": ["Build, test, and benchmark"],
-    "deployPath": "Repo-local GitHub Actions CI validates pull requests, merge queue candidates, and main pushes with Bun install, build, tests, the Python parity benchmark, and generated report freshness. Package publication is manually triggered through .github/workflows/release.yml, delegates to the central Sylphx release workflow, and runs release:preflight before publish plus release:readback after publish.",
-    "productionProof": "Merged package changes require green CI on the PR and main push, including the uploaded Python parity report artifact. Published package changes additionally require benchmark evidence for performance-sensitive claims, all-public-package registry readback after release, and consumer smoke proof for affected exports.",
+    "deployPath": "Repo-local GitHub Actions CI validates pull requests, merge queue candidates, and main pushes with Bun install, build, tests, the Python parity benchmark, and generated report freshness. Package publication is manually triggered through .github/workflows/release.yml. That workflow runs repo-local release:preflight on macOS for the native BLAS Python parity gate, then delegates versioning and npm publication to the central Sylphx release workflow, and runs release:readback after publish.",
+    "productionProof": "Merged package changes require green CI on the PR and main push, including the uploaded Python parity report artifact. Published package changes additionally require a passing macOS release:preflight run with bench:python-parity:enforce, all-public-package registry readback after release, provenance/attestation evidence, and consumer smoke proof for affected exports.",
     "recoveryClass": "forward-fix-only",
     "packageRelease": {
       "publishesPackages": true,
@@ -158,7 +158,7 @@
       "versionPr": "Declared through the central Sylphx reusable release workflow, which runs changesets/action to create GitHub Actions bot-authored version PRs when release intent exists. A dedicated Sylphx release-bot/GitHub App identity remains a release-hardening gap before commercial-grade publish.",
       "publisher": "Declared through the protected central Sylphx reusable release workflow with id-token: write OIDC posture and inherited bounded NPM_TOKEN fallback.",
       "requiredContexts": ["Build, test, and benchmark", "release:preflight", "release:readback"],
-      "publishProof": "Required before publish: release:preflight must pass build, tests, and bench:python-parity:enforce. Required after publish: release:readback must verify every public workspace npm package version. Provenance/attestation evidence, changelog evidence, and consumer smoke proof are still required for affected exports."
+      "publishProof": "Required before publish: repo-local macOS release:preflight must pass install, build, tests, and bench:python-parity:enforce. Required during central publish: the workspace must still build through the protected reusable release workflow. Required after publish: release:readback must verify every public workspace npm package version. Provenance/attestation evidence, changelog evidence, and consumer smoke proof are still required for affected exports."
     }
   },
   "adoption": {
@@ -172,7 +172,7 @@
       },
       {
         "id": "release-workflow-unproven",
-        "description": "Manual release workflow, preflight, and npm readback are declared, but no successful @sylphx/numpy publish/readback has been observed yet. Current Python speed parity gaps intentionally block release:preflight.",
+        "description": "Manual release workflow, macOS preflight, central publish delegation, and npm readback are declared, but no successful @sylphx/numpy publish/readback has been observed yet. Current Python speed parity gaps intentionally block release:preflight.",
         "owner": "SylphxAI/tsnum",
         "target": "Before commercial-grade library operation"
       },
@@ -184,7 +184,7 @@
       },
       {
         "id": "native-output-speed-parity-incomplete",
-        "description": "Recent CI evidence consistently passes checksum parity, but 1.05x covered speed parity is volatile across reporting and enforced runs. PR #28 proved bench:python-parity:enforce is not stable enough for admission yet, and release preflight remains intentionally blocked until covered-operation speed parity passes repeatably.",
+        "description": "Recent CI evidence consistently passes checksum parity, but 1.05x covered speed parity is volatile across reporting and enforced runs. PR #28 proved bench:python-parity:enforce is not stable enough for admission yet, and release preflight remains intentionally blocked until covered-operation speed parity passes repeatably on the release preflight runner.",
         "owner": "SylphxAI/tsnum",
         "target": "Before package publication or full Python-speed marketing"
       }
