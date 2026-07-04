@@ -87,6 +87,10 @@ CI uploads the same files as the `native-dispatch-report` artifact. It is useful
 for optimization triage, but it is not release evidence by itself: publish
 readiness still depends on `bench:python-parity:enforce`.
 
+The `matmul128` probe rows use the same default sample count, warmup, and
+iteration count as the Python parity benchmark so the CI artifact can separate
+small-matrix native overhead from runner noise.
+
 ## Backend Evidence
 
 - TypeScript backend: always-available reference implementation and fallback.

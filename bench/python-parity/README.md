@@ -62,6 +62,11 @@ kernel speed. It writes ignored local reports:
 CI also uploads these files as the `native-dispatch-report` artifact whenever
 the probe runs.
 
+The vector-operation probe defaults to short samples so CI remains fast. The
+`matmul128` rows use parity-equivalent defaults of 7 samples, 100 warmup
+iterations, and 1000 measured iterations so small-matrix overhead can be
+compared against the Python parity report on the same runner.
+
 This probe does not replace `bench:python-parity:enforce`; publish readiness
 still depends on the Python parity gate.
 
@@ -77,6 +82,10 @@ still depends on the Python parity gate.
 - Override: `PYTHON_PARITY_MAX_SLOWDOWN=1.10`.
 - Default samples per runtime: `7`.
 - Sample override: `PYTHON_PARITY_RUNS=5`.
+- Native dispatch matmul overrides:
+  `NATIVE_DISPATCH_PROBE_MATMUL_SAMPLES`,
+  `NATIVE_DISPATCH_PROBE_MATMUL_WARMUP`, and
+  `NATIVE_DISPATCH_PROBE_MATMUL_ITERATIONS`.
 - Checksum tolerance: `PYTHON_PARITY_CHECKSUM_ATOL=1e-6` and
   `PYTHON_PARITY_CHECKSUM_RTOL=1e-9`.
 - Disable native backend: `TSNUM_NATIVE_BLAS=0`.

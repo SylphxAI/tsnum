@@ -20,6 +20,9 @@ type BenchResult = {
   median_ms: number
   samples_ms: number[]
   checksum: number
+  iterations: number
+  warmup: number
+  samples: number
 }
 
 type NativeKernelModule = {
@@ -43,6 +46,9 @@ const length = readPositiveInt('NATIVE_DISPATCH_PROBE_LENGTH', 1_000_000)
 const iterations = readPositiveInt('NATIVE_DISPATCH_PROBE_ITERATIONS', 30)
 const warmup = readPositiveInt('NATIVE_DISPATCH_PROBE_WARMUP', 5)
 const samples = readPositiveInt('NATIVE_DISPATCH_PROBE_SAMPLES', 3)
+const matmulIterations = readPositiveInt('NATIVE_DISPATCH_PROBE_MATMUL_ITERATIONS', 1000)
+const matmulWarmup = readPositiveInt('NATIVE_DISPATCH_PROBE_MATMUL_WARMUP', 100)
+const matmulSamples = readPositiveInt('NATIVE_DISPATCH_PROBE_MATMUL_SAMPLES', 7)
 
 function readPositiveInt(name: string, defaultValue: number): number {
   const raw = process.env[name]
@@ -103,20 +109,35 @@ function checksum(value: unknown): number {
   return Number.NaN
 }
 
-function measure(name: string, fn: () => unknown): BenchResult {
+type MeasureOptions = {
+  iterations?: number
+  warmup?: number
+  samples?: number
+}
+
+const matmulMeasureOptions = {
+  iterations: matmulIterations,
+  warmup: matmulWarmup,
+  samples: matmulSamples,
+}
+
+function measure(name: string, fn: () => unknown, options: MeasureOptions = {}): BenchResult {
+  const caseIterations = options.iterations ?? iterations
+  const caseWarmup = options.warmup ?? warmup
+  const caseSamples = options.samples ?? samples
   const samplesMs: number[] = []
   let last: unknown
 
-  for (let sample = 0; sample < samples; sample++) {
-    for (let index = 0; index < warmup; index++) {
+  for (let sample = 0; sample < caseSamples; sample++) {
+    for (let index = 0; index < caseWarmup; index++) {
       fn()
     }
 
     const startedAt = performance.now()
-    for (let index = 0; index < iterations; index++) {
+    for (let index = 0; index < caseIterations; index++) {
       last = fn()
     }
-    samplesMs.push((performance.now() - startedAt) / iterations)
+    samplesMs.push((performance.now() - startedAt) / caseIterations)
   }
 
   return {
@@ -124,6 +145,9 @@ function measure(name: string, fn: () => unknown): BenchResult {
     median_ms: median(samplesMs),
     samples_ms: samplesMs,
     checksum: checksum(last),
+    iterations: caseIterations,
+    warmup: caseWarmup,
+    samples: caseSamples,
   }
 }
 
@@ -209,18 +233,28 @@ const results = [
   measure('backend.typescript.addArrays', () => tsBackend.add(leftData, rightData)),
   measure('backend.typescript.mulScalar', () => tsBackend.mul(leftData, 2)),
   measure('backend.typescript.transpose512', () => tsBackend.transpose(matrixData)),
-  measure('backend.typescript.matmul128', () => tsBackend.matmul(matmulLeftData, matmulRightData)),
+  measure(
+    'backend.typescript.matmul128',
+    () => tsBackend.matmul(matmulLeftData, matmulRightData),
+    matmulMeasureOptions,
+  ),
   measure('backend.native-blas.addScalar', () => nativeBackend.add(leftData, 5)),
   measure('backend.native-blas.addArrays', () => nativeBackend.add(leftData, rightData)),
   measure('backend.native-blas.mulScalar', () => nativeBackend.mul(leftData, 2)),
   measure('backend.native-blas.transpose512', () => nativeBackend.transpose(matrixData)),
-  measure('backend.native-blas.matmul128', () =>
-    nativeBackend.matmul(matmulLeftData, matmulRightData),
+  measure(
+    'backend.native-blas.matmul128',
+    () => nativeBackend.matmul(matmulLeftData, matmulRightData),
+    matmulMeasureOptions,
   ),
   measure('public.addScalar', () => add(leftArray, 5)),
   measure('public.addArrays', () => add(leftArray, rightArray)),
   measure('public.mulScalar', () => mul(leftArray, 2)),
-  measure('public.matmul128', () => matmul(matmulLeftArray, matmulRightArray)),
+  measure(
+    'public.matmul128',
+    () => matmul(matmulLeftArray, matmulRightArray),
+    matmulMeasureOptions,
+  ),
 ]
 
 const report = {
@@ -229,6 +263,9 @@ const report = {
   iterations,
   warmup,
   samples,
+  matmul_iterations: matmulIterations,
+  matmul_warmup: matmulWarmup,
+  matmul_samples: matmulSamples,
   bun: Bun.version,
   platform: process.platform,
   arch: process.arch,
@@ -245,6 +282,9 @@ writeFileSync(reportPath, renderMarkdown(report))
 
 console.log(
   `Native dispatch probe: length ${length}, median of ${samples} samples, ${iterations} iterations`,
+)
+console.log(
+  `Matmul probe override: median of ${matmulSamples} samples, ${matmulIterations} iterations`,
 )
 for (const result of results) {
   console.log(`${result.name.padEnd(34)} ${result.median_ms.toFixed(4).padStart(10)} ms`)
@@ -268,15 +308,19 @@ function renderMarkdown(data: typeof report): string {
     `- Length: ${data.length}`,
     `- Samples: median of ${data.samples}`,
     `- Iterations per sample: ${data.iterations}`,
+    `- Matmul samples: median of ${data.matmul_samples}`,
+    `- Matmul iterations per sample: ${data.matmul_iterations}`,
     '',
     '## Results',
     '',
-    '| Layer | Median ms | Checksum |',
-    '| --- | ---: | ---: |',
+    '| Layer | Median ms | Samples | Iterations | Checksum |',
+    '| --- | ---: | ---: | ---: | ---: |',
   ]
 
   for (const result of data.results) {
-    lines.push(`| ${result.name} | ${result.median_ms.toFixed(4)} | ${result.checksum} |`)
+    lines.push(
+      `| ${result.name} | ${result.median_ms.toFixed(4)} | ${result.samples} | ${result.iterations} | ${result.checksum} |`,
+    )
   }
 
   lines.push(
