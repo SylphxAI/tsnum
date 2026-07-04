@@ -307,7 +307,26 @@ export class NativeBLASBackend extends TypeScriptBackend {
       return out
     }
 
-    if (b.dtype !== 'float64' || !(b.buffer instanceof Float64Array) || !this.hasSameShape(a, b)) {
+    if (b.dtype !== 'float64' || !(b.buffer instanceof Float64Array)) {
+      return super.addInto(a, b, out)
+    }
+
+    if (
+      a.shape.length === 1 &&
+      b.shape.length === 1 &&
+      out.shape.length === 1 &&
+      a.shape[0] === b.shape[0] &&
+      a.shape[0] === out.shape[0] &&
+      a.buffer.length === b.buffer.length &&
+      a.buffer.length === out.buffer.length &&
+      out.strides.length === 1 &&
+      out.strides[0] === 1
+    ) {
+      writeVdspAdd(a.buffer, b.buffer, pointerFor(out.buffer))
+      return out
+    }
+
+    if (!this.hasSameShape(a, b)) {
       return super.addInto(a, b, out)
     }
 
@@ -411,7 +430,7 @@ export class NativeBLASBackend extends TypeScriptBackend {
       throw new Error(`Shape mismatch: (${m}, ${k}) and (${b.shape[0]}, ${n})`)
     }
 
-    const output = createNativeOutput(m * n)
+    const output = new Float64Array(m * n)
     this.writeNativeMatmul(a.buffer, b.buffer, m, k, n, ptr(output))
     const layout = getMatmulLayout(m, n)
 
