@@ -38,19 +38,19 @@ Current truth:
   paths.
 - Evidence tools: Python parity benchmark plus native dispatch probe for
   kernel/wrapper/public-API timing.
-- Recorded benchmark evidence: accepted main CI run `28699755902` passes
+- Recorded benchmark evidence: accepted main CI run `28699887631` passes
   checksum parity for every covered row and passes the 1.05x speed target on
-  eight of ten covered rows. The latest uploaded `python-parity-report`
+  seven of ten covered rows. The latest uploaded `python-parity-report`
   artifact is canonical when this dated snapshot drifts.
-- Recent main CI: `add_arrays_1m` (`0.62x`), `add_scalar_1m` (`0.59x`),
-  `add_scalar_1m_out` (`0.97x`), `matmul_128` (`1.00x`), `mean_1m` (`0.56x`),
-  `mul_scalar_1m` (`0.68x`), `sum_1m` (`0.58x`), and `transpose_512` (`0.76x`)
-  pass the speed target. `add_arrays_1m_out` (`1.24x`) and
+- Recent main CI: `add_arrays_1m` (`0.71x`), `add_scalar_1m` (`0.65x`),
+  `add_scalar_1m_out` (`1.04x`), `mean_1m` (`0.56x`), `mul_scalar_1m`
+  (`0.64x`), `sum_1m` (`0.57x`), and `transpose_512` (`0.73x`) pass the speed
+  target. `add_arrays_1m_out` (`1.06x`), `matmul_128` (`1.11x`), and
   `mul_scalar_1m_out` (`1.06x`) remain release blockers. Full speed parity is
   not claimed.
 - Native dispatch evidence: the same run measured `public.addScalar.out` at
-  `0.1769ms`, `public.addArrays.out` at `0.3387ms`, `public.mulScalar.out` at
-  `0.1743ms`, and `public.matmul128.out` at `0.0797ms`, confirming that native
+  `0.1888ms`, `public.addArrays.out` at `0.3409ms`, `public.mulScalar.out` at
+  `0.1895ms`, and `public.matmul128.out` at `0.0797ms`, confirming that native
   output-buffer paths are the right direction while the NumPy release threshold
   still needs to clear for every covered row.
 - Release gate evidence: `bench:python-parity:enforce` and `release:preflight`
@@ -498,9 +498,9 @@ bun run bench:native-dispatch
 Recent CI evidence:
 
 - Checksum parity: all covered benchmark cases pass.
-- Reporting-mode speed evidence: main CI run `28699755902` passed eight of ten
-  covered speed rows. `add_arrays_1m_out` (`1.24x`) and `mul_scalar_1m_out`
-  (`1.06x`) remain over the strict `1.05x` target.
+- Reporting-mode speed evidence: main CI run `28699887631` passed seven of ten
+  covered speed rows. `add_arrays_1m_out` (`1.06x`), `matmul_128` (`1.11x`),
+  and `mul_scalar_1m_out` (`1.06x`) remain over the strict `1.05x` target.
 - Release gate evidence: `bench:python-parity:enforce` and `release:preflight`
   remain blockers until every covered speed row passes repeatably. Full speed
   parity is not marketed until that release gate passes.
