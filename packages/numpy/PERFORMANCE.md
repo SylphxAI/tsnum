@@ -50,20 +50,21 @@ Recent accepted main CI evidence as of 2026-07-04. The latest uploaded
 `python-parity-report` and `native-dispatch-report` artifacts remain canonical
 when this dated snapshot drifts.
 
-- Main CI run `28699144963` on macOS arm64 uploaded `python-parity-report`.
-- Commit: `d675426` (`bench: add ufunc out parity diagnostics`).
+- Main CI run `28699451145` on macOS arm64 uploaded `python-parity-report`.
+- Commit: `518ab26` (`docs: refresh parity launch evidence`).
 - Runtime: Python 3.12.10, NumPy 2.5.0, Bun 1.3.14,
   `@sylphx/numpy` backend `native-blas`.
 - Checksum parity passed for every covered row.
-- Speed rows passed for `add_arrays_1m` (`0.74x`), `add_scalar_1m` (`0.57x`),
-  `mean_1m` (`0.59x`), `mul_scalar_1m` (`0.52x`), `mul_scalar_1m_out`
-  (`1.05x`), `sum_1m` (`0.60x`), and `transpose_512` (`0.59x`).
-- `add_arrays_1m_out` failed the 1.05x speed target at `1.07x`,
-  `add_scalar_1m_out` failed at `1.11x`, and `matmul_128` failed at `1.17x`.
+- Speed rows passed for `add_arrays_1m` (`0.63x`), `add_scalar_1m` (`0.56x`),
+  `mean_1m` (`0.58x`), `mul_scalar_1m` (`0.57x`), `sum_1m` (`0.57x`), and
+  `transpose_512` (`0.70x`).
+- `add_arrays_1m_out` failed the 1.05x speed target at `1.08x`,
+  `add_scalar_1m_out` failed at `1.07x`, `matmul_128` failed at `1.11x`, and
+  `mul_scalar_1m_out` failed at `1.10x`.
 - The same run's native dispatch artifact measured `public.addScalar.out` at
-  `0.2320ms`, `public.addArrays.out` at `0.4306ms`, `public.mulScalar.out` at
-  `0.2063ms`, `public.matmul128` at `0.0829ms`, and `public.matmul128.out` at
-  `0.0705ms`, which supports the native output-buffer direction while keeping
+  `0.2023ms`, `public.addArrays.out` at `0.3931ms`, `public.mulScalar.out` at
+  `0.2156ms`, `public.matmul128` at `0.0811ms`, and `public.matmul128.out` at
+  `0.0718ms`, which supports the native output-buffer direction while keeping
   the same-machine NumPy comparison as the release blocker.
 - Full speed parity is therefore not claimed.
 - PR #36's native-addon Accelerate matmul bridge regressed `matmul_128` to
