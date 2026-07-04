@@ -44,8 +44,8 @@ benchmark gate passes on the same machine against Python/NumPy.
 | Benchmarks | `bench/python-parity` compares TypeScript and NumPy on identical inputs. |
 | Native path | Bun/macOS can initialize Rust/N-API and native BLAS fast paths for float64 hot loops. |
 | Dispatch evidence | `bun run bench:native-dispatch` separates kernel, backend, and public API overhead before performance changes are promoted. |
-| Proven today | Main CI run `28693587707` at `6c3d481` reports checksum parity and all covered reporting-mode speed rows passing on macOS arm64 native BLAS. |
-| Not claimed yet | PR #28 proved `bench:python-parity:enforce` is not stable enough for admission yet, and local `release:preflight` still fails; full NumPy API coverage, enforced all-op speed parity, and npm publication are still launch gates. |
+| Proven today | Covered benchmark checksums pass across recent CI runs, and native-backed rows often beat NumPy on reductions and vector scalar operations. |
+| Not claimed yet | Recent CI artifacts include both reporting-mode speed passes and failures; PR #28 proved `bench:python-parity:enforce` is not stable enough for admission yet, and local `release:preflight` still fails. Full NumPy API coverage, repeatable all-op speed parity, and npm publication are still launch gates. |
 
 **Features:**
 - 🎯 **NumPy-compatible DX** - Python spelling and behavior are the target
@@ -552,10 +552,10 @@ bun run lint
 
 **Status:** Broad NumPy-compatible surface with 251+ implemented operations and
 an explicit Python parity performance gate, native dispatch diagnostics, and
-release readback wiring. A recorded main CI reporting artifact passes checksum
-parity and all covered speed rows, but the enforced parity-gate experiment in
-PR #28 still failed under CI. Full NumPy API coverage, enforced all-op speed
-parity, and first npm publication remain launch gates, not completed claims.
+release readback wiring. Recent CI artifacts consistently pass checksum parity,
+but 1.05x speed parity is still volatile across reporting and enforced runs.
+Full NumPy API coverage, repeatable all-op speed parity, and first npm
+publication remain launch gates, not completed claims.
 
 Next: make `bench:python-parity:enforce` repeatably pass on the release path,
 harden GPU acceleration contract, and add more decompositions (LU,

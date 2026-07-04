@@ -184,7 +184,7 @@
       },
       {
         "id": "native-output-speed-parity-incomplete",
-        "description": "Main CI reporting evidence passes checksum parity and all covered speed rows on macOS arm64 native BLAS, but PR #28 proved bench:python-parity:enforce is not stable enough for admission yet. Release preflight remains intentionally blocked until enforced covered-operation speed parity passes repeatably.",
+        "description": "Recent CI evidence consistently passes checksum parity, but 1.05x covered speed parity is volatile across reporting and enforced runs. PR #28 proved bench:python-parity:enforce is not stable enough for admission yet, and release preflight remains intentionally blocked until covered-operation speed parity passes repeatably.",
         "owner": "SylphxAI/tsnum",
         "target": "Before package publication or full Python-speed marketing"
       }
