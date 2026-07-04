@@ -38,7 +38,7 @@ jobs:
         run: bun run test
 
       - name: Python parity benchmark
-        run: bun run bench:python-parity
+        run: bun run bench:python-parity:enforce
 
       - name: Python parity report freshness
         run: bun run bench:python-parity:report:check
