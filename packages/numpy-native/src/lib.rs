@@ -137,14 +137,14 @@ fn ensure_equal_len(left_len: usize, right_len: usize) -> Result<()> {
 }
 
 fn add_scalar_into(input: &[f64], scalar: f64, output: &mut [f64]) {
-    for index in 0..input.len() {
-        output[index] = input[index] + scalar;
+    for (out, value) in output.iter_mut().zip(input.iter()) {
+        *out = *value + scalar;
     }
 }
 
 fn mul_scalar_into(input: &[f64], scalar: f64, output: &mut [f64]) {
-    for index in 0..input.len() {
-        output[index] = input[index] * scalar;
+    for (out, value) in output.iter_mut().zip(input.iter()) {
+        *out = *value * scalar;
     }
 }
 
@@ -161,8 +161,8 @@ fn add_into(left: &[f64], right: &[f64], output: &mut [f64]) -> Result<()> {
         ));
     }
 
-    for index in 0..left.len() {
-        output[index] = left[index] + right[index];
+    for ((out, left_value), right_value) in output.iter_mut().zip(left.iter()).zip(right.iter()) {
+        *out = *left_value + *right_value;
     }
 
     Ok(())
