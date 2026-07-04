@@ -65,6 +65,9 @@ canonical when this dated snapshot drifts.
 - Commit: `154a285` (`bench: measure parity in steady-state runtime samples`)
 - Result: checksum parity passed, but speed parity failed on near-threshold
   rows after merge.
+- Subsequent PR validation run: `28706160711`
+- Result: required CI passed, but the non-enforcing `python-parity-report`
+  failed `add_scalar_1m_out` at `1.16x`, reinforcing the repeatability blocker.
 - Platform: macOS arm64
 - Python: 3.12.10
 - NumPy: 2.5.0
@@ -110,7 +113,9 @@ proved that every covered row can pass the configured `1.05x` speed target on
 the GitHub macOS runner. Merged main still shows near-threshold volatility in
 `add_arrays_1m_out`, `matmul_128`, and `mul_scalar_1m_out`; therefore full
 covered-operation speed parity is not claimed until `release:preflight` proves
-the result repeatably on the release path.
+the result repeatably on the release path. Later non-enforcing CI artifacts may
+fail different near-threshold rows and must be treated as volatility evidence,
+not as public speed-parity proof.
 
 ## Native Dispatch Evidence
 

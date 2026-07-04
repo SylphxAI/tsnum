@@ -58,10 +58,10 @@ benchmark gate passes on the same machine against Python/NumPy.
 | Proven today | Covered rows can all pass the 1.05x speed target on the GitHub macOS runner; checksum parity passes on every covered row. |
 | Not claimed yet | Merged main still shows near-threshold speed volatility; full NumPy API coverage, repeatable all-op speed parity, and npm publication are still launch gates. |
 
-Best accepted PR snapshot as of 2026-07-04. The latest uploaded
-`python-parity-report` artifact remains the canonical source when this table
-drifts. PR #76 run `28705663337`, commit `6435456`, macOS arm64, Python
-3.12.10, NumPy 2.5.0, Bun 1.3.14:
+Best accepted PR snapshot as of 2026-07-04. This is a historical best artifact,
+not a release claim. Newer uploaded `python-parity-report` artifacts remain the
+canonical source for current status. PR #76 run `28705663337`, commit
+`6435456`, macOS arm64, Python 3.12.10, NumPy 2.5.0, Bun 1.3.14:
 
 | Case | Speed vs NumPy | Status |
 | --- | ---: | --- |
@@ -81,8 +81,11 @@ All covered checksums passed in that run. The same code on merged main run
 `1.06x`, `matmul_128` at `1.07x`, and `mul_scalar_1m_out` at `1.05x`), so the
 release rule stays stricter than the marketing copy: no full-speed claim and no
 npm publish until the enforced gate passes repeatably on the release path.
-Closed follow-up experiments #77 and #78 are recorded as negative evidence
-because their artifacts worsened the release-blocking rows.
+Subsequent PR validation run `28706160711` kept required CI green but uploaded a
+non-enforcing `python-parity-report` with `add_scalar_1m_out` at `1.16x`, which
+reinforces the repeatability blocker. Closed follow-up experiments #77 and #78
+are recorded as negative evidence because their artifacts worsened the
+release-blocking rows.
 
 ## Python-To-TypeScript Contract
 

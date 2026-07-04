@@ -41,12 +41,15 @@ Current truth:
   kernel/wrapper/public-API timing.
 - Recorded benchmark evidence: PR #76 run `28705663337` passed checksum parity
   and the 1.05x speed target for every covered row on the GitHub macOS runner.
-  The latest uploaded `python-parity-report` artifact is canonical when this
-  dated snapshot drifts.
+  This is a historical best snapshot, not a release claim; newer uploaded
+  `python-parity-report` artifacts remain canonical for current status.
 - Merged main truth: the same code on run `28705714377` still failed
   near-threshold rows: `add_arrays_1m_out` (`1.06x`), `matmul_128` (`1.07x`),
   and `mul_scalar_1m_out` (`1.05x`). Full speed parity is not claimed until
   release preflight proves repeatability.
+- Subsequent PR validation run `28706160711` kept required CI green but uploaded
+  a non-enforcing report with `add_scalar_1m_out` at `1.16x`, reinforcing the
+  repeatability blocker.
 - Native dispatch evidence: merged main measured `public.addScalar.out` at
   `0.2210ms`, `public.addArrays.out` at `0.3911ms`, `public.mulScalar.out` at
   `0.2057ms`, `public.matmul128` at `0.0904ms`, and `public.matmul128.out` at

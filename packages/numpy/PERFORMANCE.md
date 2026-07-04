@@ -54,9 +54,10 @@ The release path uses `bench:python-parity:repeatability`, which runs the
 enforced benchmark multiple times and fails unless every attempt passes. This
 turns repeatability into a release gate rather than a README promise.
 
-Recent accepted evidence as of 2026-07-04. The latest uploaded
+Recent accepted evidence as of 2026-07-04. The cited passing artifact is a
+historical best snapshot, not a release claim. Newer uploaded
 `python-parity-report` and `native-dispatch-report` artifacts remain canonical
-when this dated snapshot drifts.
+for current status when this dated snapshot drifts.
 
 - PR #76 CI run `28705663337` on macOS arm64 uploaded a passing
   `python-parity-report`.
@@ -73,6 +74,9 @@ when this dated snapshot drifts.
 - Merged main run `28705714377` on commit `154a285` still failed
   near-threshold rows: `add_arrays_1m_out` (`1.06x`), `matmul_128` (`1.07x`),
   and `mul_scalar_1m_out` (`1.05x`).
+- Subsequent PR validation run `28706160711` kept required CI green but
+  uploaded a non-enforcing report with `add_scalar_1m_out` at `1.16x`, proving
+  the covered speed target is still not repeatable enough for publication.
 - The merged main native dispatch artifact measured `public.addScalar.out` at
   `0.2210ms`, `public.addArrays.out` at `0.3911ms`, `public.mulScalar.out` at
   `0.2057ms`, `public.matmul128` at `0.0904ms`, and `public.matmul128.out` at
