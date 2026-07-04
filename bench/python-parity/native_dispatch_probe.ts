@@ -92,6 +92,38 @@ function median(values: number[]): number {
   return (sorted[middle - 1] + sorted[middle]) / 2
 }
 
+function percentile(values: number[], percentileRank: number): number {
+  if (values.length === 0) {
+    return Number.NaN
+  }
+
+  const sorted = values.toSorted((a, b) => a - b)
+  const index = Math.ceil((percentileRank / 100) * sorted.length) - 1
+  return sorted[Math.max(0, Math.min(sorted.length - 1, index))]
+}
+
+function mean(values: number[]): number {
+  if (values.length === 0) {
+    return Number.NaN
+  }
+
+  return values.reduce((total, value) => total + value, 0) / values.length
+}
+
+function relativeStddev(values: number[]): number {
+  const average = mean(values)
+  if (!Number.isFinite(average) || average === 0) {
+    return Number.NaN
+  }
+
+  const variance = mean(values.map((value) => (value - average) * (value - average)))
+  return Math.sqrt(variance) / average
+}
+
+function formatPercent(value: number): string {
+  return Number.isFinite(value) ? `${(value * 100).toFixed(1)}%` : 'unknown'
+}
+
 function range(size: number, scale: number): Float64Array {
   const output = new Float64Array(size)
   for (let index = 0; index < size; index++) {
@@ -387,13 +419,13 @@ function renderMarkdown(data: typeof report): string {
     '',
     '## Results',
     '',
-    '| Layer | Median ms | Samples | Iterations | Checksum |',
-    '| --- | ---: | ---: | ---: | ---: |',
+    '| Layer | Median ms | p95 ms | RSD | Samples | Iterations | Checksum |',
+    '| --- | ---: | ---: | ---: | ---: | ---: | ---: |',
   ]
 
   for (const result of data.results) {
     lines.push(
-      `| ${result.name} | ${result.median_ms.toFixed(4)} | ${result.samples} | ${result.iterations} | ${result.checksum} |`,
+      `| ${result.name} | ${result.median_ms.toFixed(4)} | ${percentile(result.samples_ms, 95).toFixed(4)} | ${formatPercent(relativeStddev(result.samples_ms))} | ${result.samples} | ${result.iterations} | ${result.checksum} |`,
     )
   }
 
