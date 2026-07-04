@@ -511,8 +511,8 @@ Recent CI evidence:
 - Release gate evidence: `bench:python-parity:repeatability` and
   `release:preflight` remain blockers until every enforced release speed row
   passes repeatably and every benchmarked row keeps checksum parity. Diagnostic
-  allocation-return rows stay visible but do not support launch speed claims
-  until promoted to release rows.
+  allocation-return and short rows stay visible but do not support launch speed
+  claims until promoted to release rows.
 - Diagnostic evidence: `bench:native-dispatch` separates Rust/N-API kernel,
   TypeScript backend, NativeBLAS backend, and public API overhead before backend
   dispatch changes are promoted.

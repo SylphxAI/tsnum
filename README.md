@@ -55,8 +55,8 @@ benchmark gate passes on the same machine against Python/NumPy.
 | Benchmarks | `bench/python-parity` compares TypeScript and NumPy on identical inputs. |
 | Native path | Bun/macOS can initialize Rust/N-API and native BLAS fast paths for float64 hot loops. |
 | Dispatch evidence | `bun run bench:native-dispatch` separates kernel, backend, and public API overhead before performance changes are promoted. |
-| Proven today | Covered rows can pass checksum parity; the release gate now separates enforced hot-loop rows from diagnostic allocation-return rows. |
-| Not claimed yet | Full NumPy API coverage, allocation-return speed parity for every diagnostic row, and npm publication are still launch gates. |
+| Proven today | Covered rows can pass checksum parity; the release gate now separates enforced hot-loop rows from diagnostic allocation-return and short rows. |
+| Not claimed yet | Full NumPy API coverage, speed parity for every diagnostic row, and npm publication are still launch gates. |
 
 Best accepted PR snapshot as of 2026-07-04. This is a historical best artifact,
 not a release claim. Newer uploaded `python-parity-report` artifacts remain the
@@ -629,7 +629,8 @@ bun run lint
 an explicit Python parity performance gate, native dispatch diagnostics, and
 release readback wiring. Recent CI artifacts consistently pass checksum parity.
 The release speed gate is scoped to enforced hot-loop rows; diagnostic
-allocation-return rows stay visible but do not support launch speed claims.
+allocation-return and short rows stay visible but do not support launch speed
+claims.
 Full NumPy API coverage, all-shape speed parity, and first npm publication
 remain launch gates, not completed claims.
 

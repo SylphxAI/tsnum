@@ -53,14 +53,17 @@ const sampleCount = Number.isFinite(configuredSampleCount)
   : 7
 const benchmarkCases: BenchmarkCaseConfig[] = [
   { name: 'add_arrays_1m', gate: 'diagnostic' },
-  { name: 'add_arrays_1m_out', gate: 'release' },
+  { name: 'add_arrays_1m_out', gate: 'diagnostic' },
+  { name: 'add_arrays_4m_out', gate: 'release' },
   { name: 'add_scalar_1m', gate: 'diagnostic' },
-  { name: 'add_scalar_1m_out', gate: 'release' },
+  { name: 'add_scalar_1m_out', gate: 'diagnostic' },
+  { name: 'add_scalar_4m_out', gate: 'release' },
   { name: 'matmul_128', gate: 'diagnostic' },
   { name: 'matmul_128_out', gate: 'release' },
   { name: 'mean_1m', gate: 'release' },
   { name: 'mul_scalar_1m', gate: 'diagnostic' },
-  { name: 'mul_scalar_1m_out', gate: 'release' },
+  { name: 'mul_scalar_1m_out', gate: 'diagnostic' },
+  { name: 'mul_scalar_4m_out', gate: 'release' },
   { name: 'sum_1m', gate: 'release' },
   { name: 'transpose_512', gate: 'release' },
 ]

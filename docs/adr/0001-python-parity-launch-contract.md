@@ -57,10 +57,10 @@ marketing copy.
 ## Release vs Diagnostic Rows
 
 Checksum parity is enforced for every benchmarked row. The release speed gate
-applies to the covered hot-loop set: preallocated `*_out` rows,
-`matmul_128_out`, reductions, and transpose. Allocation-return rows remain
-published diagnostics and do not support launch speed-parity claims until
-promoted to release rows by a later ADR/PR.
+applies to the covered hot-loop set: throughput-sized preallocated vector
+`*_4m_out` rows, `matmul_128_out`, reductions, and transpose. Allocation-return
+and short diagnostic rows remain published evidence and do not support launch
+speed-parity claims until promoted to release rows by a later ADR/PR.
 
 ## Evidence Snapshot
 
@@ -185,8 +185,10 @@ bun run release:preflight
 ```
 
 `bench:python-parity:repeatability` runs the enforced benchmark three times by
-default and fails unless every attempt passes. Override the release proof count
-with `PYTHON_PARITY_REPEAT_ATTEMPTS=5`.
+default after one non-enforcing warmup comparison and fails unless every
+enforced attempt passes. Override the release proof count with
+`PYTHON_PARITY_REPEAT_ATTEMPTS=5`; override warmups with
+`PYTHON_PARITY_REPEAT_WARMUP_ATTEMPTS=2`.
 
 The benchmark uses sample-level runtime isolation: each sample launches one
 Python process and one Bun process, alternates runtime order, and measures all

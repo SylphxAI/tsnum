@@ -53,8 +53,9 @@ gaps from process-order or runner variance, and does not relax the checksum or
 speed gates.
 
 The release path uses `bench:python-parity:repeatability`, which runs the
-enforced benchmark multiple times and fails unless every attempt passes. This
-turns repeatability into a release gate rather than a README promise.
+comparison once as a non-enforcing warmup, then runs the enforced benchmark
+multiple times and fails unless every enforced attempt passes. This turns
+repeatability into a release gate rather than a README promise.
 
 Recent accepted evidence as of 2026-07-04. The cited passing artifact is a
 historical best snapshot, not a release claim. Newer uploaded
@@ -155,8 +156,8 @@ small-matrix native overhead from runner noise.
 - Close the remaining enforced-gate volatility against NumPy by reducing
   output-buffer wrapper overhead and proving that `add_scalar_1m_out`,
   `matmul_128_out`, and `mul_scalar_1m_out` stay repeatably inside the 1.05x
-  gate on the release runner. Allocation-return rows remain diagnostic until
-  their speed is repeatable enough to promote.
+  gate on the release runner. Allocation-return and short rows remain
+  diagnostic until their speed is repeatable enough to promote.
 - Promote only optimizations that improve the Python parity gate or are backed
   by the native dispatch probe; negative microbench experiments should not
   become public API.

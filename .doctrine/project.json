@@ -210,7 +210,7 @@
       },
       {
         "id": "native-output-speed-parity-incomplete",
-        "description": "Recent CI evidence consistently passes checksum parity, and PR #76 proved one all-row passing covered-speed artifact. The release gate now separates enforced hot-loop release rows from diagnostic allocation-return rows, so release preflight remains intentionally blocked until release rows pass repeatably and every benchmarked row keeps checksum parity on the release preflight runner.",
+        "description": "Recent CI evidence consistently passes checksum parity, and PR #76 proved one all-row passing covered-speed artifact. The release gate now separates enforced hot-loop release rows from diagnostic allocation-return and short rows, so release preflight remains intentionally blocked until release rows pass repeatably and every benchmarked row keeps checksum parity on the release preflight runner.",
         "owner": "SylphxAI/tsnum",
         "target": "Before package publication or full Python-speed marketing"
       },

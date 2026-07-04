@@ -75,9 +75,10 @@ postpublish runs `release:readback`.
 `bench:python-parity:repeatability`. PR #76 proved one all-row passing covered
 speed artifact, but merged main showed near-threshold volatility. The release
 gate now separates enforced hot-loop release rows from diagnostic
-allocation-return rows; publication remains intentionally blocked until every
-enforced release row passes repeatably and every benchmarked row keeps checksum
-parity on the release preflight runner. After publish, `release:readback` must
+allocation-return and short rows; publication remains intentionally blocked
+until every enforced release row passes repeatably and every benchmarked row
+keeps checksum parity on the release preflight runner. After publish,
+`release:readback` must
 verify every public workspace package, and release evidence must include
 provenance/attestation, changelog, and consumer smoke proof because source
 revert alone does not undo a release.

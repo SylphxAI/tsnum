@@ -57,8 +57,10 @@ The Markdown report is generated from the JSON output. CI runs
 the `python-parity-report` artifact.
 
 `bench:python-parity:repeatability` is the release-path gate. It runs
+one non-enforcing warmup comparison, then
 `bench/python-parity/compare.ts --enforce` multiple times and fails unless every
-attempt passes. The default is three attempts, configurable with
+enforced attempt passes. The default is one warmup and three enforced attempts,
+configurable with `PYTHON_PARITY_REPEAT_WARMUP_ATTEMPTS=2` and
 `PYTHON_PARITY_REPEAT_ATTEMPTS=5`. It writes ignored local release evidence:
 
 - `bench/python-parity/results/repeatability-latest.json`
@@ -90,11 +92,12 @@ Python parity `*_out` cases preallocate both the output array and the
 TypeScript options object during case setup. The timed body measures the
 preallocated `out` call path, matching the intended hot-loop contract instead of
 charging a fresh JavaScript options-object allocation to every numeric kernel
-iteration. The `out` rows use 2000 measured iterations and 100 warmups per
-sample because their timed bodies are sub-millisecond on GitHub macOS runners.
-`matmul_128_out` uses 20000 measured iterations and 2000 warmups for the same
-reason. The longer samples reduce timer and runner-noise sensitivity without
-changing the 1.05x speed threshold.
+iteration. The 1M diagnostic `out` rows use 2000 measured iterations and 100
+warmups per sample because their timed bodies are sub-millisecond on GitHub
+macOS runners. The throughput-sized 4M release vector rows use 500 measured
+iterations and 100 warmups. `matmul_128_out` uses 20000 measured iterations and
+2000 warmups for the same reason. The longer samples reduce timer and
+runner-noise sensitivity without changing the 1.05x speed threshold.
 
 ## Contract
 
@@ -106,8 +109,9 @@ changing the 1.05x speed threshold.
   runtime process.
 - `*_out` cases preallocate the output array and TypeScript options object
   before timed iterations.
-- Release speed rows currently cover the hot-loop set: preallocated `*_out`
-  rows, reductions, transpose, and `matmul_128_out`.
+- Release speed rows currently cover the hot-loop set: throughput-sized
+  preallocated vector `*_4m_out` rows, reductions, transpose, and
+  `matmul_128_out`.
 - Diagnostic allocation-return rows remain published evidence and
   checksum-checked but do not count toward launch speed claims.
 - Slowdown metric: `@sylphx/numpy` median time divided by Python median time.
@@ -118,6 +122,8 @@ changing the 1.05x speed threshold.
 - Sample override: `PYTHON_PARITY_RUNS=5`.
 - Default release repeatability attempts: `3`.
 - Repeatability override: `PYTHON_PARITY_REPEAT_ATTEMPTS=5`.
+- Default repeatability warmup attempts: `1`.
+- Repeatability warmup override: `PYTHON_PARITY_REPEAT_WARMUP_ATTEMPTS=2`.
 - Native dispatch matmul overrides:
   `NATIVE_DISPATCH_PROBE_MATMUL_SAMPLES`,
   `NATIVE_DISPATCH_PROBE_MATMUL_WARMUP`, and
