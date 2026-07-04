@@ -3,9 +3,9 @@
  * Performance comparison: WASM vs TypeScript backend
  */
 
-import { TypeScriptBackend } from '../packages/tsnum/src/backend/typescript'
-import { WASMBackend } from '../packages/tsnum/src/backend/wasm'
-import { array } from '../packages/tsnum/src/creation'
+import { TypeScriptBackend } from '../packages/numpy/src/backend/typescript'
+import { WASMBackend } from '../packages/numpy/src/backend/wasm'
+import { array } from '../packages/numpy/src/creation'
 
 // Benchmark helper
 function benchmark(name: string, fn: () => void, iterations = 1000) {

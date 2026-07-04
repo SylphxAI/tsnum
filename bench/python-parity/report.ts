@@ -94,12 +94,12 @@ export function renderMarkdownReport(report: ComparisonReport): string {
     `- Bun: ${report.ts.bun ?? 'unknown'}`,
     `- Platform: ${report.ts.platform ?? report.python.platform ?? 'unknown'}`,
     `- Architecture: ${report.ts.arch ?? 'unknown'}`,
-    `- tsnum backend: ${backend?.name ?? 'unknown'}`,
+    `- @sylphx/numpy backend: ${backend?.name ?? 'unknown'}`,
     `- Native BLAS init: ${native?.success ? 'pass' : (native?.error ?? 'not reported')}`,
     '',
     '## Cases',
     '',
-    '| Case | Python median ms | tsnum median ms | Slowdown | Speed | Checksum |',
+    '| Case | Python median ms | @sylphx/numpy median ms | Slowdown | Speed | Checksum |',
     '| --- | ---: | ---: | ---: | --- | --- |',
   ]
 

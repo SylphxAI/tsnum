@@ -12,8 +12,10 @@
       "dist",
       ".turbo",
       ".changeset",
-      "packages/tsnum/wasm",
-      "packages/tsnum-wasm/target",
+      "packages/numpy/wasm",
+      "packages/numpy-native/index.js",
+      "packages/numpy-native/index.d.ts",
+      "packages/numpy-wasm/target",
       "**/*.wasm"
     ]
   },

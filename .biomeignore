@@ -4,3 +4,5 @@ target/
 *.wasm
 **/wasm/
 **/target/
+packages/numpy-native/index.js
+packages/numpy-native/index.d.ts

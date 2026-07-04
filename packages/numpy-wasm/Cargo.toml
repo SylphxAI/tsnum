@@ -1,0 +1,21 @@
+[package]
+name = "sylphx-numpy-wasm"
+version = "0.3.0"
+edition = "2021"
+authors = ["SylphxAI"]
+description = "WASM backend for the Sylphx NumPy-compatible TypeScript stack"
+license = "MIT"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+wasm-bindgen = "0.2"
+
+[dev-dependencies]
+wasm-bindgen-test = "0.3"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1

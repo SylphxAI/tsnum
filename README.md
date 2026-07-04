@@ -1,8 +1,8 @@
-# NumPy for TypeScript
+# @sylphx/numpy
 
-`tsnum` is the current implementation codename for the NumPy-compatible
-TypeScript engine. The target public DX is `@sylphx/numpy` with `np` as the
-canonical import alias.
+NumPy-compatible numerical computing for TypeScript. This repository was
+started as `tsnum`; the public package contract is now `@sylphx/numpy`, with
+`np` as the canonical import alias.
 
 The mission is direct: make Python-grade numerical computing available inside
 TypeScript without forcing teams to run a Python sidecar for every model,
@@ -10,19 +10,28 @@ agent, dashboard, or server workflow. The API target is NumPy spelling and
 semantics; the performance target is NumPy-class native execution, admitted by
 repository-local Python parity benchmarks.
 
+Release gate: `@sylphx/numpy` npm publication must pass
+`bun run bench:python-parity:enforce` and npm registry readback first. Until
+that readback exists, treat the install command below as the post-release
+package contract rather than current registry availability.
+
+NumPy is a project of the NumPy community. This package is NumPy-compatible in
+API direction and is not affiliated with, endorsed by, or sponsored by NumPy.
+
 ## Why Star This
 
 - **Python ecosystem migration path** - Python users should recognize the API,
   shapes, dtypes, broadcasting, and numerical vocabulary immediately.
 - **Native-speed target, not JavaScript-only ambition** - TypeScript is the
-  public language surface; hot operations can run through Rust/N-API native
-  kernels, native BLAS, WASM, or GPU backends when the workload demands it.
+  public language surface; hot operations are designed to route through
+  Rust/N-API native kernels, native BLAS, WASM, and future GPU backends when the
+  workload demands it.
 - **Evidence-gated marketing** - this repo carries a NumPy comparison gate
   (`bun run bench:python-parity:enforce`) and a generated CI report artifact, so
   public performance claims are tied to reproducible measurements instead of
   README optimism.
-- **Commercial package direction** - `tsnum` is the implementation codename; the
-  intended public package/DX is `@sylphx/numpy` imported as `np`.
+- **Commercial package contract** - public examples, package metadata, release
+  readback, and benchmark reports now point at `@sylphx/numpy`.
 
 ## Python Parity Status
 
@@ -35,7 +44,7 @@ benchmark gate passes on the same machine against Python/NumPy.
 | Benchmarks | `bench/python-parity` compares TypeScript and NumPy on identical inputs. |
 | Native path | Bun/macOS can initialize Rust/N-API and native BLAS fast paths for float64 hot loops. |
 | Proven today | Checksum parity passes for the covered benchmark cases; CI uploads the generated Python parity report; speed parity is not complete yet. |
-| Not claimed yet | Full NumPy API coverage, all-op 1.05x performance parity, and npm rename completion. |
+| Not claimed yet | Full NumPy API coverage, all-op 1.05x performance parity, and npm publication. |
 
 **Features:**
 - 🎯 **NumPy-compatible DX** - Python spelling and behavior are the target
@@ -48,55 +57,36 @@ benchmark gate passes on the same machine against Python/NumPy.
 - 🌊 **FFT Operations** - Fast Fourier Transform (Cooley-Tukey)
 - ⚡ **Native/WASM backend path** - Rust/N-API, native BLAS, and WASM acceleration with TS fallback
 - 🌳 Tree-shakeable - import only what you need
-- 📦 Lightweight core (~20KB gzipped)
+- 📦 Lightweight core with optional native acceleration
 - 🔒 Full TypeScript type safety
-- 💨 Zero runtime dependencies
+- 💨 Zero required runtime dependencies; native kernels are optional packages
 - 🎨 Elegant `pipe` composition
 
 ## Installation
 
-```bash
-bun add tsnum
-# or
-npm install tsnum
-```
-
-Target package after rename migration:
+After the gated npm release:
 
 ```bash
 bun add @sylphx/numpy
+# or
+npm install @sylphx/numpy
 ```
 
 ## Quick Start
 
 ```typescript
-import * as np from 'tsnum'
+import * as np from '@sylphx/numpy'
 
 const a = np.array([1, 2, 3])
 const b = np.add(a, 5)           // [6, 7, 8]
 const result = np.sum(b)         // 21
 ```
 
-Target accelerated backend DX after the backend migration uses one async
-boundary, not `await` on every operation:
-
-```typescript
-import * as np from 'tsnum'
-
-await np.use('webgpu') // target API
-
-const a = np.array([[1, 2], [3, 4]], { device: 'webgpu' })
-const b = np.matmul(a, a.T)
-
-await np.sync()
-const values = await b.tolist()
-```
-
 ## API Overview
 
 ### Creation (Functional-only)
 ```typescript
-import { array, zeros, ones, arange, linspace, eye } from 'tsnum'
+import { array, zeros, ones, arange, linspace, eye } from '@sylphx/numpy'
 
 const a = array([1, 2, 3])
 const b = zeros([3, 3])
@@ -108,7 +98,7 @@ const f = eye(3)                  // 3x3 identity matrix
 
 ### Arithmetic Operations
 ```typescript
-import { add, sub, mul, div, pow } from 'tsnum'
+import { add, sub, mul, div, pow } from '@sylphx/numpy'
 
 const a = array([1, 2, 3])
 
@@ -125,7 +115,7 @@ const z = add(x, y)               // [5, 7, 9]
 
 ### Reductions
 ```typescript
-import { sum, mean, max, min, std, variance } from 'tsnum'
+import { sum, mean, max, min, std, variance } from '@sylphx/numpy'
 
 const a = array([1, 2, 3, 4, 5])
 
@@ -139,7 +129,7 @@ variance(a)                       // variance
 
 ### Shape Operations
 ```typescript
-import { reshape, transpose, flatten } from 'tsnum'
+import { reshape, transpose, flatten } from '@sylphx/numpy'
 
 const a = array([[1, 2], [3, 4]])
 
@@ -153,7 +143,7 @@ a.T                               // [[1, 3], [2, 4]]
 
 ### Comparison
 ```typescript
-import { equal, less, greater, lessEqual, greaterEqual } from 'tsnum'
+import { equal, less, greater, lessEqual, greaterEqual } from '@sylphx/numpy'
 
 const a = array([1, 2, 3])
 
@@ -164,7 +154,7 @@ greater(a, 1)                     // [0, 1, 1]
 
 ### Indexing & Slicing
 ```typescript
-import { array, at, slice, take } from 'tsnum'
+import { array, at, slice, take } from '@sylphx/numpy'
 
 // Element access with at()
 const arr = array([[1, 2, 3], [4, 5, 6]])
@@ -187,7 +177,7 @@ take(c, [0, 2, 4])                // [10, 30, 50]
 
 ### Math Functions
 ```typescript
-import { abs, sign, sqrt, exp, log, sin, cos, tan, round, floor, ceil } from 'tsnum'
+import { abs, sign, sqrt, exp, log, sin, cos, tan, round, floor, ceil } from '@sylphx/numpy'
 
 const a = array([1, 4, 9])
 
@@ -209,7 +199,7 @@ ceil(vals)                        // [2, 3, 4]
 
 ### Logical Operations
 ```typescript
-import { all, any, logicalAnd, logicalOr, logicalNot, where } from 'tsnum'
+import { all, any, logicalAnd, logicalOr, logicalNot, where } from '@sylphx/numpy'
 
 const a = array([1, 0, 1])
 const b = array([1, 1, 0])
@@ -230,7 +220,7 @@ where(cond, x, y)                 // [10, 200, 30]
 
 ### Sorting & Search
 ```typescript
-import { sort, argsort, argmax, argmin } from 'tsnum'
+import { sort, argsort, argmax, argmin } from '@sylphx/numpy'
 
 const a = array([3, 1, 4, 1, 5])
 
@@ -242,7 +232,7 @@ argmin(a)                         // 1 (index of min)
 
 ### Array Manipulation
 ```typescript
-import { concat, stack, vstack, hstack, repeat } from 'tsnum'
+import { concat, stack, vstack, hstack, repeat } from '@sylphx/numpy'
 
 const a = array([1, 2])
 const b = array([3, 4])
@@ -256,7 +246,7 @@ repeat(a, 3)                      // [1, 2, 1, 2, 1, 2]
 
 ### Linear Algebra
 ```typescript
-import { dot, matmul, inv, solve, det, trace, qr, svd, cholesky } from 'tsnum'
+import { dot, matmul, inv, solve, det, trace, qr, svd, cholesky } from '@sylphx/numpy'
 
 const A = array([[1, 2], [3, 4]])
 const b = array([5, 6])
@@ -277,7 +267,7 @@ const L = cholesky(A)             // Cholesky decomposition (positive-definite)
 
 ### Random Number Generation
 ```typescript
-import { random, randn, randint, shuffle, choice, setSeed } from 'tsnum'
+import { random, randn, randint, shuffle, choice, setSeed } from '@sylphx/numpy'
 
 // Set seed for reproducibility
 setSeed(42)
@@ -296,7 +286,7 @@ choice(arr, 3, false)             // Without replacement
 
 ### Advanced Statistics
 ```typescript
-import { median, percentile, quantile, corrcoef, cov, histogram } from 'tsnum'
+import { median, percentile, quantile, corrcoef, cov, histogram } from '@sylphx/numpy'
 
 const a = array([1, 2, 3, 4, 5])
 
@@ -316,7 +306,7 @@ const { counts, edges } = histogram(a, 10)
 
 ### FFT Operations
 ```typescript
-import { fft, ifft, rfft, irfft } from 'tsnum'
+import { fft, ifft, rfft, irfft } from '@sylphx/numpy'
 
 const signal = array([1, 2, 1, 0, 1, 2, 1, 0])  // Length must be power of 2
 
@@ -333,7 +323,7 @@ const original = irfft(realSpec)
 
 ### Broadcasting
 ```typescript
-import { array, add, mul } from 'tsnum'
+import { array, add, mul } from '@sylphx/numpy'
 
 // Scalar broadcasting
 const a = array([1, 2, 3])
@@ -367,39 +357,40 @@ a.T                               // Transpose
 ## Functional Composition with `pipe`
 
 ```typescript
-import { pipe } from 'tsnum'
-import * as tn from 'tsnum'
+import { pipe } from '@sylphx/numpy'
+import * as np from '@sylphx/numpy'
+import type { NDArray } from '@sylphx/numpy'
 
 // ===== Example 1: Data normalization =====
 const normalize = (data: NDArray) => pipe(
   data,
-  d => tn.sub(d, tn.mean(d)),      // Center around mean
-  d => tn.div(d, tn.std(d))         // Scale by std deviation
+  d => np.sub(d, np.mean(d)),      // Center around mean
+  d => np.div(d, np.std(d))         // Scale by std deviation
 )
 
 const normalized = normalize(myData)
 
 // ===== Example 2: Complex transformation =====
 const result = pipe(
-  tn.arange(12),
-  d => tn.reshape(d, [3, 4]),
-  tn.transpose,
-  d => tn.add(d, 10),
-  d => tn.mul(d, 2),
-  tn.sum
+  np.arange(12),
+  d => np.reshape(d, [3, 4]),
+  np.transpose,
+  d => np.add(d, 10),
+  d => np.mul(d, 2),
+  np.sum
 )
 
 // ===== Example 3: Reusable transformations =====
-const add5 = (a: NDArray) => tn.add(a, 5)
-const double = (a: NDArray) => tn.mul(a, 2)
-const square = (a: NDArray) => tn.pow(a, 2)
+const add5 = (a: NDArray) => np.add(a, 5)
+const double = (a: NDArray) => np.mul(a, 2)
+const square = (a: NDArray) => np.pow(a, 2)
 
 const transform = (data: NDArray) => pipe(
   data,
   add5,
   double,
   square,
-  tn.sum
+  np.sum
 )
 ```
 
@@ -420,26 +411,26 @@ result = np.sum(multiplied)
 ```
 
 ```typescript
-// TypeScript tsnum (functional + pipe - more elegant!)
-import * as tn from 'tsnum'
-import { pipe } from 'tsnum'
+// TypeScript with @sylphx/numpy
+import * as np from '@sylphx/numpy'
+import { pipe } from '@sylphx/numpy'
 
-const data = tn.array([[1, 2], [3, 4]])
+const data = np.array([[1, 2], [3, 4]])
 
 // With pipe (recommended)
 const result = pipe(
   data,
-  d => tn.reshape(d, [4]),
-  d => tn.add(d, 10),
-  d => tn.mul(d, 2),
-  tn.sum
+  d => np.reshape(d, [4]),
+  d => np.add(d, 10),
+  d => np.mul(d, 2),
+  np.sum
 )
 
 // Or with intermediate variables (NumPy style)
-const reshaped = tn.reshape(data, [4])
-const added = tn.add(reshaped, 10)
-const multiplied = tn.mul(added, 2)
-const result2 = tn.sum(multiplied)
+const reshaped = np.reshape(data, [4])
+const added = np.add(reshaped, 10)
+const multiplied = np.mul(added, 2)
+const result2 = np.sum(multiplied)
 ```
 
 ## Design Philosophy
@@ -455,10 +446,10 @@ const result2 = tn.sum(multiplied)
 ### Why `pipe` over method chaining?
 
 ```typescript
-// ❌ Method chaining (not available in tsnum)
+// Method chaining is not the current public API.
 data.reshape([4]).add(10).mul(2).sum()
 
-// ✅ pipe (elegant and functional)
+// Use pipe or NumPy-style functions instead.
 pipe(
   data,
   d => reshape(d, [4]),
@@ -479,11 +470,11 @@ pipe(
 
 ### Backend Architecture
 
-tsnum keeps the public API in TypeScript while routing hot paths through the
-best available backend:
+`@sylphx/numpy` keeps the public API in TypeScript while routing hot paths
+through the best available backend:
 
 ```typescript
-import { getBackendInfo, initNativeBLAS, initWASM } from 'tsnum'
+import { getBackendInfo, initNativeBLAS, initWASM } from '@sylphx/numpy'
 
 // Optional: preload an accelerated backend during app startup
 await initNativeBLAS()
@@ -496,10 +487,11 @@ console.log(info.usingWASM)  // true if WASM loaded
 ```
 
 **How it works:**
-- 🚀 **Native BLAS path**: Bun/macOS can use Accelerate for covered float64 kernels
-- 🔄 **WASM path**: portable acceleration for supported operations
-- 🧱 **TypeScript fallback**: always available reference implementation
-- ⚡ **Explicit preload**: accelerated backends can be initialized during startup
+- **Native path**: Rust/N-API kernels and Bun/macOS Accelerate cover selected
+  float64 hot loops.
+- **WASM path**: portable acceleration for supported operations.
+- **TypeScript fallback**: always available reference implementation.
+- **Explicit preload**: accelerated backends can be initialized during startup.
 
 **Performance:**
 - **Native/WASM backend paths**: Accelerated execution for covered hot paths
@@ -543,20 +535,20 @@ bun run lint
 an explicit Python parity performance gate. Full NumPy API coverage and all-op
 1.05x speed parity remain launch gates, not completed claims.
 
-Next: package rename, Python parity closure, GPU acceleration, more
-decompositions (LU, eigendecomposition)
+Next: Python parity closure, GPU acceleration contract, and more decompositions
+(LU, eigendecomposition).
 
-## Why tsnum?
+## Why @sylphx/numpy?
 
-| Feature | tsnum | NumPy.js | ndarrays |
+| Feature | @sylphx/numpy | NumPy.js | ndarrays |
 |---------|-------|----------|----------|
-| **Functional-first** | ✅ | ❌ | ❌ |
-| **pipe composition** | ✅ | ❌ | ❌ |
-| **Tree-shakeable** | ✅ | ⚠️ | ⚠️ |
-| **TypeScript native** | ✅ | ⚠️ | ✅ |
-| **NumPy-compatible** | ✅ | ✅ | ❌ |
+| **Functional-first** | Yes | No | No |
+| **pipe composition** | Yes | No | No |
+| **Tree-shakeable** | Yes | Partial | Partial |
+| **TypeScript native** | Yes | Partial | Yes |
+| **NumPy-compatible target** | Yes | Yes | No |
 | **Bundle size** | ~20KB | ~200KB | ~50KB |
-| **Zero dependencies** | ✅ | ❌ | ✅ |
+| **Required runtime dependencies** | None | Yes | None |
 
 ## License
 

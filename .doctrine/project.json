@@ -5,10 +5,10 @@
     "name": "tsnum",
     "lifecycle": "active",
     "layer": "foundation",
-    "summary": "Foundation TypeScript numerical computing library family moving toward a NumPy-compatible public contract with TypeScript, native, and WASM backend paths, benchmarks, tests, and package exports.",
+    "summary": "Foundation TypeScript numerical computing library family whose public npm contract is @sylphx/numpy, with TypeScript, native, and WASM backend paths, benchmarks, tests, and package exports.",
     "goals": [
       "Provide a typed, functional-first numerical computing API for JavaScript and TypeScript consumers.",
-      "Move the package family toward the @sylphx/numpy public contract with NumPy-compatible spelling, array semantics, and explicit backend boundaries.",
+      "Maintain the package family around the @sylphx/numpy public contract with NumPy-compatible spelling, array semantics, and explicit backend boundaries.",
       "Keep TypeScript, native, and WASM backend behavior coherent through package exports, tests, and benchmarks.",
       "Publish only documented package exports and performance claims that can be reproduced by repository-local evidence."
     ],
@@ -21,19 +21,19 @@
   "boundaries": {
     "owns": [
       {
-        "name": "tsnum-core-package",
-        "description": "The tsnum package exports, TypeScript implementation, tests, and documented numerical API behavior."
+        "name": "sylphx-numpy-core-package",
+        "description": "The @sylphx/numpy package exports, TypeScript implementation, tests, and documented numerical API behavior."
       },
       {
-        "name": "tsnum-wasm-backend",
+        "name": "sylphx-numpy-wasm-backend",
         "description": "Rust/WASM backend package and compatibility expectations for accelerated numerical operations."
       },
       {
-        "name": "tsnum-native-backend-path",
+        "name": "numpy-native-backend-path",
         "description": "Rust/N-API native kernel package, native BLAS backend integration point, and compatibility expectations for Python parity hot paths."
       },
       {
-        "name": "tsnum-benchmark-evidence",
+        "name": "sylphx-numpy-benchmark-evidence",
         "description": "Repository-local benchmark and performance documentation used to support package performance claims."
       }
     ],
@@ -51,32 +51,32 @@
       {
         "type": "documentation",
         "name": "Package README",
-        "location": "packages/tsnum/README.md"
+        "location": "packages/numpy/README.md"
       },
       {
         "type": "package-export",
-        "name": "tsnum package exports",
-        "location": "packages/tsnum/package.json"
+        "name": "@sylphx/numpy package exports",
+        "location": "packages/numpy/package.json"
       },
       {
         "type": "package-export",
         "name": "Rust native kernel package",
-        "location": "packages/tsnum-native/package.json"
+        "location": "packages/numpy-native/package.json"
       },
       {
         "type": "api",
         "name": "Backend implementations",
-        "location": "packages/tsnum/src/backend/"
+        "location": "packages/numpy/src/backend/"
       },
       {
         "type": "package-export",
-        "name": "tsnum WASM backend package",
-        "location": "packages/tsnum-wasm/Cargo.toml"
+        "name": "@sylphx/numpy WASM backend package",
+        "location": "packages/numpy-wasm/Cargo.toml"
       },
       {
         "type": "documentation",
         "name": "Performance evidence",
-        "location": "packages/tsnum/PERFORMANCE.md"
+        "location": "packages/numpy/PERFORMANCE.md"
       },
       {
         "type": "documentation",
@@ -129,7 +129,7 @@
       "status": "planned"
     },
     "specs": {
-      "path": "packages/tsnum/README.md",
+      "path": "packages/numpy/README.md",
       "status": "present"
     },
     "catalog": {
@@ -137,11 +137,11 @@
       "status": "present"
     },
     "runbooks": {
-      "path": "packages/tsnum/PERFORMANCE.md",
+      "path": "packages/numpy/PERFORMANCE.md",
       "status": "present"
     },
     "generatedReferences": {
-      "path": "packages/tsnum/dist/",
+      "path": "packages/numpy/dist/",
       "status": "generated"
     }
   },
@@ -172,7 +172,7 @@
       },
       {
         "id": "release-workflow-unproven",
-        "description": "Manual release workflow, preflight, and npm readback are declared, but no successful tsnum publish/readback has been observed yet. Current Python speed parity gaps intentionally block release:preflight.",
+        "description": "Manual release workflow, preflight, and npm readback are declared, but no successful @sylphx/numpy publish/readback has been observed yet. Current Python speed parity gaps intentionally block release:preflight.",
         "owner": "SylphxAI/tsnum",
         "target": "Before commercial-grade library operation"
       },

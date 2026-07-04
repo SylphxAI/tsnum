@@ -1,0 +1,91 @@
+/* tslint:disable */
+/* eslint-disable */
+export const memory: WebAssembly.Memory
+export const abs_array: (a: number, b: number) => [number, number]
+export const acosh_array: (a: number, b: number) => [number, number]
+export const add_arrays: (a: number, b: number, c: number, d: number) => [number, number]
+export const add_scalar: (a: number, b: number, c: number) => [number, number]
+export const arccos_array: (a: number, b: number) => [number, number]
+export const arcsin_array: (a: number, b: number) => [number, number]
+export const arctan2_arrays: (a: number, b: number, c: number, d: number) => [number, number]
+export const arctan_array: (a: number, b: number) => [number, number]
+export const argmax: (a: number, b: number) => number
+export const argmin: (a: number, b: number) => number
+export const asinh_array: (a: number, b: number) => [number, number]
+export const atanh_array: (a: number, b: number) => [number, number]
+export const cbrt_array: (a: number, b: number) => [number, number]
+export const ceil_array: (a: number, b: number) => [number, number]
+export const clip_array: (a: number, b: number, c: number, d: number) => [number, number]
+export const cos_array: (a: number, b: number) => [number, number]
+export const cosh_array: (a: number, b: number) => [number, number]
+export const deg2rad_array: (a: number, b: number) => [number, number]
+export const det_matrix: (a: number, b: number, c: number) => [number, number, number]
+export const div_arrays: (a: number, b: number, c: number, d: number) => [number, number]
+export const div_scalar: (a: number, b: number, c: number) => [number, number]
+export const dot: (a: number, b: number, c: number, d: number) => number
+export const exp2_array: (a: number, b: number) => [number, number]
+export const exp_array: (a: number, b: number) => [number, number]
+export const expm1_array: (a: number, b: number) => [number, number]
+export const fft: (a: number, b: number) => [number, number]
+export const floor_array: (a: number, b: number) => [number, number]
+export const fmod_arrays: (a: number, b: number, c: number, d: number) => [number, number]
+export const fmod_scalar: (a: number, b: number, c: number) => [number, number]
+export const hypot_arrays: (a: number, b: number, c: number, d: number) => [number, number]
+export const ifft: (a: number, b: number, c: number) => [number, number]
+export const inner_product: (a: number, b: number, c: number, d: number) => number
+export const inv_matrix: (a: number, b: number, c: number) => [number, number, number, number]
+export const log10_array: (a: number, b: number) => [number, number]
+export const log1p_array: (a: number, b: number) => [number, number]
+export const log2_array: (a: number, b: number) => [number, number]
+export const log_array: (a: number, b: number) => [number, number]
+export const matmul: (
+  a: number,
+  b: number,
+  c: number,
+  d: number,
+  e: number,
+  f: number,
+  g: number,
+) => [number, number]
+export const max: (a: number, b: number) => number
+export const maximum_arrays: (a: number, b: number, c: number, d: number) => [number, number]
+export const mean: (a: number, b: number) => number
+export const min: (a: number, b: number) => number
+export const minimum_arrays: (a: number, b: number, c: number, d: number) => [number, number]
+export const mul_arrays: (a: number, b: number, c: number, d: number) => [number, number]
+export const mul_scalar: (a: number, b: number, c: number) => [number, number]
+export const nanmax: (a: number, b: number) => number
+export const nanmean: (a: number, b: number) => number
+export const nanmin: (a: number, b: number) => number
+export const nanstd: (a: number, b: number) => number
+export const nansum: (a: number, b: number) => number
+export const nanvar: (a: number, b: number) => number
+export const norm: (a: number, b: number, c: number) => [number, number, number]
+export const outer_product: (a: number, b: number, c: number, d: number) => [number, number]
+export const pow_scalar: (a: number, b: number, c: number) => [number, number]
+export const prod: (a: number, b: number) => number
+export const rad2deg_array: (a: number, b: number) => [number, number]
+export const reciprocal_array: (a: number, b: number) => [number, number]
+export const round_array: (a: number, b: number) => [number, number]
+export const sign_array: (a: number, b: number) => [number, number]
+export const sin_array: (a: number, b: number) => [number, number]
+export const sinh_array: (a: number, b: number) => [number, number]
+export const sqrt_array: (a: number, b: number) => [number, number]
+export const square_array: (a: number, b: number) => [number, number]
+export const std: (a: number, b: number) => number
+export const sub_arrays: (a: number, b: number, c: number, d: number) => [number, number]
+export const sub_scalar: (a: number, b: number, c: number) => [number, number]
+export const sum: (a: number, b: number) => number
+export const tan_array: (a: number, b: number) => [number, number]
+export const tanh_array: (a: number, b: number) => [number, number]
+export const trace_matrix: (a: number, b: number, c: number, d: number) => number
+export const transpose_matrix: (a: number, b: number, c: number, d: number) => [number, number]
+export const trunc_array: (a: number, b: number) => [number, number]
+export const variance: (a: number, b: number) => number
+export const mod_arrays: (a: number, b: number, c: number, d: number) => [number, number]
+export const mod_scalar: (a: number, b: number, c: number) => [number, number]
+export const __wbindgen_externrefs: WebAssembly.Table
+export const __wbindgen_malloc: (a: number, b: number) => number
+export const __wbindgen_free: (a: number, b: number, c: number) => void
+export const __externref_table_dealloc: (a: number) => void
+export const __wbindgen_start: () => void

@@ -1,7 +1,7 @@
 # Python Parity Benchmark
 
-This benchmark compares tsnum against Python/NumPy on the same machine. It is
-the admission evidence for Python-compatible performance claims.
+This benchmark compares `@sylphx/numpy` against Python/NumPy on the same
+machine. It is the admission evidence for Python-compatible performance claims.
 
 ## Setup
 

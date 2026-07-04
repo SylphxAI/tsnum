@@ -4,7 +4,8 @@ Start with `PROJECT.md` and `.doctrine/project.json` before changing this
 repository. They define the project goal, lifecycle, boundaries, public
 surfaces, delivery model, and adoption gaps.
 
-Use `SylphxAI/doctrine` for enterprise standards. Keep tsnum consumer-neutral:
+Use `SylphxAI/doctrine` for enterprise standards. Keep `@sylphx/numpy`
+consumer-neutral while treating `tsnum` as repository history:
 product-specific numerical behavior, benchmark claims, and downstream usage
 policy belong in documented APIs, tests, benchmarks, or consuming products, not
 hidden package behavior.
