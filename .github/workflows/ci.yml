@@ -38,3 +38,16 @@ jobs:
 
       - name: Python parity benchmark
         run: bun run bench:python-parity
+
+      - name: Python parity report freshness
+        run: bun run bench:python-parity:report:check
+
+      - name: Upload Python parity report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-parity-report
+          path: |
+            bench/python-parity/results/latest.json
+            bench/python-parity/results/latest.md
+          if-no-files-found: ignore

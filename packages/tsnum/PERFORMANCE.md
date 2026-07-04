@@ -30,11 +30,14 @@ Run from the repository root:
 ```bash
 bun run bench:python-parity
 bun run bench:python-parity:enforce
+bun run bench:python-parity:report:check
 ```
 
 Default runs print and save current ratios. Enforced runs fail when a covered
 operation is slower than NumPy by more than the configured threshold. Checksum
-parity is always enforced.
+parity is always enforced. Each run writes JSON and Markdown evidence under
+`bench/python-parity/results/`; CI checks the generated Markdown report and
+uploads both files as the `python-parity-report` artifact.
 
 Latest local evidence after the native reduction path:
 
@@ -43,6 +46,7 @@ Latest local evidence after the native reduction path:
   operations still miss the 1.05x target in some local runs, so full speed parity
   is not marketed yet.
 - Current JSON output is written to `bench/python-parity/results/latest.json`.
+- Current Markdown output is written to `bench/python-parity/results/latest.md`.
 
 ## Backend Evidence
 
@@ -65,7 +69,6 @@ Latest local evidence after the native reduction path:
 ## Future Optimizations (Roadmap)
 
 - Close the remaining add/mul/matmul speed gaps against NumPy.
-- Produce a generated benchmark report or freshness gate for README claims.
 - Prove the release workflow with a successful package publish, npm registry
   readback, changelog evidence, and consumer smoke evidence after the enforced
   parity benchmark passes.

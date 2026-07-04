@@ -74,6 +74,11 @@
         "location": "packages/tsnum/PERFORMANCE.md"
       },
       {
+        "type": "documentation",
+        "name": "Generated Python parity benchmark report",
+        "location": "bench/python-parity/results/latest.md"
+      },
+      {
         "type": "workflow",
         "name": "Pull request and main validation",
         "location": ".github/workflows/ci.yml"
@@ -138,8 +143,8 @@
   "delivery": {
     "ciModel": "legacy-ci",
     "requiredContexts": ["Build, test, and benchmark"],
-    "deployPath": "Repo-local GitHub Actions CI validates pull requests and main pushes with Bun install, build, tests, and the Python parity benchmark. Package publication is manually triggered through .github/workflows/release.yml, delegates to the central Sylphx release workflow, and runs release:preflight before publish plus release:readback after publish.",
-    "productionProof": "Merged package changes require green CI on the PR and main push. Published package changes additionally require benchmark evidence for performance-sensitive claims, package registry readback after release, and consumer smoke proof for affected exports.",
+    "deployPath": "Repo-local GitHub Actions CI validates pull requests and main pushes with Bun install, build, tests, the Python parity benchmark, and generated report freshness. Package publication is manually triggered through .github/workflows/release.yml, delegates to the central Sylphx release workflow, and runs release:preflight before publish plus release:readback after publish.",
+    "productionProof": "Merged package changes require green CI on the PR and main push, including the uploaded Python parity report artifact. Published package changes additionally require benchmark evidence for performance-sensitive claims, package registry readback after release, and consumer smoke proof for affected exports.",
     "recoveryClass": "forward-fix-only",
     "packageRelease": {
       "publishesPackages": true,
@@ -173,10 +178,10 @@
         "target": "Before commercial-grade library operation"
       },
       {
-        "id": "benchmark-report-missing",
-        "description": "Turn the Python parity benchmark output into a stable generated report or freshness gate so public performance docs cannot drift from measured evidence.",
+        "id": "native-output-speed-parity-incomplete",
+        "description": "Native-backed reductions pass the speed target, but output-producing vector, matmul, and transpose cases still miss the 1.05x Python speed target in the generated parity report.",
         "owner": "SylphxAI/tsnum",
-        "target": "Before full package adoption"
+        "target": "Before package publication or full Python-speed marketing"
       }
     ]
   }

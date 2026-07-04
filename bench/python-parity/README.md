@@ -16,6 +16,7 @@ python -m pip install -r bench/python-parity/requirements.txt
 ```bash
 bun run bench:python-parity
 bun run bench:python-parity:enforce
+bun run bench:python-parity:report:check
 ```
 
 Without activating the venv:
@@ -30,6 +31,15 @@ parity is always enforced across every sample. Enforcement runs additionally
 fail when any covered operation is slower than NumPy by more than the configured
 threshold.
 
+Each run writes:
+
+- `bench/python-parity/results/latest.json`
+- `bench/python-parity/results/latest.md`
+
+The Markdown report is generated from the JSON output. CI runs
+`bench:python-parity:report:check` after the benchmark and uploads both files as
+the `python-parity-report` artifact.
+
 ## Contract
 
 - Reference runtime: Python with NumPy.
@@ -43,3 +53,4 @@ threshold.
 - Disable native backend: `TSNUM_NATIVE_BLAS=0`.
 - Python executable override: `PYTHON=/path/to/python`.
 - Result file: `bench/python-parity/results/latest.json`.
+- Report file: `bench/python-parity/results/latest.md`.
