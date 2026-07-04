@@ -38,10 +38,10 @@ Current truth:
 - Recorded benchmark evidence: recent CI artifacts consistently pass checksum
   parity, and native-backed reductions, transpose, and vector scalar operations
   often beat NumPy on macOS arm64 native BLAS.
-- Latest main CI after PR #37: checksum parity passed for every covered row;
+- Latest main CI after PR #38: checksum parity passed for every covered row;
   `add_arrays_1m`, `add_scalar_1m`, `mean_1m`, `mul_scalar_1m`, `sum_1m`, and
   `transpose_512` passed the 1.05x speed target; `matmul_128` still failed at
-  `1.18x`, so the package is not claiming full speed parity yet.
+  `1.23x`, so the package is not claiming full speed parity yet.
 - Release gate evidence: `bench:python-parity:enforce` and `release:preflight`
   remain admission blockers until every covered speed row passes repeatably, so
   npm publication remains blocked.
@@ -484,11 +484,11 @@ bun run bench:python-parity:enforce
 bun run bench:native-dispatch
 ```
 
-Current CI evidence after PR #37:
+Current CI evidence after PR #38:
 
 - Checksum parity: all covered benchmark cases pass.
-- Reporting-mode speed evidence: main CI run `28695180293` passed six of seven
-  covered speed rows and failed `matmul_128` at `1.18x` slowdown against the
+- Reporting-mode speed evidence: main CI run `28695393008` passed six of seven
+  covered speed rows and failed `matmul_128` at `1.23x` slowdown against the
   strict `1.05x` target.
 - Release gate evidence: `bench:python-parity:enforce` and `release:preflight`
   remain blockers until every covered speed row passes repeatably. Full speed

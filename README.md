@@ -53,20 +53,20 @@ benchmark gate passes on the same machine against Python/NumPy.
 | Native path | Bun/macOS can initialize Rust/N-API and native BLAS fast paths for float64 hot loops. |
 | Dispatch evidence | `bun run bench:native-dispatch` separates kernel, backend, and public API overhead before performance changes are promoted. |
 | Proven today | Covered benchmark checksums pass across recent CI runs, and native-backed rows often beat NumPy on reductions, transpose, and vector scalar operations on macOS arm64 native BLAS. |
-| Not claimed yet | Latest main CI after PR #37 still fails the strict speed gate on `matmul_128`; full NumPy API coverage, repeatable all-op speed parity, and npm publication are still launch gates. |
+| Not claimed yet | Latest main CI after PR #38 still fails the strict speed gate on `matmul_128`; full NumPy API coverage, repeatable all-op speed parity, and npm publication are still launch gates. |
 
-Latest main CI snapshot after reverting the slower native-addon matmul bridge
-(run `28695180293`, macOS arm64, Python 3.12.10, NumPy 2.5.0, Bun 1.3.14):
+Latest main CI snapshot after the public positioning update
+(run `28695393008`, macOS arm64, Python 3.12.10, NumPy 2.5.0, Bun 1.3.14):
 
 | Case | Speed vs NumPy | Status |
 | --- | ---: | --- |
-| `add_arrays_1m` | `0.67x` | pass |
-| `add_scalar_1m` | `0.66x` | pass |
-| `matmul_128` | `1.18x` | fail |
-| `mean_1m` | `0.52x` | pass |
-| `mul_scalar_1m` | `0.64x` | pass |
-| `sum_1m` | `0.62x` | pass |
-| `transpose_512` | `0.81x` | pass |
+| `add_arrays_1m` | `0.91x` | pass |
+| `add_scalar_1m` | `0.63x` | pass |
+| `matmul_128` | `1.23x` | fail |
+| `mean_1m` | `0.55x` | pass |
+| `mul_scalar_1m` | `0.57x` | pass |
+| `sum_1m` | `0.56x` | pass |
+| `transpose_512` | `0.77x` | pass |
 
 All covered checksums passed in that run. The release rule remains stricter
 than the marketing copy: no full-speed claim and no npm publish until
