@@ -17,7 +17,8 @@ Current truth:
 
 - Target API: NumPy-compatible `np` namespace.
 - Target package: `@sylphx/numpy` after the rename/publish migration.
-- Acceleration: TypeScript fallback plus WASM and native BLAS paths.
+- Acceleration: TypeScript fallback plus WASM, Rust/N-API, and native BLAS
+  paths.
 - Latest benchmark evidence: checksum parity passes for covered operations;
   speed parity is reported per benchmark run and is not complete yet.
 - Claim boundary: full NumPy parity is the target, not a completed claim.

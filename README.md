@@ -15,8 +15,8 @@ repository-local Python parity benchmarks.
 - **Python ecosystem migration path** - Python users should recognize the API,
   shapes, dtypes, broadcasting, and numerical vocabulary immediately.
 - **Native-speed target, not JavaScript-only ambition** - TypeScript is the
-  public language surface; hot operations can run through native BLAS, WASM, or
-  GPU backends when the workload demands it.
+  public language surface; hot operations can run through Rust/N-API native
+  kernels, native BLAS, WASM, or GPU backends when the workload demands it.
 - **Evidence-gated marketing** - this repo carries a NumPy comparison gate
   (`bun run bench:python-parity:enforce`) and a generated CI report artifact, so
   public performance claims are tied to reproducible measurements instead of
@@ -33,7 +33,7 @@ benchmark gate passes on the same machine against Python/NumPy.
 | --- | --- |
 | API direction | NumPy-compatible spelling and behavior are the target. |
 | Benchmarks | `bench/python-parity` compares TypeScript and NumPy on identical inputs. |
-| Native path | Bun/macOS can initialize a native BLAS-backed fast path for float64 hot loops. |
+| Native path | Bun/macOS can initialize Rust/N-API and native BLAS fast paths for float64 hot loops. |
 | Proven today | Checksum parity passes for the covered benchmark cases; CI uploads the generated Python parity report; speed parity is not complete yet. |
 | Not claimed yet | Full NumPy API coverage, all-op 1.05x performance parity, and npm rename completion. |
 
@@ -46,7 +46,7 @@ benchmark gate passes on the same machine against Python/NumPy.
 - 📈 **Linear Algebra** - Matrix ops, decompositions (QR, SVD, Cholesky)
 - 🎲 **Random & Stats** - Seedable RNG, distributions, statistics
 - 🌊 **FFT Operations** - Fast Fourier Transform (Cooley-Tukey)
-- ⚡ **Native/WASM backend path** - Native BLAS and WASM acceleration with TS fallback
+- ⚡ **Native/WASM backend path** - Rust/N-API, native BLAS, and WASM acceleration with TS fallback
 - 🌳 Tree-shakeable - import only what you need
 - 📦 Lightweight core (~20KB gzipped)
 - 🔒 Full TypeScript type safety

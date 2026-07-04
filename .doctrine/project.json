@@ -30,7 +30,7 @@
       },
       {
         "name": "tsnum-native-backend-path",
-        "description": "Native BLAS backend integration point and compatibility expectations for Python parity hot paths."
+        "description": "Rust/N-API native kernel package, native BLAS backend integration point, and compatibility expectations for Python parity hot paths."
       },
       {
         "name": "tsnum-benchmark-evidence",
@@ -57,6 +57,11 @@
         "type": "package-export",
         "name": "tsnum package exports",
         "location": "packages/tsnum/package.json"
+      },
+      {
+        "type": "package-export",
+        "name": "Rust native kernel package",
+        "location": "packages/tsnum-native/package.json"
       },
       {
         "type": "api",
@@ -144,7 +149,7 @@
     "ciModel": "legacy-ci",
     "requiredContexts": ["Build, test, and benchmark"],
     "deployPath": "Repo-local GitHub Actions CI validates pull requests and main pushes with Bun install, build, tests, the Python parity benchmark, and generated report freshness. Package publication is manually triggered through .github/workflows/release.yml, delegates to the central Sylphx release workflow, and runs release:preflight before publish plus release:readback after publish.",
-    "productionProof": "Merged package changes require green CI on the PR and main push, including the uploaded Python parity report artifact. Published package changes additionally require benchmark evidence for performance-sensitive claims, package registry readback after release, and consumer smoke proof for affected exports.",
+    "productionProof": "Merged package changes require green CI on the PR and main push, including the uploaded Python parity report artifact. Published package changes additionally require benchmark evidence for performance-sensitive claims, all-public-package registry readback after release, and consumer smoke proof for affected exports.",
     "recoveryClass": "forward-fix-only",
     "packageRelease": {
       "publishesPackages": true,
@@ -153,7 +158,7 @@
       "versionPr": "Declared through the central Sylphx reusable release workflow, which runs changesets/action to create GitHub Actions bot-authored version PRs when release intent exists. A dedicated Sylphx release-bot/GitHub App identity remains a release-hardening gap before commercial-grade publish.",
       "publisher": "Declared through the protected central Sylphx reusable release workflow with id-token: write OIDC posture and inherited bounded NPM_TOKEN fallback.",
       "requiredContexts": ["Build, test, and benchmark", "release:preflight", "release:readback"],
-      "publishProof": "Required before publish: release:preflight must pass build, tests, and bench:python-parity:enforce. Required after publish: release:readback must verify the npm registry version. Provenance/attestation evidence, changelog evidence, and consumer smoke proof are still required for affected exports."
+      "publishProof": "Required before publish: release:preflight must pass build, tests, and bench:python-parity:enforce. Required after publish: release:readback must verify every public workspace npm package version. Provenance/attestation evidence, changelog evidence, and consumer smoke proof are still required for affected exports."
     }
   },
   "adoption": {
@@ -179,7 +184,7 @@
       },
       {
         "id": "native-output-speed-parity-incomplete",
-        "description": "Native-backed reductions pass the speed target, but output-producing vector, matmul, and transpose cases still miss the 1.05x Python speed target in the generated parity report.",
+        "description": "Native-backed reductions pass the speed target, and Rust/N-API vector kernels reduce output-producing gaps, but add/mul/matmul/transpose cases still do not consistently pass the 1.05x Python speed target in the generated parity report.",
         "owner": "SylphxAI/tsnum",
         "target": "Before package publication or full Python-speed marketing"
       }

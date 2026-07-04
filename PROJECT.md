@@ -39,6 +39,8 @@ applications or separate adapter packages.
 
 - `README.md` and `packages/tsnum/README.md` document the library and API.
 - `packages/tsnum/package.json` defines public package exports.
+- `packages/tsnum-native/package.json` defines the Rust/N-API native kernel
+  package used by the NumPy-compatible backend path.
 - `packages/tsnum/src/` contains the TypeScript implementation.
 - `packages/tsnum/src/backend/` defines TypeScript and native backend behavior.
 - `packages/tsnum-wasm/Cargo.toml` defines the WASM backend package.
@@ -63,8 +65,8 @@ versioning path. The release workflow runs `release:preflight` before publish,
 and that preflight runs install, build, tests, and
 `bench:python-parity:enforce`. Current speed gaps intentionally block
 publication until the enforced benchmark passes. After publish, `release:readback`
-must verify the npm registry version, and release evidence must include
-provenance/attestation, changelog, and consumer smoke proof because source revert
-alone does not undo a release.
+must verify every public workspace npm package, and release evidence must
+include provenance/attestation, changelog, and consumer smoke proof because
+source revert alone does not undo a release.
 
 The authoritative control-plane record is `.doctrine/project.json`.

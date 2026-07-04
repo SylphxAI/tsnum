@@ -1,0 +1,36 @@
+{
+  "name": "@sylphx/numpy-native",
+  "version": "0.0.0",
+  "description": "Native tensor kernels for the SylphxAI NumPy-compatible TypeScript stack",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SylphxAI/tsnum.git"
+  },
+  "keywords": ["numpy", "typescript", "native", "tensor", "napi-rs", "rust"],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "napi": {
+    "binaryName": "sylphx_numpy_native",
+    "targets": [
+      "x86_64-apple-darwin",
+      "aarch64-apple-darwin",
+      "x86_64-unknown-linux-gnu",
+      "aarch64-unknown-linux-gnu",
+      "x86_64-pc-windows-msvc",
+      "aarch64-pc-windows-msvc"
+    ]
+  },
+  "scripts": {
+    "build": "napi build --platform --release",
+    "test": "bun test test/*.test.ts",
+    "lint": "echo \"native package lint is covered by cargo build\""
+  },
+  "files": ["index.js", "index.d.ts", "*.node"],
+  "devDependencies": {
+    "@napi-rs/cli": "^2.18.0"
+  }
+}

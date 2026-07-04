@@ -65,7 +65,7 @@ const nativeBLASTest =
   typeof Bun !== 'undefined' && process.platform === 'darwin' ? test : test.skip
 
 describe('Native BLAS backend', () => {
-  nativeBLASTest('Accelerate kernels preserve float64 operation semantics', async () => {
+  nativeBLASTest('Native kernels preserve float64 operation semantics', async () => {
     const { NativeBLASBackend } = await import('./native-blas')
     const backend = new NativeBLASBackend()
 

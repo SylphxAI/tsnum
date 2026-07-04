@@ -1,0 +1,25 @@
+[package]
+name = "sylphx_numpy_native"
+version = "0.0.0"
+edition = "2021"
+rust-version = "1.81"
+license = "MIT"
+authors = ["SylphxAI"]
+repository = "https://github.com/SylphxAI/tsnum"
+description = "Native tensor kernels for the SylphxAI NumPy-compatible TypeScript stack"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+napi = "2"
+napi-derive = "2"
+
+[build-dependencies]
+napi-build = "2"
+
+[profile.release]
+lto = true
+codegen-units = 1
+opt-level = 3
+strip = true
