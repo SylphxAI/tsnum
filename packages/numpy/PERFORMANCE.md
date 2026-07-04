@@ -50,22 +50,26 @@ Recent accepted main CI evidence as of 2026-07-04. The latest uploaded
 `python-parity-report` and `native-dispatch-report` artifacts remain canonical
 when this dated snapshot drifts.
 
-- Main CI run `28700015980` on macOS arm64 uploaded `python-parity-report`.
-- Commit: `145deb1` (`docs: sync latest main parity artifact`).
+- Main CI run `28700645799` on macOS arm64 uploaded `python-parity-report`.
+- Commit: `424846b` (`docs: sync latest parity evidence`).
 - Runtime: Python 3.12.10, NumPy 2.5.0, Bun 1.3.14,
   `@sylphx/numpy` backend `native-blas`.
 - Checksum parity passed for every covered row.
-- Speed rows passed for `add_arrays_1m` (`0.68x`), `add_arrays_1m_out`
-  (`1.04x`), `add_scalar_1m` (`0.59x`), `add_scalar_1m_out` (`1.05x`),
-  `matmul_128` (`0.87x`), `mean_1m` (`0.56x`), `mul_scalar_1m` (`0.50x`),
-  `sum_1m` (`0.56x`), and `transpose_512` (`0.62x`).
-- `mul_scalar_1m_out` failed the 1.05x speed target at `1.07x`.
+- Speed rows passed for `add_arrays_1m` (`0.75x`), `add_arrays_1m_out`
+  (`0.87x`), `add_scalar_1m` (`0.62x`), `mean_1m` (`0.74x`),
+  `mul_scalar_1m` (`0.65x`), `mul_scalar_1m_out` (`0.95x`), `sum_1m`
+  (`0.63x`), and `transpose_512` (`0.84x`).
+- `add_scalar_1m_out` failed the 1.05x speed target at `1.33x`, and
+  `matmul_128` failed at `1.08x`.
 - The same run's native dispatch artifact measured `public.addScalar.out` at
-  `0.2685ms`, `public.addArrays.out` at `0.5183ms`, `public.mulScalar.out` at
-  `0.2716ms`, `public.matmul128` at `0.0826ms`, and `public.matmul128.out` at
-  `0.0703ms`, which supports the native output-buffer direction while keeping
+  `0.4459ms`, `public.addArrays.out` at `0.6398ms`, `public.mulScalar.out` at
+  `0.2948ms`, `public.matmul128` at `0.2027ms`, and `public.matmul128.out` at
+  `0.1917ms`, which supports the native output-buffer direction while keeping
   the same-machine NumPy comparison as the release blocker.
 - Full speed parity is therefore not claimed.
+- The preceding accepted main CI run `28700015980` passed nine of ten rows and
+  failed only `mul_scalar_1m_out` at `1.07x`; the latest run demonstrates that
+  release readiness depends on repeatability, not a single favorable artifact.
 - PR #36's native-addon Accelerate matmul bridge regressed `matmul_128` to
   `1.50x` on main CI run `28695093346`; PR #37 reverted that path and restored
   the column-major native BLAS route.
@@ -124,9 +128,10 @@ small-matrix native overhead from runner noise.
 
 ## Future Optimizations (Roadmap)
 
-- Close the remaining enforced-gate gap against NumPy by reducing
-  `mul_scalar_1m_out` overhead and proving that `add_arrays_1m_out` and
-  `matmul_128` stay repeatably inside the 1.05x gate on the release runner.
+- Close the remaining enforced-gate volatility against NumPy by reducing
+  output-buffer wrapper overhead and proving that `add_scalar_1m_out`,
+  `matmul_128`, and `mul_scalar_1m_out` stay repeatably inside the 1.05x gate
+  on the release runner.
 - Promote only optimizations that improve the Python parity gate or are backed
   by the native dispatch probe; negative microbench experiments should not
   become public API.
