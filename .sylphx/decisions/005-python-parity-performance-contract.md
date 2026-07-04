@@ -91,5 +91,5 @@ TypeScript backend remains the portable fallback.
 - Benchmark runner: `bench/python-parity/compare.ts`
 - Python baseline: `bench/python-parity/python_bench.py`
 - tsnum baseline: `bench/python-parity/ts_bench.ts`
-- Native BLAS backend: `packages/tsnum/src/backend/native-blas.ts`
+- Native BLAS backend: `packages/numpy/src/backend/native-blas.ts`
 - Project context: `.sylphx/context.md`

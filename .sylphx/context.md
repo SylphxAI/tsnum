@@ -4,19 +4,19 @@
 TypeScript NumPy alternative (tsnum): High-performance n-dimensional array library for TypeScript/JavaScript with WASM acceleration.
 
 **Scope:**
-- NumPy-like API for TypeScript
-- Pure TS core + optional WASM acceleration
+- NumPy-compatible API for TypeScript
+- Pure TS fallback plus optional WASM, Rust/N-API, and native BLAS acceleration
 - Tree-shakeable functional API
-- Browser + Node.js support
+- Browser + Node.js support according to backend availability
 
 **Target:** TypeScript developers needing NumPy-compatible functionality and
 NumPy-class speed without a Python runtime.
 
-**Out of scope (v1.0):**
-- GPU acceleration (WebGL/WebGPU)
+**Out of scope (current package):**
 - Sparse arrays
 - File I/O (CSV, NPY)
 - Plotting/visualization
+- Distributed arrays
 
 ## Why (Business/Internal)
 **Market gap:** Python dominates scientific computing, but TypeScript/JavaScript ecosystem lacks mature numerical computing library. Existing TS libraries are either incomplete, have large bundles, or poor type safety.
@@ -55,14 +55,14 @@ NumPy-class speed without a Python runtime.
 - Python parity benchmark contract and local evidence for performance claims
 
 **Out of scope:**
-- Complex numbers (future)
-- Advanced FFT (future)
+- Sparse arrays
 - File I/O
 - Visualization
-- GPU compute
+- Distributed execution
+- GPU compute until it is admitted as a documented backend boundary
 
 ## SSOT References
-- Dependencies: `package.json` (monorepo root + packages/tsnum)
+- Dependencies: `package.json` (monorepo root plus `packages/numpy` and `packages/numpy-native`)
 - Build config: `turbo.json`, `tsconfig.json`
 - Linting: `biome.json`
 - Package manager: Bun (see `packageManager` field)
