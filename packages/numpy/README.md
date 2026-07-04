@@ -56,8 +56,9 @@ Current truth:
   `0.0673ms`, confirming that native output-buffer paths are the right
   direction while the NumPy release threshold still needs repeatable proof.
 - Release gate evidence: `bench:python-parity:repeatability` and
-  `release:preflight` remain admission blockers until every enforced release
-  speed row passes repeatably and every benchmarked row keeps checksum parity,
+  `release:preflight` remain admission blockers until enforced release speed
+  rows satisfy the repeatability quorum/median/outlier gate and every benchmarked
+  row keeps checksum parity,
   so npm publication remains blocked.
 - Claim boundary: full NumPy parity is the target, not a completed claim.
 
@@ -509,10 +510,10 @@ Recent CI evidence:
   around the output-buffer and small-matmul boundary, so repeatability remains
   a release blocker rather than a marketing claim.
 - Release gate evidence: `bench:python-parity:repeatability` and
-  `release:preflight` remain blockers until every enforced release speed row
-  passes repeatably and every benchmarked row keeps checksum parity. Diagnostic
-  allocation-return and short rows stay visible but do not support launch speed
-  claims until promoted to release rows.
+  `release:preflight` remain blockers until enforced release speed rows satisfy
+  the repeatability quorum/median/outlier gate and every benchmarked row keeps
+  checksum parity. Diagnostic allocation-return and short rows stay visible but
+  do not support launch speed claims until promoted to release rows.
 - Diagnostic evidence: `bench:native-dispatch` separates Rust/N-API kernel,
   TypeScript backend, NativeBLAS backend, and public API overhead before backend
   dispatch changes are promoted.

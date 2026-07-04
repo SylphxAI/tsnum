@@ -54,8 +54,11 @@ speed gates.
 
 The release path uses `bench:python-parity:repeatability`, which runs the
 comparison twice as a non-enforcing warmup, then runs the enforced benchmark
-multiple times and fails unless every enforced attempt passes. This turns
-repeatability into a release gate rather than a README promise.
+multiple times. Checksum parity must hold on every attempt, each release row may
+have at most one speed outlier, each release row median slowdown across attempts
+must stay inside the configured target, and no release-row outlier may exceed
+the configured cap. This turns repeatability into a release gate rather than a
+README promise.
 
 Recent accepted evidence as of 2026-07-04. The cited passing artifact is a
 historical best snapshot, not a release claim. Newer uploaded

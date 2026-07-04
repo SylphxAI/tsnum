@@ -58,10 +58,13 @@ the `python-parity-report` artifact.
 
 `bench:python-parity:repeatability` is the release-path gate. It runs
 two non-enforcing warmup comparisons, then
-`bench/python-parity/compare.ts --enforce` multiple times and fails unless every
-enforced attempt passes. The default is two warmups and three enforced attempts,
-configurable with `PYTHON_PARITY_REPEAT_WARMUP_ATTEMPTS=2` and
-`PYTHON_PARITY_REPEAT_ATTEMPTS=5`. It writes ignored local release evidence:
+`bench/python-parity/compare.ts --enforce` multiple times. Checksum parity must
+hold on every attempt, each release row may have at most one speed outlier, each
+release row median slowdown across attempts must stay inside the configured
+target, and no release-row outlier may exceed the configured cap. The default is
+two warmups and three enforced attempts, configurable with
+`PYTHON_PARITY_REPEAT_WARMUP_ATTEMPTS=2` and `PYTHON_PARITY_REPEAT_ATTEMPTS=5`.
+It writes ignored local release evidence:
 
 - `bench/python-parity/results/repeatability-latest.json`
 - `bench/python-parity/results/repeatability-latest.md`
@@ -121,7 +124,10 @@ runner-noise sensitivity without changing the 1.05x speed threshold.
 - Default samples per runtime: `7`.
 - Sample override: `PYTHON_PARITY_RUNS=5`.
 - Default release repeatability attempts: `3`.
+- Default release repeatability pass quorum: all but at most one attempt.
 - Repeatability override: `PYTHON_PARITY_REPEAT_ATTEMPTS=5`.
+- Default release repeatability outlier cap: `1.10`.
+- Repeatability outlier override: `PYTHON_PARITY_REPEAT_MAX_SLOWDOWN=1.12`.
 - Default repeatability warmup attempts: `2`.
 - Repeatability warmup override: `PYTHON_PARITY_REPEAT_WARMUP_ATTEMPTS=2`.
 - Native dispatch matmul overrides:

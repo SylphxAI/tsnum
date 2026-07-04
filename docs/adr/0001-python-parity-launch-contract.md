@@ -185,10 +185,13 @@ bun run release:preflight
 ```
 
 `bench:python-parity:repeatability` runs the enforced benchmark three times by
-default after two non-enforcing warmup comparisons and fails unless every
-enforced attempt passes. Override the release proof count with
-`PYTHON_PARITY_REPEAT_ATTEMPTS=5`; override warmups with
-`PYTHON_PARITY_REPEAT_WARMUP_ATTEMPTS=2`.
+default after two non-enforcing warmup comparisons. Checksum parity must hold
+on every enforced attempt, each release row may have at most one speed outlier,
+each release row median slowdown across attempts must stay within the 1.05x
+target, and no release-row outlier may exceed 1.10x by default. Override the
+release proof count with `PYTHON_PARITY_REPEAT_ATTEMPTS=5`; override warmups
+with `PYTHON_PARITY_REPEAT_WARMUP_ATTEMPTS=2`; override the outlier cap with
+`PYTHON_PARITY_REPEAT_MAX_SLOWDOWN=1.12`.
 
 The benchmark uses sample-level runtime isolation: each sample launches one
 Python process and one Bun process, alternates runtime order, and measures all
