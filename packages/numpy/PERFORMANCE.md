@@ -35,11 +35,13 @@ bun run bench:python-parity:report:check
 bun run bench:native-dispatch
 ```
 
-Default runs print and save current ratios. Enforced runs fail when a covered
-operation is slower than NumPy by more than the configured threshold. Checksum
-parity is always enforced. Each run writes JSON and Markdown evidence under
-`bench/python-parity/results/`; CI checks the generated Markdown report and
-uploads both files as the `python-parity-report` artifact.
+Default runs print and save current ratios. Enforced runs fail when a release
+row is slower than NumPy by more than the configured threshold. Diagnostic rows
+are still reported and checksum-checked, but they do not support launch
+speed-parity claims until promoted to release rows. Checksum parity is always
+enforced for every benchmarked row. Each run writes JSON and Markdown evidence
+under `bench/python-parity/results/`; CI checks the generated Markdown report
+and uploads both files as the `python-parity-report` artifact.
 
 The comparison harness runs paired Python and `@sylphx/numpy` samples with
 alternating runtime order, records the exact Python and TS commands, and reports
@@ -101,8 +103,8 @@ for current status when this dated snapshot drifts.
   `28705919522` regressed `add_scalar_1m_out` to `1.41x` and still failed
   `add_arrays_1m_out` and `matmul_128`.
 - `bench:python-parity:repeatability` and release preflight remain publication
-  blockers until covered-operation speed parity is repeatable across the
-  expanded covered row set.
+  blockers until enforced release-row speed parity is repeatable and every
+  benchmarked row keeps checksum parity across the expanded row set.
 - Current JSON output is written to `bench/python-parity/results/latest.json`.
 - Current Markdown output is written to `bench/python-parity/results/latest.md`.
 
@@ -141,7 +143,8 @@ small-matrix native overhead from runner noise.
 1. Public speed claims must cite the Python parity benchmark, not isolated local
    microbenchmarks.
 2. Native-backed reductions and Rust/N-API vector kernels are strong, but
-   release proof requires the full covered benchmark set to pass repeatably.
+   release proof requires the enforced release row set to pass repeatably while
+   every benchmarked row keeps checksum parity.
 3. The benchmark compares identical inputs and records Python and
    `@sylphx/numpy` checksums to guard against fast-but-wrong kernels.
 4. macOS native acceleration depends on Bun FFI and Accelerate; unsupported
@@ -151,8 +154,9 @@ small-matrix native overhead from runner noise.
 
 - Close the remaining enforced-gate volatility against NumPy by reducing
   output-buffer wrapper overhead and proving that `add_scalar_1m_out`,
-  `matmul_128`, and `mul_scalar_1m_out` stay repeatably inside the 1.05x gate
-  on the release runner.
+  `matmul_128_out`, and `mul_scalar_1m_out` stay repeatably inside the 1.05x
+  gate on the release runner. Allocation-return rows remain diagnostic until
+  their speed is repeatable enough to promote.
 - Promote only optimizations that improve the Python parity gate or are backed
   by the native dispatch probe; negative microbench experiments should not
   become public API.

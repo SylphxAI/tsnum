@@ -43,7 +43,9 @@ and timed iterations. This measures steady-state library behavior for training
 and numerical loops without charging Bun native-backend initialization or JIT
 warmup to every individual case. Checksum parity is always enforced across every
 sample. Enforcement runs additionally fail when any covered operation is slower
-than NumPy by more than the configured threshold.
+than NumPy by more than the configured threshold for the release row set.
+Diagnostic rows are still reported and checksum-checked, but they do not support
+launch speed-parity claims until promoted to release rows by a follow-up ADR/PR.
 
 Each run writes:
 
@@ -65,8 +67,8 @@ attempt passes. The default is three attempts, configurable with
 `bench:native-dispatch` is a diagnostic probe for backend work. It measures the
 same float64 vector operations at the native N-API kernel layer, TypeScript
 backend layer, NativeBLAS backend layer, and public API layer. It also records
-allocation-return rows so release-blocking non-`out` overhead can be separated
-from preallocated kernel speed. Use it before changing dispatch or native
+allocation-return rows so diagnostic non-`out` overhead can be separated from
+preallocated kernel speed. Use it before changing dispatch or native
 kernels so wrapper overhead is separated from kernel speed. It writes ignored
 local reports:
 
@@ -90,9 +92,9 @@ preallocated `out` call path, matching the intended hot-loop contract instead of
 charging a fresh JavaScript options-object allocation to every numeric kernel
 iteration. The `out` rows use 2000 measured iterations and 100 warmups per
 sample because their timed bodies are sub-millisecond on GitHub macOS runners.
-`matmul_128` uses 5000 measured iterations and 500 warmups for the same reason.
-The longer samples reduce timer and runner-noise sensitivity without changing
-the 1.05x speed threshold.
+`matmul_128_out` uses 20000 measured iterations and 2000 warmups for the same
+reason. The longer samples reduce timer and runner-noise sensitivity without
+changing the 1.05x speed threshold.
 
 ## Contract
 
@@ -104,6 +106,10 @@ the 1.05x speed threshold.
   runtime process.
 - `*_out` cases preallocate the output array and TypeScript options object
   before timed iterations.
+- Release speed rows currently cover the hot-loop set: preallocated `*_out`
+  rows, reductions, transpose, and `matmul_128_out`.
+- Diagnostic allocation-return rows remain published evidence and
+  checksum-checked but do not count toward launch speed claims.
 - Slowdown metric: `@sylphx/numpy` median time divided by Python median time.
   Paired slowdown p95 is kept as diagnostic runner-volatility evidence.
 - Default max slowdown: `1.05`.

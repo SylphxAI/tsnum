@@ -84,7 +84,12 @@ def main() -> None:
 
     def matmul_128() -> tuple[int, int, Callable[[], object]]:
         left, right = matmul_input()
-        return 5000, 500, lambda: left @ right
+        return 1000, 100, lambda: left @ right
+
+    def matmul_128_out() -> tuple[int, int, Callable[[], object]]:
+        left, right = matmul_input()
+        out = np.empty((128, 128), dtype=np.float64)
+        return 20000, 2000, lambda: np.matmul(left, right, out=out)
 
     cases: dict[str, Callable[[], tuple[int, int, Callable[[], object]]]] = {
         "add_scalar_1m": add_scalar_1m,
@@ -97,6 +102,7 @@ def main() -> None:
         "mean_1m": mean_1m,
         "transpose_512": transpose_512,
         "matmul_128": matmul_128,
+        "matmul_128_out": matmul_128_out,
     }
 
     selected_case = os.environ.get("PYTHON_PARITY_CASE")

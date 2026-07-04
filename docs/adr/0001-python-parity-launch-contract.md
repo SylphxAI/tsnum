@@ -40,8 +40,10 @@ Public claims move through these gates in order:
    spelling and semantics.
 2. **Checksum parity**: covered benchmark operations match Python/NumPy
    checksums within configured tolerance.
-3. **Covered-operation speed parity**: every covered row passes
-   `bench:python-parity:enforce` at the configured slowdown threshold.
+3. **Covered hot-loop speed parity**: every release row passes
+   `bench:python-parity:enforce` at the configured slowdown threshold, while
+   diagnostic rows remain published evidence without supporting launch speed
+   claims.
 4. **Release readiness**: build, tests, repeatable enforced parity benchmark,
    release preflight, npm publish, npm registry readback, and consumer smoke
    all pass.
@@ -51,6 +53,14 @@ Public claims move through these gates in order:
 
 Only claims at or below the highest proven gate should appear in public
 marketing copy.
+
+## Release vs Diagnostic Rows
+
+Checksum parity is enforced for every benchmarked row. The release speed gate
+applies to the covered hot-loop set: preallocated `*_out` rows,
+`matmul_128_out`, reductions, and transpose. Allocation-return rows remain
+published diagnostics and do not support launch speed-parity claims until
+promoted to release rows by a later ADR/PR.
 
 ## Evidence Snapshot
 
@@ -109,13 +119,13 @@ Merged main artifact after the same code landed:
 Current truthful public statement:
 
 `@sylphx/numpy` has checksum parity on the covered benchmark set, and PR #76
-proved that every covered row can pass the configured `1.05x` speed target on
-the GitHub macOS runner. Merged main still shows near-threshold volatility in
-`add_arrays_1m_out`, `matmul_128`, and `mul_scalar_1m_out`; therefore full
-covered-operation speed parity is not claimed until `release:preflight` proves
-the result repeatably on the release path. Later non-enforcing CI artifacts may
-fail different near-threshold rows and must be treated as volatility evidence,
-not as public speed-parity proof.
+proved that every then-covered row can pass the configured `1.05x` speed target
+on the GitHub macOS runner. Merged main still shows near-threshold volatility in
+allocation-return and small-matmul rows, so public launch speed claims are now
+scoped to the enforced release hot-loop set. Allocation-return rows remain
+diagnostic evidence until promoted by a later ADR/PR. Later non-enforcing CI
+artifacts may fail different near-threshold rows
+and must be treated as volatility evidence, not as public speed-parity proof.
 
 ## Native Dispatch Evidence
 
@@ -130,9 +140,9 @@ The merged main run uploaded `native-dispatch-report`:
 | `public.matmul128.out` | `0.0673` |
 
 This supports the current technical direction: native-backed dispatch and
-preallocated output buffers are the right hot-path shape. The remaining release
-blocker is the same-machine NumPy comparison for every covered row, not merely
-the existence of a native path.
+preallocated output buffers are the right hot-path shape. The release blocker is
+the same-machine NumPy comparison for every enforced release row, plus checksum
+parity for every benchmarked row, not merely the existence of a native path.
 
 ## Negative Experiment Policy
 
@@ -198,7 +208,7 @@ After publish, release completion also requires:
 - Covered benchmark checksums pass in the dated accepted main CI artifact.
 - The recorded dated accepted main CI artifact lists current per-row speed
   evidence, and recent accepted main snapshots show output-buffer and
-  small-matmul volatility instead of repeatable all-row speed parity.
+  small-matmul volatility outside the enforced hot-loop release claim.
 - Native-backed public hot paths and preallocated output buffers are measured in
   the accepted native dispatch probe.
 
@@ -206,15 +216,16 @@ After publish, release completion also requires:
 
 - Full NumPy API compatibility.
 - Full PyTorch compatibility.
-- Full covered-operation Python speed parity.
+- Full covered-operation Python speed parity, including allocation-return
+  diagnostic rows.
 - Published npm availability for `@sylphx/numpy`.
 - Any broad statement that TypeScript is already as fast as Python for all
   numerical or ML workloads.
 
 ## Next Launch Work
 
-1. Close the output-buffer and small-matmul repeatability gaps so
-   `add_arrays_1m_out`, `add_scalar_1m_out`, `matmul_128`, and every
+1. Close the output-buffer and small-matmul release-row repeatability gaps so
+   `add_arrays_1m_out`, `add_scalar_1m_out`, `matmul_128_out`, and every
    near-threshold output-buffer row stay repeatably inside the `1.05x` release
    target.
 2. Expand API compatibility tests around NumPy spelling, dtype behavior,

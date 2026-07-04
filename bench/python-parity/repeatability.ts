@@ -4,6 +4,8 @@ import { fileURLToPath } from 'node:url'
 
 type Row = {
   name: string
+  gate?: 'release' | 'diagnostic'
+  enforced?: boolean
   slowdown: number
   speed_pass: boolean
   checksum_pass: boolean
@@ -24,6 +26,7 @@ type Attempt = {
   checksums_passed: boolean
   failing_rows: Array<{
     name: string
+    gate?: 'release' | 'diagnostic'
     slowdown: number
     speed_pass: boolean
     checksum_pass: boolean
@@ -112,9 +115,10 @@ for (let index = 1; index <= attempts; index++) {
 
   const report = readLatestReport()
   const failingRows = report.rows
-    .filter((row) => !row.pass)
+    .filter((row) => (row.enforced ?? true) && !row.pass)
     .map((row) => ({
       name: row.name,
+      gate: row.gate,
       slowdown: row.slowdown,
       speed_pass: row.speed_pass,
       checksum_pass: row.checksum_pass,

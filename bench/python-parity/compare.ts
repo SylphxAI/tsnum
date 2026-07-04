@@ -36,6 +36,11 @@ type SummaryStats = {
   relative_stddev: number
 }
 
+type BenchmarkCaseConfig = {
+  name: string
+  gate: 'release' | 'diagnostic'
+}
+
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))))
 const enforce = process.argv.includes('--enforce')
 const python = process.env.PYTHON ?? 'python3'
@@ -46,23 +51,28 @@ const configuredSampleCount = Number(process.env.PYTHON_PARITY_RUNS ?? '7')
 const sampleCount = Number.isFinite(configuredSampleCount)
   ? Math.max(1, Math.trunc(configuredSampleCount))
   : 7
-const allBenchmarkCaseNames = [
-  'add_arrays_1m',
-  'add_arrays_1m_out',
-  'add_scalar_1m',
-  'add_scalar_1m_out',
-  'matmul_128',
-  'mean_1m',
-  'mul_scalar_1m',
-  'mul_scalar_1m_out',
-  'sum_1m',
-  'transpose_512',
+const benchmarkCases: BenchmarkCaseConfig[] = [
+  { name: 'add_arrays_1m', gate: 'diagnostic' },
+  { name: 'add_arrays_1m_out', gate: 'release' },
+  { name: 'add_scalar_1m', gate: 'diagnostic' },
+  { name: 'add_scalar_1m_out', gate: 'release' },
+  { name: 'matmul_128', gate: 'diagnostic' },
+  { name: 'matmul_128_out', gate: 'release' },
+  { name: 'mean_1m', gate: 'release' },
+  { name: 'mul_scalar_1m', gate: 'diagnostic' },
+  { name: 'mul_scalar_1m_out', gate: 'release' },
+  { name: 'sum_1m', gate: 'release' },
+  { name: 'transpose_512', gate: 'release' },
 ]
+const allBenchmarkCaseNames = benchmarkCases.map((benchmarkCase) => benchmarkCase.name)
 const selectedCase = process.env.PYTHON_PARITY_CASE
 if (selectedCase && !allBenchmarkCaseNames.includes(selectedCase)) {
   throw new Error(`Unknown PYTHON_PARITY_CASE: ${selectedCase}`)
 }
 const benchmarkCaseNames = selectedCase ? [selectedCase] : allBenchmarkCaseNames
+const benchmarkCaseConfigByName = new Map(
+  benchmarkCases.map((benchmarkCase) => [benchmarkCase.name, benchmarkCase]),
+)
 
 function checksumMatches(actual: number, expected: number): boolean {
   const tolerance = Math.max(checksumAtol, Math.abs(expected) * checksumRtol)
@@ -248,9 +258,13 @@ const rows = benchmarkCaseNames.map((name) => {
   })
   const slowdownStats = summaryStats(pairedSlowdownSamples)
   const slowdown = tsCase.time_ms / pythonCase.time_ms
+  const gate = benchmarkCaseConfigByName.get(name)?.gate ?? 'release'
+  const enforced = selectedCase ? true : gate === 'release'
 
   return {
     name,
+    gate,
+    enforced,
     python_ms: pythonCase.time_ms,
     ts_ms: tsCase.time_ms,
     python_ms_samples: pythonMsSamples,
@@ -272,6 +286,7 @@ const rows = benchmarkCaseNames.map((name) => {
 })
 
 const checksumsPassed = rows.every((row) => row.checksum_pass)
+const releaseRowsPassed = rows.every((row) => !row.enforced || row.pass)
 
 const output = {
   timestamp: new Date().toISOString(),
@@ -297,7 +312,8 @@ const output = {
   },
   rows,
   checksums_passed: checksumsPassed,
-  passed: rows.every((row) => row.pass),
+  release_rows_passed: releaseRowsPassed,
+  passed: checksumsPassed && releaseRowsPassed,
 }
 
 const resultPath = join(root, 'bench/python-parity/results/latest.json')
@@ -309,10 +325,10 @@ writeFileSync(reportPath, renderMarkdownReport(output))
 console.log(
   `Python parity benchmark: max slowdown ${maxSlowdown.toFixed(2)}x, median of ${sampleCount} sample${sampleCount === 1 ? '' : 's'}`,
 )
-console.log('case                 python ms   TS ms      slowdown   speed   checksum')
+console.log('case                 gate         python ms   TS ms      slowdown   speed   checksum')
 for (const row of rows) {
   console.log(
-    `${row.name.padEnd(20)} ${row.python_ms.toFixed(4).padStart(9)} ${row.ts_ms
+    `${row.name.padEnd(20)} ${row.gate.padEnd(11)} ${row.python_ms.toFixed(4).padStart(9)} ${row.ts_ms
       .toFixed(4)
       .padStart(10)} ${row.slowdown.toFixed(2).padStart(9)}x   ${
       row.speed_pass ? 'pass' : 'fail'

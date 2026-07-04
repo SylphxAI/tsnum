@@ -40,7 +40,7 @@ Current truth:
 - Evidence tools: Python parity benchmark plus native dispatch probe for
   kernel/wrapper/public-API timing.
 - Recorded benchmark evidence: PR #76 run `28705663337` passed checksum parity
-  and the 1.05x speed target for every covered row on the GitHub macOS runner.
+  and the 1.05x speed target for every then-covered row on the GitHub macOS runner.
   This is a historical best snapshot, not a release claim; newer uploaded
   `python-parity-report` artifacts remain canonical for current status.
 - Merged main truth: the same code on run `28705714377` still failed
@@ -56,8 +56,9 @@ Current truth:
   `0.0673ms`, confirming that native output-buffer paths are the right
   direction while the NumPy release threshold still needs repeatable proof.
 - Release gate evidence: `bench:python-parity:repeatability` and
-  `release:preflight` remain admission blockers until every covered speed row
-  passes repeatably, so npm publication remains blocked.
+  `release:preflight` remain admission blockers until every enforced release
+  speed row passes repeatably and every benchmarked row keeps checksum parity,
+  so npm publication remains blocked.
 - Claim boundary: full NumPy parity is the target, not a completed claim.
 
 ## Python-To-TypeScript Contract
@@ -502,14 +503,16 @@ Recent CI evidence:
 
 - Checksum parity: all covered benchmark cases pass.
 - Reporting-mode speed evidence: recorded main CI run `28701383776` passed
-  checksum parity for every covered row and still had near-threshold misses in
+  checksum parity for every benchmarked row and still had near-threshold misses in
   `add_arrays_1m_out` (`1.25x`), `add_scalar_1m_out` (`1.05x`), and
   `matmul_128` (`1.10x`). Recent accepted main snapshots move the failing rows
   around the output-buffer and small-matmul boundary, so repeatability remains
   a release blocker rather than a marketing claim.
 - Release gate evidence: `bench:python-parity:repeatability` and
-  `release:preflight` remain blockers until every covered speed row passes
-  repeatably. Full speed parity is not marketed until that release gate passes.
+  `release:preflight` remain blockers until every enforced release speed row
+  passes repeatably and every benchmarked row keeps checksum parity. Diagnostic
+  allocation-return rows stay visible but do not support launch speed claims
+  until promoted to release rows.
 - Diagnostic evidence: `bench:native-dispatch` separates Rust/N-API kernel,
   TypeScript backend, NativeBLAS backend, and public API overhead before backend
   dispatch changes are promoted.
