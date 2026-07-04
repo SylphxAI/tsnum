@@ -13,6 +13,8 @@ declare const Buffer: {
 const CBLAS_COLUMN_MAJOR = 102
 const CBLAS_NO_TRANS = 111
 
+type Pointer = ReturnType<typeof ptr>
+
 const accelerate = dlopen('/System/Library/Frameworks/Accelerate.framework/Accelerate', {
   cblas_dgemm: {
     args: [
@@ -88,7 +90,21 @@ type NativeKernelModule = {
   ) => Uint8Array
 }
 
+type NativeFFIModule = {
+  symbols: {
+    sylphx_numpy_dgemm_f64: (
+      left: Pointer,
+      right: Pointer,
+      output: Pointer,
+      rows: number,
+      inner: number,
+      cols: number,
+    ) => number
+  }
+}
+
 let nativeKernelModule: NativeKernelModule | null | undefined
+let nativeFFIModule: NativeFFIModule | null | undefined
 const byteViewCache = new WeakMap<Float64Array, Uint8Array>()
 
 function getNativeKernels(): NativeKernelModule | null {
@@ -103,6 +119,67 @@ function getNativeKernels(): NativeKernelModule | null {
   }
 
   return nativeKernelModule
+}
+
+function getNativeFFIModule(): NativeFFIModule | null {
+  if (nativeFFIModule !== undefined) {
+    return nativeFFIModule
+  }
+
+  const nativeBindingPath = resolveNativeBindingPath()
+  if (!nativeBindingPath) {
+    nativeFFIModule = null
+    return nativeFFIModule
+  }
+
+  try {
+    nativeFFIModule = dlopen(nativeBindingPath, {
+      sylphx_numpy_dgemm_f64: {
+        args: [FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.u32, FFIType.u32],
+        returns: FFIType.i32,
+      },
+    }) as unknown as NativeFFIModule
+  } catch {
+    nativeFFIModule = null
+  }
+
+  return nativeFFIModule
+}
+
+function resolveNativeBindingPath(): string | null {
+  if (typeof process === 'undefined' || process.platform !== 'darwin') {
+    return null
+  }
+
+  try {
+    const { existsSync } = require('node:fs') as { existsSync(path: string): boolean }
+    const { dirname, join } = require('node:path') as {
+      dirname(path: string): string
+      join(...paths: string[]): string
+    }
+    const packageDir = dirname(require.resolve('@sylphx/numpy-native/package.json'))
+    const candidates = [
+      join(packageDir, 'index.darwin-universal.node'),
+      join(packageDir, `index.darwin-${process.arch}.node`),
+    ]
+
+    for (const candidate of candidates) {
+      if (existsSync(candidate)) {
+        return candidate
+      }
+    }
+  } catch {}
+
+  try {
+    if (process.arch === 'arm64') {
+      return require.resolve('@sylphx/numpy-native-darwin-arm64')
+    }
+    if (process.arch === 'x64') {
+      return require.resolve('@sylphx/numpy-native-darwin-x64')
+    }
+  } catch {}
+
+  return null
 }
 
 function pointerFor(buffer: Float64Array): ReturnType<typeof ptr> {
@@ -321,6 +398,28 @@ export class NativeBLASBackend extends TypeScriptBackend {
     }
 
     const output = createNativeOutput(m * n)
+    const result = {
+      buffer: output,
+      shape: [m, n],
+      strides: [n, 1],
+      dtype: 'float64' as const,
+    }
+
+    const nativeFFI = getNativeFFIModule()
+    if (nativeFFI && m <= 0xffffffff && k <= 0xffffffff && n <= 0xffffffff) {
+      const status = nativeFFI.symbols.sylphx_numpy_dgemm_f64(
+        pointerFor(a.buffer),
+        pointerFor(b.buffer),
+        ptr(output),
+        m,
+        k,
+        n,
+      )
+      if (status === 0) {
+        return result
+      }
+    }
+
     // Row-major C = A x B has the same memory layout as column-major
     // C^T = B^T x A^T, which avoids the cblas row-major adapter path.
     accelerate.symbols.cblas_dgemm(
@@ -340,12 +439,7 @@ export class NativeBLASBackend extends TypeScriptBackend {
       n,
     )
 
-    return {
-      buffer: output,
-      shape: [m, n],
-      strides: [n, 1],
-      dtype: 'float64',
-    }
+    return result
   }
 
   transpose(a: NDArrayData): NDArrayData {

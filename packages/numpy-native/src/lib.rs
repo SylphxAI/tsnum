@@ -3,6 +3,34 @@
 use napi::bindgen_prelude::{Buffer, Float64Array};
 use napi::{Error, Result, Status};
 use napi_derive::napi;
+#[cfg(target_os = "macos")]
+use std::os::raw::c_int;
+
+#[cfg(target_os = "macos")]
+#[link(name = "Accelerate", kind = "framework")]
+extern "C" {
+    fn cblas_dgemm(
+        order: c_int,
+        trans_a: c_int,
+        trans_b: c_int,
+        m: c_int,
+        n: c_int,
+        k: c_int,
+        alpha: f64,
+        a: *const f64,
+        lda: c_int,
+        b: *const f64,
+        ldb: c_int,
+        beta: f64,
+        c: *mut f64,
+        ldc: c_int,
+    );
+}
+
+#[cfg(target_os = "macos")]
+const CBLAS_COLUMN_MAJOR: c_int = 102;
+#[cfg(target_os = "macos")]
+const CBLAS_NO_TRANS: c_int = 111;
 
 fn uninit_vec(len: usize) -> Vec<f64> {
     vec![0.0; len]
@@ -113,6 +141,85 @@ pub fn transpose_f64_buffer(
     let output_slice = output_as_f64_mut(&mut output, expected_len)?;
     transpose_into(input, rows, cols, output_slice);
     Ok(output)
+}
+
+/// Low-overhead C ABI matmul entrypoint for Bun FFI.
+///
+/// Return codes:
+/// - 0: success
+/// - -1: null input/output pointer
+/// - -2: matrix dimension overflow
+/// - -3: matrix dimension is too large for CBLAS
+/// - -4: Accelerate is unavailable on this platform
+#[no_mangle]
+pub unsafe extern "C" fn sylphx_numpy_dgemm_f64(
+    left: *const f64,
+    right: *const f64,
+    output: *mut f64,
+    rows: u32,
+    inner: u32,
+    cols: u32,
+) -> i32 {
+    #[cfg(not(target_os = "macos"))]
+    {
+        let _ = (left, right, output, rows, inner, cols);
+        -4
+    }
+
+    #[cfg(target_os = "macos")]
+    {
+        if left.is_null() || right.is_null() || output.is_null() {
+            return -1;
+        }
+
+        if checked_matrix_len(rows as usize, inner as usize).is_none()
+            || checked_matrix_len(inner as usize, cols as usize).is_none()
+            || checked_matrix_len(rows as usize, cols as usize).is_none()
+        {
+            return -2;
+        }
+
+        let Some(c_rows) = to_c_int(rows as usize) else {
+            return -3;
+        };
+        let Some(c_inner) = to_c_int(inner as usize) else {
+            return -3;
+        };
+        let Some(c_cols) = to_c_int(cols as usize) else {
+            return -3;
+        };
+
+        // Row-major C = A x B has the same memory layout as column-major
+        // C^T = B^T x A^T.
+        cblas_dgemm(
+            CBLAS_COLUMN_MAJOR,
+            CBLAS_NO_TRANS,
+            CBLAS_NO_TRANS,
+            c_cols,
+            c_rows,
+            c_inner,
+            1.0,
+            right,
+            c_cols,
+            left,
+            c_inner,
+            0.0,
+            output,
+            c_cols,
+        );
+
+        0
+    }
+}
+
+#[cfg(target_os = "macos")]
+fn checked_matrix_len(rows: usize, cols: usize) -> Option<usize> {
+    rows.checked_mul(cols)
+}
+
+#[cfg(target_os = "macos")]
+fn to_c_int(value: usize) -> Option<c_int> {
+    c_int::try_from(value).ok()
 }
 
 fn buffer_as_f64(buffer: &mut Buffer, expected_len: usize) -> Result<&[f64]> {

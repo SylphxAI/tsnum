@@ -1,5 +1,6 @@
+import { FFIType, dlopen, ptr } from 'bun:ffi'
 import { Buffer } from 'node:buffer'
-import { mkdirSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { dirname, join } from 'node:path'
 import { performance } from 'node:perf_hooks'
@@ -36,6 +37,19 @@ type NativeKernelModule = {
   mulScalarF64Buffer: (input: Float64Array, scalar: number, output: Buffer) => Buffer
   mulScalarF64Buffers: (input: Buffer, scalar: number, output: Buffer) => Buffer
   transposeF64Buffer: (input: Float64Array, rows: number, cols: number, output: Buffer) => Buffer
+}
+
+type NativeFFIModule = {
+  symbols: {
+    sylphx_numpy_dgemm_f64: (
+      left: ReturnType<typeof ptr>,
+      right: ReturnType<typeof ptr>,
+      output: ReturnType<typeof ptr>,
+      rows: number,
+      inner: number,
+      cols: number,
+    ) => number
+  }
 }
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))))
@@ -167,6 +181,48 @@ const matmulSize = 128
 const matmulLength = matmulSize * matmulSize
 const matmulLeft = range(matmulLength, 0.001)
 const matmulRight = range(matmulLength, 0.002)
+const matmulOutput = new Float64Array(matmulLength)
+const matmulLeftPointer = ptr(matmulLeft)
+const matmulRightPointer = ptr(matmulRight)
+const matmulOutputPointer = ptr(matmulOutput)
+const nativeBindingPath = resolveNativeBindingPath()
+const nativeFFI = nativeBindingPath
+  ? (dlopen(nativeBindingPath, {
+      sylphx_numpy_dgemm_f64: {
+        args: [FFIType.ptr, FFIType.ptr, FFIType.ptr, FFIType.u32, FFIType.u32, FFIType.u32],
+        returns: FFIType.i32,
+      },
+    }) as unknown as NativeFFIModule)
+  : null
+
+function resolveNativeBindingPath(): string | null {
+  if (process.platform !== 'darwin') {
+    return null
+  }
+
+  const packageDir = join(root, 'packages/numpy-native')
+  const candidates = [
+    join(packageDir, 'index.darwin-universal.node'),
+    join(packageDir, `index.darwin-${process.arch}.node`),
+  ]
+
+  for (const candidate of candidates) {
+    if (existsSync(candidate)) {
+      return candidate
+    }
+  }
+
+  try {
+    if (process.arch === 'arm64') {
+      return require.resolve('@sylphx/numpy-native-darwin-arm64')
+    }
+    if (process.arch === 'x64') {
+      return require.resolve('@sylphx/numpy-native-darwin-x64')
+    }
+  } catch {}
+
+  return null
+}
 
 const leftArray = array(Array.from(left), { dtype: 'float64' })
 const rightArray = array(Array.from(right), { dtype: 'float64' })
@@ -229,6 +285,27 @@ const results = [
     native.transposeF64Buffer(matrix, matrixSize, matrixSize, matrixOutputBytes)
     return matrixOutput
   }),
+  measure(
+    'native.ffiDgemmF64',
+    () => {
+      if (!nativeFFI) {
+        throw new Error('nativeBindingPath is unavailable for native FFI dgemm')
+      }
+      const status = nativeFFI.symbols.sylphx_numpy_dgemm_f64(
+        matmulLeftPointer,
+        matmulRightPointer,
+        matmulOutputPointer,
+        matmulSize,
+        matmulSize,
+        matmulSize,
+      )
+      if (status !== 0) {
+        throw new Error(`native FFI dgemm failed with status ${status}`)
+      }
+      return matmulOutput
+    },
+    matmulMeasureOptions,
+  ),
   measure('backend.typescript.addScalar', () => tsBackend.add(leftData, 5)),
   measure('backend.typescript.addArrays', () => tsBackend.add(leftData, rightData)),
   measure('backend.typescript.mulScalar', () => tsBackend.mul(leftData, 2)),
