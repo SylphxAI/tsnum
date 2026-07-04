@@ -30,8 +30,9 @@ Current truth:
   paths.
 - Evidence tools: Python parity benchmark plus native dispatch probe for
   kernel/wrapper/public-API timing.
-- Latest benchmark evidence: checksum parity passes for covered operations;
-  speed parity is reported per benchmark run and is not complete yet.
+- Latest benchmark evidence: main CI run `28693429159` at `0187bbc` reports
+  checksum parity and 6 of 7 covered speed rows passing on macOS arm64 native
+  BLAS; `matmul_128` remains above the 1.05x target in that artifact.
 - Claim boundary: full NumPy parity is the target, not a completed claim.
 
 ## Features
@@ -448,13 +449,14 @@ bun run bench:python-parity:enforce
 bun run bench:native-dispatch
 ```
 
-Current local evidence after the native dispatch path:
+Current CI evidence after the Rust/N-API unrolled vector kernels and native
+add-buffer dispatch path:
 
 - Checksum parity: all covered benchmark cases pass.
-- Speed parity at 1.05x: reported per run in
-  `bench/python-parity/results/latest.json`.
-- Remaining speed work: covered operations still miss the 1.05x target in some
-  local runs, so full speed parity is not marketed yet.
+- Speed parity at 1.05x: main CI run `28693429159` passes 6 of 7 covered rows:
+  add arrays, add scalar, multiply scalar, sum, mean, and transpose.
+- Remaining speed work: `matmul_128` is still slower than the 1.05x target in
+  the latest main CI artifact, so full speed parity is not marketed yet.
 - Diagnostic evidence: `bench:native-dispatch` separates Rust/N-API kernel,
   TypeScript backend, NativeBLAS backend, and public API overhead before backend
   dispatch changes are promoted.
