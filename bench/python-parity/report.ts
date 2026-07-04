@@ -30,10 +30,29 @@ type RuntimeReport = {
   benchmarks: Record<string, RuntimeBenchCase>
 }
 
+type SummaryStats = {
+  min: number
+  median: number
+  p75: number
+  p95: number
+  max: number
+  mean: number
+  stddev: number
+  relative_stddev: number
+}
+
 type ComparisonRow = {
   name: string
   python_ms: number
   ts_ms: number
+  python_ms_samples?: number[]
+  ts_ms_samples?: number[]
+  paired_slowdown_samples?: number[]
+  sample_stats?: {
+    python_ms: SummaryStats
+    ts_ms: SummaryStats
+    slowdown: SummaryStats
+  }
   slowdown: number
   speed_pass: boolean
   checksum_pass: boolean
@@ -48,6 +67,15 @@ type ComparisonReport = {
   enforce: boolean
   max_slowdown: number
   sample_count: number
+  sampling?: {
+    strategy: string
+    python_command: string
+    ts_command: string
+    sample_pairs: Array<{
+      index: number
+      order: Array<'python' | 'ts'>
+    }>
+  }
   python: RuntimeReport
   ts: RuntimeReport
   rows: ComparisonRow[]
@@ -60,11 +88,15 @@ const resultPath = join(root, 'bench/python-parity/results/latest.json')
 const reportPath = join(root, 'bench/python-parity/results/latest.md')
 
 function formatMs(value: number): string {
-  return value.toFixed(4)
+  return Number.isFinite(value) ? value.toFixed(4) : 'unknown'
 }
 
 function formatSlowdown(value: number): string {
-  return `${value.toFixed(2)}x`
+  return Number.isFinite(value) ? `${value.toFixed(2)}x` : 'unknown'
+}
+
+function formatPercent(value: number): string {
+  return Number.isFinite(value) ? `${(value * 100).toFixed(1)}%` : 'unknown'
 }
 
 function status(value: boolean): string {
@@ -85,6 +117,7 @@ export function renderMarkdownReport(report: ComparisonReport): string {
     `- Checksum parity: ${status(report.checksums_passed)}`,
     `- Speed target: ${report.max_slowdown.toFixed(2)}x max slowdown`,
     `- Samples: median of ${report.sample_count}`,
+    `- Sampling strategy: ${report.sampling?.strategy ?? 'sequential-runtime-order'}`,
     `- Enforcement mode: ${report.enforce ? 'on' : 'off'}`,
     '',
     '## Runtime',
@@ -96,18 +129,42 @@ export function renderMarkdownReport(report: ComparisonReport): string {
     `- Architecture: ${report.ts.arch ?? 'unknown'}`,
     `- @sylphx/numpy backend: ${backend?.name ?? 'unknown'}`,
     `- Native BLAS init: ${native?.success ? 'pass' : (native?.error ?? 'not reported')}`,
+    `- Python command: ${report.sampling?.python_command ?? 'unknown'}`,
+    `- TS command: ${report.sampling?.ts_command ?? 'unknown'}`,
+    '',
+    '## Sampling',
+    '',
+    '| Pair | Runtime order |',
+    '| ---: | --- |',
+    ...(report.sampling?.sample_pairs.map(
+      (pair) => `| ${pair.index} | ${pair.order.join(' -> ')} |`,
+    ) ?? ['| 1 | python -> ts |']),
     '',
     '## Cases',
     '',
-    '| Case | Python median ms | @sylphx/numpy median ms | Slowdown | Speed | Checksum |',
-    '| --- | ---: | ---: | ---: | --- | --- |',
+    '| Case | Python median ms | Python p95 ms | Python RSD | @sylphx/numpy median ms | @sylphx/numpy p95 ms | @sylphx/numpy RSD | Slowdown | Paired slowdown p95 | Speed | Checksum |',
+    '| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- |',
   ]
 
   for (const row of report.rows) {
+    const pythonStats = row.sample_stats?.python_ms
+    const tsStats = row.sample_stats?.ts_ms
+    const slowdownStats = row.sample_stats?.slowdown
+
     lines.push(
-      `| ${row.name} | ${formatMs(row.python_ms)} | ${formatMs(row.ts_ms)} | ${formatSlowdown(
-        row.slowdown,
-      )} | ${status(row.speed_pass)} | ${status(row.checksum_pass)} |`,
+      [
+        `| ${row.name}`,
+        formatMs(row.python_ms),
+        formatMs(pythonStats?.p95 ?? row.python_ms),
+        formatPercent(pythonStats?.relative_stddev ?? Number.NaN),
+        formatMs(row.ts_ms),
+        formatMs(tsStats?.p95 ?? row.ts_ms),
+        formatPercent(tsStats?.relative_stddev ?? Number.NaN),
+        formatSlowdown(row.slowdown),
+        formatSlowdown(slowdownStats?.p95 ?? row.slowdown),
+        status(row.speed_pass),
+        `${status(row.checksum_pass)} |`,
+      ].join(' | '),
     )
   }
 

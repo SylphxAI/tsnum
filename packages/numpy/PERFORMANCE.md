@@ -40,6 +40,12 @@ parity is always enforced. Each run writes JSON and Markdown evidence under
 `bench/python-parity/results/`; CI checks the generated Markdown report and
 uploads both files as the `python-parity-report` artifact.
 
+The comparison harness runs paired Python and `@sylphx/numpy` samples with
+alternating runtime order, records the exact Python and TS commands, and reports
+raw samples plus median, p95, and relative standard deviation for every row.
+That evidence separates true backend gaps from process-order or runner variance
+without relaxing the checksum or speed gates.
+
 Recorded CI evidence after the Rust/N-API unrolled vector kernels and native
 add-buffer dispatch path:
 
@@ -52,6 +58,9 @@ add-buffer dispatch path:
 - PR #28 run `28693698365` uploaded `python-parity-report` artifact
   `8077937938`; enforced mode still failed add arrays, `matmul_128`, and
   transpose while checksum parity passed.
+- Main CI run `28694558172` at `e2d79cb` uploaded `python-parity-report`;
+  reporting mode passed checksum parity but failed `transpose_512` at the
+  configured 1.05x speed target.
 - `bench:python-parity:enforce` and release preflight remain publication
   blockers until covered-operation speed parity is repeatable.
 - Current JSON output is written to `bench/python-parity/results/latest.json`.
