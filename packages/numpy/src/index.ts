@@ -24,10 +24,14 @@ export {
   vander,
   // Like functions
   zerosLike,
+  zeros_like,
   onesLike,
+  ones_like,
   fullLike,
+  full_like,
   empty,
   emptyLike,
+  empty_like,
 } from './creation'
 
 // 2. Operations (functional API - primary)
