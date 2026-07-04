@@ -71,10 +71,9 @@ when this dated snapshot drifts.
   `0.0763ms`, which supports the native output-buffer direction while keeping
   the same-machine NumPy comparison as the release blocker.
 - Full speed parity is therefore not claimed.
-- Recent accepted main CI snapshots have ranged from seven to nine
-  speed-passing rows: run `28700645799` passed eight of ten, and run
-  `28700015980` passed nine of ten. The recorded run demonstrates that release
-  readiness depends on repeatability, not a single favorable artifact.
+- Recent accepted main CI snapshots move the failing rows around the
+  output-buffer and small-matmul boundary. The recorded run demonstrates that
+  release readiness depends on repeatability, not a single favorable artifact.
 - PR #36's native-addon Accelerate matmul bridge regressed `matmul_128` to
   `1.50x` on main CI run `28695093346`; PR #37 reverted that path and restored
   the column-major native BLAS route.
