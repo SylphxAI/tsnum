@@ -1,4 +1,5 @@
 import json
+import os
 import platform
 import sys
 import time
@@ -26,24 +27,68 @@ def scalar_checksum(value: object) -> float:
 
 
 def main() -> None:
-    vector = np.arange(1_000_000, dtype=np.float64) * 0.001
-    vector_b = np.arange(1_000_000, dtype=np.float64) * 0.002
-    matrix = np.arange(512 * 512, dtype=np.float64).reshape(512, 512) * 0.001
-    left = np.arange(128 * 128, dtype=np.float64).reshape(128, 128) * 0.001
-    right = np.arange(128 * 128, dtype=np.float64).reshape(128, 128) * 0.002
+    def vector() -> np.ndarray:
+        return np.arange(1_000_000, dtype=np.float64) * 0.001
 
-    cases: dict[str, tuple[int, int, Callable[[], object]]] = {
-        "add_scalar_1m": (30, 5, lambda: vector + 5.0),
-        "add_arrays_1m": (30, 5, lambda: vector + vector_b),
-        "mul_scalar_1m": (30, 5, lambda: vector * 2.0),
-        "sum_1m": (100, 10, lambda: np.sum(vector)),
-        "mean_1m": (100, 10, lambda: np.mean(vector)),
-        "transpose_512": (60, 10, lambda: matrix.T.copy()),
-        "matmul_128": (20, 5, lambda: left @ right),
+    def vector_b() -> np.ndarray:
+        return np.arange(1_000_000, dtype=np.float64) * 0.002
+
+    def matrix() -> np.ndarray:
+        return np.arange(512 * 512, dtype=np.float64).reshape(512, 512) * 0.001
+
+    def matmul_input() -> tuple[np.ndarray, np.ndarray]:
+        left = np.arange(128 * 128, dtype=np.float64).reshape(128, 128) * 0.001
+        right = np.arange(128 * 128, dtype=np.float64).reshape(128, 128) * 0.002
+        return left, right
+
+    def add_scalar_1m() -> tuple[int, int, Callable[[], object]]:
+        data = vector()
+        return 100, 20, lambda: data + 5.0
+
+    def add_arrays_1m() -> tuple[int, int, Callable[[], object]]:
+        left = vector()
+        right = vector_b()
+        return 100, 20, lambda: left + right
+
+    def mul_scalar_1m() -> tuple[int, int, Callable[[], object]]:
+        data = vector()
+        return 100, 20, lambda: data * 2.0
+
+    def sum_1m() -> tuple[int, int, Callable[[], object]]:
+        data = vector()
+        return 300, 30, lambda: np.sum(data)
+
+    def mean_1m() -> tuple[int, int, Callable[[], object]]:
+        data = vector()
+        return 300, 30, lambda: np.mean(data)
+
+    def transpose_512() -> tuple[int, int, Callable[[], object]]:
+        data = matrix()
+        return 120, 20, lambda: data.T.copy()
+
+    def matmul_128() -> tuple[int, int, Callable[[], object]]:
+        left, right = matmul_input()
+        return 1000, 100, lambda: left @ right
+
+    cases: dict[str, Callable[[], tuple[int, int, Callable[[], object]]]] = {
+        "add_scalar_1m": add_scalar_1m,
+        "add_arrays_1m": add_arrays_1m,
+        "mul_scalar_1m": mul_scalar_1m,
+        "sum_1m": sum_1m,
+        "mean_1m": mean_1m,
+        "transpose_512": transpose_512,
+        "matmul_128": matmul_128,
     }
 
+    selected_case = os.environ.get("PYTHON_PARITY_CASE")
+    if selected_case:
+        if selected_case not in cases:
+            raise ValueError(f"Unknown PYTHON_PARITY_CASE: {selected_case}")
+        cases = {selected_case: cases[selected_case]}
+
     benchmarks = {}
-    for name, (iterations, warmup, fn) in cases.items():
+    for name, create_case in cases.items():
+        iterations, warmup, fn = create_case()
         last = fn()
         benchmarks[name] = {
             "time_ms": measure(fn, iterations, warmup),

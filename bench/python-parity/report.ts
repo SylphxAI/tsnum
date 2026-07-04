@@ -69,6 +69,8 @@ type ComparisonReport = {
   sample_count: number
   sampling?: {
     strategy: string
+    case_isolation?: string
+    cases?: string[]
     python_command: string
     ts_command: string
     sample_pairs: Array<{
@@ -118,6 +120,7 @@ export function renderMarkdownReport(report: ComparisonReport): string {
     `- Speed target: ${report.max_slowdown.toFixed(2)}x max slowdown`,
     `- Samples: median of ${report.sample_count}`,
     `- Sampling strategy: ${report.sampling?.strategy ?? 'sequential-runtime-order'}`,
+    `- Case isolation: ${report.sampling?.case_isolation ?? 'none'}`,
     `- Enforcement mode: ${report.enforce ? 'on' : 'off'}`,
     '',
     '## Runtime',
@@ -133,6 +136,8 @@ export function renderMarkdownReport(report: ComparisonReport): string {
     `- TS command: ${report.sampling?.ts_command ?? 'unknown'}`,
     '',
     '## Sampling',
+    '',
+    `Cases: ${report.sampling?.cases?.join(', ') ?? report.rows.map((row) => row.name).join(', ')}`,
     '',
     '| Pair | Runtime order |',
     '| ---: | --- |',
@@ -173,6 +178,7 @@ export function renderMarkdownReport(report: ComparisonReport): string {
     '## Contract',
     '',
     '- Public speed claims require this report to pass with checksum parity and the configured slowdown target.',
+    '- Slowdown is the median paired @sylphx/numpy/Python sample ratio for each case.',
     '- A failing speed row means full Python speed parity is not claimed for the covered operation.',
     '- Checksum parity is enforced on every benchmark run, including non-enforcing speed runs.',
     '',
