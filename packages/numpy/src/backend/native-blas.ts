@@ -242,6 +242,59 @@ export class NativeBLASBackend extends TypeScriptBackend {
     }
   }
 
+  addInto(a: NDArrayData, b: NDArrayData | number, out: NDArrayData): NDArrayData {
+    if (
+      a.dtype !== 'float64' ||
+      out.dtype !== 'float64' ||
+      !(a.buffer instanceof Float64Array) ||
+      !(out.buffer instanceof Float64Array)
+    ) {
+      return super.addInto(a, b, out)
+    }
+
+    if (typeof b === 'number') {
+      this.validateElementwiseOutput(out, 'float64', a.shape, a.buffer.length)
+      const native = getNativeKernels()
+      if (native?.addScalarF64Buffers) {
+        native.addScalarF64Buffers(bytesFor(a.buffer), b, bytesFor(out.buffer))
+        return out
+      }
+
+      scalarBuffer[0] = b
+      accelerate.symbols.vDSP_vsaddD(
+        pointerFor(a.buffer),
+        1,
+        scalarPointer,
+        pointerFor(out.buffer),
+        1,
+        a.buffer.length,
+      )
+      return out
+    }
+
+    if (b.dtype !== 'float64' || !(b.buffer instanceof Float64Array) || !this.hasSameShape(a, b)) {
+      return super.addInto(a, b, out)
+    }
+
+    this.validateElementwiseOutput(out, 'float64', a.shape, a.buffer.length)
+    const native = getNativeKernels()
+    if (native?.addF64Buffers) {
+      native.addF64Buffers(bytesFor(a.buffer), bytesFor(b.buffer), bytesFor(out.buffer))
+      return out
+    }
+
+    accelerate.symbols.vDSP_vaddD(
+      pointerFor(a.buffer),
+      1,
+      pointerFor(b.buffer),
+      1,
+      pointerFor(out.buffer),
+      1,
+      a.buffer.length,
+    )
+    return out
+  }
+
   mul(a: NDArrayData, b: NDArrayData | number): NDArrayData {
     if (a.dtype !== 'float64' || !(a.buffer instanceof Float64Array)) {
       return super.mul(a, b)
@@ -279,6 +332,39 @@ export class NativeBLASBackend extends TypeScriptBackend {
     }
 
     return super.mul(a, b)
+  }
+
+  mulInto(a: NDArrayData, b: NDArrayData | number, out: NDArrayData): NDArrayData {
+    if (
+      a.dtype !== 'float64' ||
+      out.dtype !== 'float64' ||
+      !(a.buffer instanceof Float64Array) ||
+      !(out.buffer instanceof Float64Array)
+    ) {
+      return super.mulInto(a, b, out)
+    }
+
+    if (typeof b === 'number') {
+      this.validateElementwiseOutput(out, 'float64', a.shape, a.buffer.length)
+      const native = getNativeKernels()
+      if (native?.mulScalarF64Buffers) {
+        native.mulScalarF64Buffers(bytesFor(a.buffer), b, bytesFor(out.buffer))
+        return out
+      }
+
+      scalarBuffer[0] = b
+      accelerate.symbols.vDSP_vsmulD(
+        pointerFor(a.buffer),
+        1,
+        scalarPointer,
+        pointerFor(out.buffer),
+        1,
+        a.buffer.length,
+      )
+      return out
+    }
+
+    return super.mulInto(a, b, out)
   }
 
   sum(a: NDArrayData): number {

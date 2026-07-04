@@ -113,6 +113,8 @@ hot paths:
 ```typescript
 const out = np.empty([128, 128], { dtype: 'float64' })
 np.matmul(A, B, { out })          // returns out
+const xScratch = np.empty([x.size], { dtype: 'float64' })
+np.add(x, 5, { out: xScratch })   // ufunc-style output reuse
 ```
 
 **Features:**

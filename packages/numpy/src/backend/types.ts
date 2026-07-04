@@ -12,8 +12,10 @@ export interface Backend {
 
   // Arithmetic operations
   add(a: NDArrayData, b: NDArrayData | number): NDArrayData
+  addInto?(a: NDArrayData, b: NDArrayData | number, out: NDArrayData): NDArrayData
   sub(a: NDArrayData, b: NDArrayData | number): NDArrayData
   mul(a: NDArrayData, b: NDArrayData | number): NDArrayData
+  mulInto?(a: NDArrayData, b: NDArrayData | number, out: NDArrayData): NDArrayData
   div(a: NDArrayData, b: NDArrayData | number): NDArrayData
   pow(a: NDArrayData, exponent: number): NDArrayData
 
