@@ -1,4 +1,4 @@
-# ADL 0001: Python Parity Launch Contract
+# ADR 0001: Python Parity Launch Contract
 
 Status: active
 

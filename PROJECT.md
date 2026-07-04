@@ -51,12 +51,13 @@ in consuming applications or separate adapter packages.
   performance evidence.
 - `package.json`, `turbo.json`, and `biome.json` define workspace commands and
   tool configuration.
-- `.doctrine/project.json` is the machine-readable project manifest.
+- `project.manifest.json` is the vendor-neutral GroundAtlas project-control manifest.
+- `.doctrine/project.json` is the Sylphx Doctrine adapter and org-local governance catalog.
 
 ## Delivery
 
-The repo-local GitHub Actions CI workflow runs install, build, tests, and the
-Python parity benchmark on pull requests and `main` pushes. The benchmark writes
+The repo-local GitHub Actions CI workflow runs install, build, tests, the
+Python parity benchmark, project-control tests, and GroundAtlas package dogfooding on pull requests and `main` pushes. The benchmark writes
 JSON and Markdown evidence under `bench/python-parity/results/`; CI checks the
 Markdown report freshness and uploads both files as the `python-parity-report`
 artifact. Package changes still require local evidence plus CI evidence before
@@ -83,3 +84,5 @@ show the final package contract, but release status must continue to say that
 registry installation is pending the parity-gated release.
 
 The authoritative control-plane record is `.doctrine/project.json`.
+
+Generated `.groundatlas*` reports are evidence/navigation only, not source of truth.

@@ -17,7 +17,7 @@ Until that readback exists, treat the install command below as the post-release
 package contract rather than current registry availability.
 
 Launch and marketing claims are governed by the repository
-[Python parity launch contract](https://github.com/SylphxAI/tsnum/blob/main/docs/adl/0001-python-parity-launch-contract.md).
+[Python parity launch contract](https://github.com/SylphxAI/tsnum/blob/main/docs/adr/0001-python-parity-launch-contract.md).
 
 NumPy is a project of the NumPy community. This package is NumPy-compatible in
 API direction and is not affiliated with, endorsed by, or sponsored by NumPy.

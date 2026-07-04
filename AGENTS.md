@@ -1,6 +1,6 @@
 # Repository Instructions
 
-Start with `PROJECT.md` and `.doctrine/project.json` before changing this
+Start with `PROJECT.md`, `project.manifest.json`, and `.doctrine/project.json` before changing this
 repository. They define the project goal, lifecycle, boundaries, public
 surfaces, delivery model, and adoption gaps.
 
@@ -13,9 +13,14 @@ hidden package behavior.
 For control-plane-only changes, validate with:
 
 ```bash
-python3 /Users/kyle/.doctrine/scripts/project-control-plane-audit.py --local . --fail-on-drift --json
 git diff --check
+node --test test/project-control.node-test.mjs
+npm exec --yes --package groundatlas@0.1.2 -- ga update --out .groundatlas-pilot
+npm exec --yes --package groundatlas@0.1.2 -- ga audit --out .groundatlas-pilot
+npm run --silent groundatlas:fleet
 ```
 
 For package changes, also run the relevant Bun/Turbo, TypeScript, test, and
 benchmark commands for the touched packages before claiming release readiness.
+
+Generated `.groundatlas*` reports are evidence/navigation only. Do not treat them as source of truth.

@@ -1,10 +1,18 @@
-import { describe, expect, test } from 'bun:test'
+import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 import { array } from '../creation'
 import { add, div, mean, mul, std, sub, sum, variance } from '../ops'
-import { getBackend, initWASM } from './manager'
+import { backendManager, getBackend, initWASM } from './manager'
 import { WASMBackend } from './wasm'
 
 describe('WASM Backend', () => {
+  beforeEach(() => {
+    backendManager.useTypeScript()
+  })
+
+  afterEach(() => {
+    backendManager.useTypeScript()
+  })
+
   test('WASMBackend can be initialized', async () => {
     const backend = new WASMBackend()
     expect(backend.isReady).toBe(false)
