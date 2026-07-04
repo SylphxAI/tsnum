@@ -43,6 +43,7 @@ benchmark gate passes on the same machine against Python/NumPy.
 | API direction | NumPy-compatible spelling and behavior are the target. |
 | Benchmarks | `bench/python-parity` compares TypeScript and NumPy on identical inputs. |
 | Native path | Bun/macOS can initialize Rust/N-API and native BLAS fast paths for float64 hot loops. |
+| Dispatch evidence | `bun run bench:native-dispatch` separates kernel, backend, and public API overhead before performance changes are promoted. |
 | Proven today | Checksum parity passes for the covered benchmark cases; CI uploads the generated Python parity report; speed parity is not complete yet. |
 | Not claimed yet | Full NumPy API coverage, all-op 1.05x performance parity, and npm publication. |
 
@@ -512,6 +513,8 @@ console.log(info.usingWASM)  // true if WASM loaded
 **Performance:**
 - **Native/WASM backend paths**: Accelerated execution for covered hot paths
 - **TypeScript backend**: Always-available fallback with tuned hot loops
+- **Native dispatch probe**: `bun run bench:native-dispatch` shows whether a
+  proposed backend change improves native kernel, backend, or public API timing
 - **Python parity gate**: Run `bun run bench:python-parity:enforce` before
   publishing NumPy-speed claims
 - **Tree-shakeable**: Only bundle what you use
@@ -548,11 +551,12 @@ bun run lint
 - [x] v1.0: FFT operations (fft, ifft, rfft, irfft)
 
 **Status:** Broad NumPy-compatible surface with 251+ implemented operations and
-an explicit Python parity performance gate. Full NumPy API coverage and all-op
-1.05x speed parity remain launch gates, not completed claims.
+an explicit Python parity performance gate, native dispatch diagnostics, and
+release readback wiring. Full NumPy API coverage, all-op 1.05x speed parity,
+and first npm publication remain launch gates, not completed claims.
 
-Next: Python parity closure, GPU acceleration contract, and more decompositions
-(LU, eigendecomposition).
+Next: Python parity closure for output-producing operations, GPU acceleration
+contract, and more decompositions (LU, eigendecomposition).
 
 ## Why @sylphx/numpy?
 
