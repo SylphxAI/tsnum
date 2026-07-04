@@ -64,6 +64,19 @@ pub fn add_scalar_f64_buffers(
 }
 
 #[napi]
+pub fn add_scalar_f64_buffers_into(
+    mut input: Buffer,
+    scalar: f64,
+    mut output: Buffer,
+) -> Result<()> {
+    let input_len = input.len() / std::mem::size_of::<f64>();
+    let input_slice = buffer_as_f64(&mut input, input_len)?;
+    let output_slice = output_as_f64_mut(&mut output, input_len)?;
+    add_scalar_into(input_slice, scalar, output_slice);
+    Ok(())
+}
+
+#[napi]
 pub fn mul_scalar_f64_buffers(
     mut input: Buffer,
     scalar: f64,
@@ -77,6 +90,19 @@ pub fn mul_scalar_f64_buffers(
 }
 
 #[napi]
+pub fn mul_scalar_f64_buffers_into(
+    mut input: Buffer,
+    scalar: f64,
+    mut output: Buffer,
+) -> Result<()> {
+    let input_len = input.len() / std::mem::size_of::<f64>();
+    let input_slice = buffer_as_f64(&mut input, input_len)?;
+    let output_slice = output_as_f64_mut(&mut output, input_len)?;
+    mul_scalar_into(input_slice, scalar, output_slice);
+    Ok(())
+}
+
+#[napi]
 pub fn add_f64_buffers(mut left: Buffer, mut right: Buffer, mut output: Buffer) -> Result<Buffer> {
     let left_len = left.len() / std::mem::size_of::<f64>();
     let left_slice = buffer_as_f64(&mut left, left_len)?;
@@ -84,6 +110,16 @@ pub fn add_f64_buffers(mut left: Buffer, mut right: Buffer, mut output: Buffer) 
     let output_slice = output_as_f64_mut(&mut output, left_len)?;
     add_into(left_slice, right_slice, output_slice)?;
     Ok(output)
+}
+
+#[napi]
+pub fn add_f64_buffers_into(mut left: Buffer, mut right: Buffer, mut output: Buffer) -> Result<()> {
+    let left_len = left.len() / std::mem::size_of::<f64>();
+    let left_slice = buffer_as_f64(&mut left, left_len)?;
+    let right_slice = buffer_as_f64(&mut right, left_len)?;
+    let output_slice = output_as_f64_mut(&mut output, left_len)?;
+    add_into(left_slice, right_slice, output_slice)?;
+    Ok(())
 }
 
 #[napi]

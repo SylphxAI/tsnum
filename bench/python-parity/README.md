@@ -82,12 +82,20 @@ compared against the Python parity report on the same runner.
 This probe does not replace `bench:python-parity:repeatability`; publish
 readiness still depends on the release Python parity gate.
 
+Python parity `*_out` cases preallocate both the output array and the
+TypeScript options object during case setup. The timed body measures the
+preallocated `out` call path, matching the intended hot-loop contract instead of
+charging a fresh JavaScript options-object allocation to every numeric kernel
+iteration.
+
 ## Contract
 
 - Reference runtime: Python with NumPy.
 - Native backend: Bun/macOS runs attempt `initNativeBLAS()` before measuring.
 - Case isolation: default runs spawn a fresh Python or Bun process per
   runtime/case/sample using `PYTHON_PARITY_CASE`.
+- `*_out` cases preallocate the output array and TypeScript options object
+  before timed iterations.
 - Slowdown metric: `@sylphx/numpy` median time divided by Python median time.
   Paired slowdown p95 is kept as diagnostic runner-volatility evidence.
 - Default max slowdown: `1.05`.

@@ -10,6 +10,9 @@ export declare function addScalarF64Buffer(input: Float64Array, scalar: number, 
 export declare function mulScalarF64Buffer(input: Float64Array, scalar: number, output: Buffer): Buffer
 export declare function addF64Buffer(left: Float64Array, right: Float64Array, output: Buffer): Buffer
 export declare function addScalarF64Buffers(input: Buffer, scalar: number, output: Buffer): Buffer
+export declare function addScalarF64BuffersInto(input: Buffer, scalar: number, output: Buffer): void
 export declare function mulScalarF64Buffers(input: Buffer, scalar: number, output: Buffer): Buffer
+export declare function mulScalarF64BuffersInto(input: Buffer, scalar: number, output: Buffer): void
 export declare function addF64Buffers(left: Buffer, right: Buffer, output: Buffer): Buffer
+export declare function addF64BuffersInto(left: Buffer, right: Buffer, output: Buffer): void
 export declare function transposeF64Buffer(input: Float64Array, rows: number, cols: number, output: Buffer): Buffer

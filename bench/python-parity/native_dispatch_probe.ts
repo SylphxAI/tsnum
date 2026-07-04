@@ -34,10 +34,13 @@ type NativeKernelModule = {
   addScalarF64: (input: Float64Array, scalar: number) => Float64Array
   addScalarF64Buffer: (input: Float64Array, scalar: number, output: Buffer) => Buffer
   addScalarF64Buffers: (input: Buffer, scalar: number, output: Buffer) => Buffer
+  addScalarF64BuffersInto: (input: Buffer, scalar: number, output: Buffer) => void
   mulScalarF64: (input: Float64Array, scalar: number) => Float64Array
   mulScalarF64Buffer: (input: Float64Array, scalar: number, output: Buffer) => Buffer
   mulScalarF64Buffers: (input: Buffer, scalar: number, output: Buffer) => Buffer
+  mulScalarF64BuffersInto: (input: Buffer, scalar: number, output: Buffer) => void
   transposeF64Buffer: (input: Float64Array, rows: number, cols: number, output: Buffer) => Buffer
+  addF64BuffersInto: (left: Buffer, right: Buffer, output: Buffer) => void
 }
 
 const CBLAS_COLUMN_MAJOR = 102
@@ -357,6 +360,10 @@ const results = [
     native.addScalarF64Buffers(leftBytes, 5, outputBytes)
     return output
   }),
+  measure('native.addScalarF64BuffersInto', () => {
+    native.addScalarF64BuffersInto(leftBytes, 5, outputBytes)
+    return output
+  }),
   measure('native.addScalarF64Buffer.allocFloat64', () => {
     const allocated = new Float64Array(length)
     native.addScalarF64Buffer(left, 5, bytes(allocated))
@@ -367,6 +374,11 @@ const results = [
     native.addScalarF64Buffers(leftBytes, 5, allocated.bytes)
     return allocated.array
   }),
+  measure('native.addScalarF64BuffersInto.allocBuffer', () => {
+    const allocated = createNativeOutputBuffer(length)
+    native.addScalarF64BuffersInto(leftBytes, 5, allocated.bytes)
+    return allocated.array
+  }),
   measure('native.addF64.return', () => native.addF64(left, right)),
   measure('native.addF64.buffer', () => {
     native.addF64Buffer(left, right, outputBytes)
@@ -374,6 +386,10 @@ const results = [
   }),
   measure('native.addF64.buffers', () => {
     native.addF64Buffers(leftBytes, rightBytes, outputBytes)
+    return output
+  }),
+  measure('native.addF64BuffersInto', () => {
+    native.addF64BuffersInto(leftBytes, rightBytes, outputBytes)
     return output
   }),
   measure('native.addF64Buffer.allocFloat64', () => {
@@ -386,6 +402,11 @@ const results = [
     native.addF64Buffers(leftBytes, rightBytes, allocated.bytes)
     return allocated.array
   }),
+  measure('native.addF64BuffersInto.allocBuffer', () => {
+    const allocated = createNativeOutputBuffer(length)
+    native.addF64BuffersInto(leftBytes, rightBytes, allocated.bytes)
+    return allocated.array
+  }),
   measure('native.mulScalarF64.return', () => native.mulScalarF64(left, 2)),
   measure('native.mulScalarF64.buffer', () => {
     native.mulScalarF64Buffer(left, 2, outputBytes)
@@ -393,6 +414,10 @@ const results = [
   }),
   measure('native.mulScalarF64.buffers', () => {
     native.mulScalarF64Buffers(leftBytes, 2, outputBytes)
+    return output
+  }),
+  measure('native.mulScalarF64BuffersInto', () => {
+    native.mulScalarF64BuffersInto(leftBytes, 2, outputBytes)
     return output
   }),
   measure('native.mulScalarF64Buffer.allocFloat64', () => {
@@ -403,6 +428,11 @@ const results = [
   measure('native.mulScalarF64Buffers.allocBuffer', () => {
     const allocated = createNativeOutputBuffer(length)
     native.mulScalarF64Buffers(leftBytes, 2, allocated.bytes)
+    return allocated.array
+  }),
+  measure('native.mulScalarF64BuffersInto.allocBuffer', () => {
+    const allocated = createNativeOutputBuffer(length)
+    native.mulScalarF64BuffersInto(leftBytes, 2, allocated.bytes)
     return allocated.array
   }),
   measure('native.vDSP_vsaddD.preallocated', () => vDSPScalarAdd(output, outputPointer)),
