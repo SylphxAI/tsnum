@@ -196,6 +196,17 @@ export class NativeBLASBackend extends TypeScriptBackend {
     }
 
     const native = getNativeKernels()
+    if (native?.addF64Buffer) {
+      const output = createNativeOutputBuffer(a.buffer.length)
+      native.addF64Buffer(a.buffer, b.buffer, output.bytes)
+      return {
+        buffer: output.array,
+        shape: a.shape,
+        strides: a.strides,
+        dtype: 'float64',
+      }
+    }
+
     if (native?.addF64Buffers) {
       const output = createNativeOutputBuffer(a.buffer.length)
       native.addF64Buffers(bytesFor(a.buffer), bytesFor(b.buffer), output.bytes)
