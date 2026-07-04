@@ -43,12 +43,12 @@ Current truth:
   every covered row and recently pass the 1.05x speed target on seven to nine
   of ten covered rows. The latest uploaded main `python-parity-report` artifact
   is canonical when this dated snapshot drifts.
-- Latest main CI: `add_arrays_1m` (`0.75x`), `add_scalar_1m` (`0.59x`),
-  `mean_1m` (`0.57x`), `mul_scalar_1m` (`0.55x`), `mul_scalar_1m_out`
-  (`1.04x`), `sum_1m` (`0.57x`), and `transpose_512` (`0.72x`) pass the speed
-  target. `add_arrays_1m_out` (`1.25x`), `add_scalar_1m_out` (`1.05x`), and
-  `matmul_128` (`1.10x`) miss the latest-artifact release target. Full speed
-  parity is not claimed.
+- Recorded main snapshot `28701383776`: `add_arrays_1m` (`0.75x`),
+  `add_scalar_1m` (`0.59x`), `mean_1m` (`0.57x`), `mul_scalar_1m` (`0.55x`),
+  `mul_scalar_1m_out` (`1.04x`), `sum_1m` (`0.57x`), and `transpose_512`
+  (`0.72x`) pass the speed target. `add_arrays_1m_out` (`1.25x`),
+  `add_scalar_1m_out` (`1.05x`), and `matmul_128` (`1.10x`) miss that
+  snapshot's release target. Full speed parity is not claimed.
 - Native dispatch evidence: the same run measured `public.addScalar.out` at
   `0.2121ms`, `public.addArrays.out` at `0.4782ms`, `public.mulScalar.out` at
   `0.1846ms`, `public.matmul128` at `0.0843ms`, and `public.matmul128.out` at
@@ -501,7 +501,7 @@ bun run bench:native-dispatch
 Recent CI evidence:
 
 - Checksum parity: all covered benchmark cases pass.
-- Reporting-mode speed evidence: latest main CI run `28701383776` passed seven
+- Reporting-mode speed evidence: recorded main CI run `28701383776` passed seven
   of ten covered speed rows. `add_arrays_1m_out` (`1.25x`),
   `add_scalar_1m_out` (`1.05x`), and `matmul_128` (`1.10x`) remain over the
   strict `1.05x` target. Recent accepted main snapshots have ranged from seven
