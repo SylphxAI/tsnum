@@ -471,7 +471,7 @@ function renderMarkdown(data: typeof report): string {
     '## Use',
     '',
     '- Use this probe before changing native dispatch so wrapper overhead is separated from kernel speed.',
-    '- This is diagnostic evidence only; publish readiness remains gated by `bench:python-parity:enforce`.',
+    '- This is diagnostic evidence only; publish readiness remains gated by `bench:python-parity:repeatability`.',
     '',
   )
 

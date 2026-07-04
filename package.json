@@ -10,6 +10,7 @@
     "lint": "biome check .",
     "bench:python-parity": "bun run bench/python-parity/compare.ts",
     "bench:python-parity:enforce": "bun run bench/python-parity/compare.ts --enforce",
+    "bench:python-parity:repeatability": "bun run bench/python-parity/repeatability.ts",
     "bench:python-parity:report": "bun run bench/python-parity/report.ts",
     "bench:python-parity:report:check": "bun run bench/python-parity/report.ts --check",
     "bench:native-dispatch": "bun run bench/python-parity/native_dispatch_probe.ts",

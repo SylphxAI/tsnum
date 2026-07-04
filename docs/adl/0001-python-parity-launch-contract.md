@@ -42,8 +42,9 @@ Public claims move through these gates in order:
    checksums within configured tolerance.
 3. **Covered-operation speed parity**: every covered row passes
    `bench:python-parity:enforce` at the configured slowdown threshold.
-4. **Release readiness**: build, tests, enforced parity benchmark, release
-   preflight, npm publish, npm registry readback, and consumer smoke all pass.
+4. **Release readiness**: build, tests, repeatable enforced parity benchmark,
+   release preflight, npm publish, npm registry readback, and consumer smoke
+   all pass.
 5. **Broad Python parity**: API coverage, dtype behavior, broadcasting,
    numerical edge cases, and backend coverage are large enough to support broad
    public ecosystem claims.
@@ -131,9 +132,13 @@ The npm release path is blocked until these are true on the release runner:
 bun install --frozen-lockfile
 bun run build
 bun run test
-bun run bench:python-parity:enforce
+bun run bench:python-parity:repeatability
 bun run release:preflight
 ```
+
+`bench:python-parity:repeatability` runs the enforced benchmark three times by
+default and fails unless every attempt passes. Override the release proof count
+with `PYTHON_PARITY_REPEAT_ATTEMPTS=5`.
 
 After publish, release completion also requires:
 
@@ -171,5 +176,5 @@ After publish, release completion also requires:
    broadcasting, shape semantics, and numerical edge cases.
 3. Keep public docs tied to dated accepted CI artifacts and treat the latest
    uploaded artifacts as canonical.
-4. Publish only after enforced parity, release preflight, npm readback, and
-   consumer smoke pass.
+4. Publish only after repeatable enforced parity, release preflight, npm
+   readback, and consumer smoke pass.
