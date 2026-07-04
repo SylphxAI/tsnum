@@ -56,8 +56,8 @@ marketing copy.
 Accepted main evidence as of 2026-07-04. The latest uploaded CI artifacts are
 canonical when this dated snapshot drifts.
 
-- GitHub Actions run: `28699451145`
-- Commit: `518ab26` (`docs: refresh parity launch evidence`)
+- GitHub Actions run: `28699755902`
+- Commit: `a54a453` (`perf: avoid elementwise out validation allocations`)
 - Platform: macOS arm64
 - Python: 3.12.10
 - NumPy: 2.5.0
@@ -68,24 +68,24 @@ canonical when this dated snapshot drifts.
 
 | Case | Speed vs NumPy | Status |
 | --- | ---: | --- |
-| `add_arrays_1m` | `0.63x` | pass |
-| `add_arrays_1m_out` | `1.08x` | fail |
-| `add_scalar_1m` | `0.56x` | pass |
-| `add_scalar_1m_out` | `1.07x` | fail |
-| `matmul_128` | `1.11x` | fail |
-| `mean_1m` | `0.58x` | pass |
-| `mul_scalar_1m` | `0.57x` | pass |
-| `mul_scalar_1m_out` | `1.10x` | fail |
-| `sum_1m` | `0.57x` | pass |
-| `transpose_512` | `0.70x` | pass |
+| `add_arrays_1m` | `0.62x` | pass |
+| `add_arrays_1m_out` | `1.24x` | fail |
+| `add_scalar_1m` | `0.59x` | pass |
+| `add_scalar_1m_out` | `0.97x` | pass |
+| `matmul_128` | `1.00x` | pass |
+| `mean_1m` | `0.56x` | pass |
+| `mul_scalar_1m` | `0.68x` | pass |
+| `mul_scalar_1m_out` | `1.06x` | fail |
+| `sum_1m` | `0.58x` | pass |
+| `transpose_512` | `0.76x` | pass |
 
 Current truthful public statement:
 
 `@sylphx/numpy` has checksum parity on the covered benchmark set and passes the
-speed target on six of ten covered rows in the dated accepted main CI
+speed target on eight of ten covered rows in the dated accepted main CI
 artifact. Full covered-operation speed parity is not claimed because
-`add_arrays_1m_out`, `add_scalar_1m_out`, `matmul_128`, and
-`mul_scalar_1m_out` remain over the `1.05x` release threshold.
+`add_arrays_1m_out` and `mul_scalar_1m_out` remain over the `1.05x` release
+threshold.
 
 ## Native Dispatch Evidence
 
@@ -93,11 +93,11 @@ The same main run uploaded `native-dispatch-report`:
 
 | Layer | Median ms |
 | --- | ---: |
-| `public.addScalar.out` | `0.2023` |
-| `public.addArrays.out` | `0.3931` |
-| `public.mulScalar.out` | `0.2156` |
-| `public.matmul128` | `0.0811` |
-| `public.matmul128.out` | `0.0718` |
+| `public.addScalar.out` | `0.1769` |
+| `public.addArrays.out` | `0.3387` |
+| `public.mulScalar.out` | `0.1743` |
+| `public.matmul128` | `0.0850` |
+| `public.matmul128.out` | `0.0797` |
 
 This supports the current technical direction: native-backed dispatch and
 preallocated output buffers are the right hot-path shape. The remaining release
@@ -141,7 +141,7 @@ After publish, release completion also requires:
 - `@sylphx/numpy` is the public NumPy-compatible TypeScript package contract.
 - The API target is Python/NumPy spelling and semantics.
 - Covered benchmark checksums pass in the dated accepted main CI artifact.
-- Six of ten covered speed rows pass the current `1.05x` NumPy comparison
+- Eight of ten covered speed rows pass the current `1.05x` NumPy comparison
   target in the dated accepted main CI artifact.
 - Native-backed public hot paths and preallocated output buffers are measured in
   the accepted native dispatch probe.
@@ -157,8 +157,8 @@ After publish, release completion also requires:
 
 ## Next Launch Work
 
-1. Close the `add_arrays_1m_out`, `add_scalar_1m_out`, `matmul_128`, and
-   `mul_scalar_1m_out` gaps without weakening the `1.05x` release target.
+1. Close the `add_arrays_1m_out` and `mul_scalar_1m_out` gaps without
+   weakening the `1.05x` release target.
 2. Expand API compatibility tests around NumPy spelling, dtype behavior,
    broadcasting, shape semantics, and numerical edge cases.
 3. Keep public docs tied to dated accepted CI artifacts and treat the latest
