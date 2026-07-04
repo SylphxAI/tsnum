@@ -94,6 +94,10 @@ export function lessEqual(a: NDArray, b: NDArray | number): NDArray<'uint8'> {
   return new NDArray(elementwiseCompare(aData, b.getData(), (x, y) => x <= y))
 }
 
+export function less_equal(a: NDArray, b: NDArray | number): NDArray<'uint8'> {
+  return lessEqual(a, b)
+}
+
 export function greaterEqual(a: NDArray, b: NDArray | number): NDArray<'uint8'> {
   const aData = a.getData()
 
@@ -102,6 +106,10 @@ export function greaterEqual(a: NDArray, b: NDArray | number): NDArray<'uint8'> 
   }
 
   return new NDArray(elementwiseCompare(aData, b.getData(), (x, y) => x >= y))
+}
+
+export function greater_equal(a: NDArray, b: NDArray | number): NDArray<'uint8'> {
+  return greaterEqual(a, b)
 }
 
 export function not_equal(a: NDArray, b: NDArray | number): NDArray<'uint8'> {

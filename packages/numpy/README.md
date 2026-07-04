@@ -472,19 +472,23 @@ const e = linspace(0, 1, 5)  // [0, 0.25, 0.5, 0.75, 1]
 ### Mathematical Operations
 
 ```typescript
-import { add, mul, sin, exp } from '@sylphx/numpy'
+import { add, exp, multiply, sin } from '@sylphx/numpy'
 
 const a = array([1, 2, 3])
 const b = array([4, 5, 6])
 
 // Element-wise operations
 const sum = add(a, b)  // [5, 7, 9]
-const product = mul(a, b)  // [4, 10, 18]
+const product = multiply(a, b)  // [4, 10, 18]
 
 // Math functions
 const s = sin(a)
 const e = exp(a)
 ```
+
+NumPy canonical names `subtract`, `multiply`, `divide`, `less_equal`, and
+`greater_equal` are exported. Existing short aliases such as `sub`, `mul`,
+`div`, `lessEqual`, and `greaterEqual` remain available for compatibility.
 
 ### Linear Algebra
 

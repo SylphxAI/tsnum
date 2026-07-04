@@ -98,20 +98,25 @@ const f = eye(3)                  // 3x3 identity matrix
 
 ### Arithmetic Operations
 ```typescript
-import { add, sub, mul, div, pow } from '@sylphx/numpy'
+import { add, divide, multiply, pow, subtract } from '@sylphx/numpy'
 
 const a = array([1, 2, 3])
 
 // Functional API (primary)
 const b = add(a, 5)               // [6, 7, 8]
-const c = mul(a, 2)               // [2, 4, 6]
+const c = multiply(a, 2)          // [2, 4, 6]
 const d = pow(a, 2)               // [1, 4, 9]
+const e = subtract(c, a)          // [1, 2, 3]
+const f = divide(c, 2)            // [1, 2, 3]
 
 // Works with arrays
 const x = array([1, 2, 3])
 const y = array([4, 5, 6])
 const z = add(x, y)               // [5, 7, 9]
 ```
+
+`sub`, `mul`, and `div` remain supported aliases; the canonical public spelling
+tracks NumPy's `subtract`, `multiply`, and `divide`.
 
 ### Reductions
 ```typescript

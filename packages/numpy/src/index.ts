@@ -34,16 +34,21 @@ export {
 export {
   // Arithmetic
   add,
+  subtract,
   sub,
+  multiply,
   mul,
+  divide,
   div,
   pow,
   // Comparison
   equal,
   less,
+  less_equal,
   greater,
   lessEqual,
   greaterEqual,
+  greater_equal,
   not_equal,
   array_equal,
   array_equiv,
