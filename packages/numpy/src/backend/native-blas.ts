@@ -70,6 +70,10 @@ const accelerate = dlopen('/System/Library/Frameworks/Accelerate.framework/Accel
 const scalarBuffer = new Float64Array(1)
 const scalarPointer = ptr(scalarBuffer)
 const pointerCache = new WeakMap<Float64Array, ReturnType<typeof ptr>>()
+const matmulLayoutCache = new Map<
+  string,
+  { shape: readonly number[]; strides: readonly number[] }
+>()
 
 type NativeKernelModule = {
   addScalarF64Buffer?: (input: Float64Array, scalar: number, output: Uint8Array) => Uint8Array
@@ -134,6 +138,22 @@ function bytesFor(buffer: Float64Array): Uint8Array {
     byteViewCache.set(buffer, bytes)
   }
   return bytes
+}
+
+function getMatmulLayout(
+  m: number,
+  n: number,
+): { shape: readonly number[]; strides: readonly number[] } {
+  const key = `${m}x${n}`
+  const cached = matmulLayoutCache.get(key)
+  if (cached) return cached
+
+  const layout = {
+    shape: [m, n] as const,
+    strides: [n, 1] as const,
+  }
+  matmulLayoutCache.set(key, layout)
+  return layout
 }
 
 function writeVdspScalarAdd(
@@ -379,15 +399,26 @@ export class NativeBLASBackend extends TypeScriptBackend {
       return super.matmul(a, b)
     }
 
-    const { m, k, n } = this.validateMatmulOperands(a, b)
+    if (a.shape.length !== 2 || b.shape.length !== 2) {
+      throw new Error('matmul requires 2D arrays')
+    }
+
+    const m = a.shape[0]
+    const k = a.shape[1]
+    const n = b.shape[1]
+
+    if (k !== b.shape[0]) {
+      throw new Error(`Shape mismatch: (${m}, ${k}) and (${b.shape[0]}, ${n})`)
+    }
 
     const output = createNativeOutput(m * n)
     this.writeNativeMatmul(a.buffer, b.buffer, m, k, n, ptr(output))
+    const layout = getMatmulLayout(m, n)
 
     return {
       buffer: output,
-      shape: [m, n],
-      strides: [n, 1],
+      shape: layout.shape,
+      strides: layout.strides,
       dtype: 'float64',
     }
   }

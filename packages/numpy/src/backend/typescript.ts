@@ -351,6 +351,30 @@ export class TypeScriptBackend implements Backend {
     shape: readonly number[],
     length: number,
   ): void {
+    if (shape.length === 1) {
+      if (out.shape.length !== 1 || out.shape[0] !== shape[0]) {
+        throw new Error(
+          `operation out shape mismatch: expected (${shape.join(', ')}), got (${out.shape.join(', ')})`,
+        )
+      }
+
+      if (out.dtype !== dtype) {
+        throw new Error(`operation out dtype mismatch: expected ${dtype}, got ${out.dtype}`)
+      }
+
+      if (out.buffer.length !== length) {
+        throw new Error(
+          `operation out buffer length mismatch: expected ${length}, got ${out.buffer.length}`,
+        )
+      }
+
+      if (out.strides.length !== 1 || out.strides[0] !== 1) {
+        throw new Error('operation out must be C-contiguous')
+      }
+
+      return
+    }
+
     let shapeMatches = out.shape.length === shape.length
     for (let i = 0; shapeMatches && i < shape.length; i++) {
       shapeMatches = out.shape[i] === shape[i]
