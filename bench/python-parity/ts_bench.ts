@@ -47,27 +47,56 @@ function matrix(rows: number, cols: number, scale: number): number[][] {
   )
 }
 
+type BenchCaseFactory = () => [number, number, () => BenchValue]
+
 const nativeBLAS = await initNativeBLAS()
 const backend = getBackendInfo()
 
-const vector = array(range(1_000_000, 0.001), { dtype: 'float64' })
-const vectorB = array(range(1_000_000, 0.002), { dtype: 'float64' })
-const matrix512 = array(matrix(512, 512, 0.001), { dtype: 'float64' })
-const left = array(matrix(128, 128, 0.001), { dtype: 'float64' })
-const right = array(matrix(128, 128, 0.002), { dtype: 'float64' })
+const cases: Record<string, BenchCaseFactory> = {
+  add_scalar_1m: () => {
+    const vector = array(range(1_000_000, 0.001), { dtype: 'float64' })
+    return [100, 20, () => add(vector, 5)]
+  },
+  add_arrays_1m: () => {
+    const vector = array(range(1_000_000, 0.001), { dtype: 'float64' })
+    const vectorB = array(range(1_000_000, 0.002), { dtype: 'float64' })
+    return [100, 20, () => add(vector, vectorB)]
+  },
+  mul_scalar_1m: () => {
+    const vector = array(range(1_000_000, 0.001), { dtype: 'float64' })
+    return [100, 20, () => mul(vector, 2)]
+  },
+  sum_1m: () => {
+    const vector = array(range(1_000_000, 0.001), { dtype: 'float64' })
+    return [300, 30, () => sum(vector)]
+  },
+  mean_1m: () => {
+    const vector = array(range(1_000_000, 0.001), { dtype: 'float64' })
+    return [300, 30, () => mean(vector)]
+  },
+  transpose_512: () => {
+    const matrix512 = array(matrix(512, 512, 0.001), { dtype: 'float64' })
+    return [120, 20, () => transpose(matrix512)]
+  },
+  matmul_128: () => {
+    const left = array(matrix(128, 128, 0.001), { dtype: 'float64' })
+    const right = array(matrix(128, 128, 0.002), { dtype: 'float64' })
+    return [1000, 100, () => matmul(left, right)]
+  },
+}
 
-const cases: Record<string, [number, number, () => BenchValue]> = {
-  add_scalar_1m: [30, 5, () => add(vector, 5)],
-  add_arrays_1m: [30, 5, () => add(vector, vectorB)],
-  mul_scalar_1m: [30, 5, () => mul(vector, 2)],
-  sum_1m: [100, 10, () => sum(vector)],
-  mean_1m: [100, 10, () => mean(vector)],
-  transpose_512: [60, 10, () => transpose(matrix512)],
-  matmul_128: [20, 5, () => matmul(left, right)],
+const selectedCase = process.env.PYTHON_PARITY_CASE
+if (selectedCase && !cases[selectedCase]) {
+  throw new Error(`Unknown PYTHON_PARITY_CASE: ${selectedCase}`)
 }
 
 const benchmarks: Record<string, unknown> = {}
-for (const [name, [iterations, warmup, fn]] of Object.entries(cases)) {
+for (const [name, createCase] of Object.entries(cases)) {
+  if (selectedCase && name !== selectedCase) {
+    continue
+  }
+
+  const [iterations, warmup, fn] = createCase()
   const last = fn()
   benchmarks[name] = {
     time_ms: measure(fn, iterations, warmup),

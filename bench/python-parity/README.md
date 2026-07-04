@@ -27,10 +27,19 @@ PYTHON=.venv/bin/python bun run bench:python-parity
 PYTHON=.venv/bin/python bun run bench:python-parity:enforce
 ```
 
-Default runs print and save median ratios across multiple samples. Checksum
-parity is always enforced across every sample. Enforcement runs additionally
-fail when any covered operation is slower than NumPy by more than the configured
-threshold.
+To debug one row directly:
+
+```bash
+PYTHON_PARITY_CASE=matmul_128 python bench/python-parity/python_bench.py
+PYTHON_PARITY_CASE=matmul_128 bun run bench/python-parity/ts_bench.ts
+```
+
+Default runs print and save median ratios across multiple samples. Each
+runtime/case/sample is executed in a fresh process so tiny kernels are not
+contaminated by allocator or garbage-collector state from earlier cases.
+Checksum parity is always enforced across every sample. Enforcement runs
+additionally fail when any covered operation is slower than NumPy by more than
+the configured threshold.
 
 Each run writes:
 
@@ -57,9 +66,12 @@ still depends on the Python parity gate.
 
 - Reference runtime: Python with NumPy.
 - Native backend: Bun/macOS runs attempt `initNativeBLAS()` before measuring.
+- Case isolation: default runs spawn a fresh Python or Bun process per
+  runtime/case/sample using `PYTHON_PARITY_CASE`.
+- Slowdown metric: median paired `@sylphx/numpy` / Python sample ratio.
 - Default max slowdown: `1.05`.
 - Override: `PYTHON_PARITY_MAX_SLOWDOWN=1.10`.
-- Default samples per runtime: `3`.
+- Default samples per runtime: `7`.
 - Sample override: `PYTHON_PARITY_RUNS=5`.
 - Checksum tolerance: `PYTHON_PARITY_CHECKSUM_ATOL=1e-6` and
   `PYTHON_PARITY_CHECKSUM_RTOL=1e-9`.

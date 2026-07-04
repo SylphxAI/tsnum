@@ -42,10 +42,19 @@ const python = process.env.PYTHON ?? 'python3'
 const maxSlowdown = Number(process.env.PYTHON_PARITY_MAX_SLOWDOWN ?? '1.05')
 const checksumAtol = Number(process.env.PYTHON_PARITY_CHECKSUM_ATOL ?? '1e-6')
 const checksumRtol = Number(process.env.PYTHON_PARITY_CHECKSUM_RTOL ?? '1e-9')
-const configuredSampleCount = Number(process.env.PYTHON_PARITY_RUNS ?? '3')
+const configuredSampleCount = Number(process.env.PYTHON_PARITY_RUNS ?? '7')
 const sampleCount = Number.isFinite(configuredSampleCount)
   ? Math.max(1, Math.trunc(configuredSampleCount))
   : 3
+const benchmarkCaseNames = [
+  'add_arrays_1m',
+  'add_scalar_1m',
+  'matmul_128',
+  'mean_1m',
+  'mul_scalar_1m',
+  'sum_1m',
+  'transpose_512',
+]
 
 function checksumMatches(actual: number, expected: number): boolean {
   const tolerance = Math.max(checksumAtol, Math.abs(expected) * checksumRtol)
@@ -99,9 +108,13 @@ function summaryStats(values: number[]): SummaryStats {
   }
 }
 
-function runJson(command: string[], cwd: string): BenchReport {
+function runJson(command: string[], cwd: string, env: Record<string, string> = {}): BenchReport {
   const result = Bun.spawnSync(command, {
     cwd,
+    env: {
+      ...process.env,
+      ...env,
+    },
     stdout: 'pipe',
     stderr: 'pipe',
   })
@@ -121,6 +134,43 @@ function runJson(command: string[], cwd: string): BenchReport {
   }
 
   return JSON.parse(new TextDecoder().decode(result.stdout)) as BenchReport
+}
+
+function mergeCaseReport(
+  sample: BenchReport | undefined,
+  caseName: string,
+  caseReport: BenchReport,
+): BenchReport {
+  const benchmark = caseReport.benchmarks[caseName]
+  if (!benchmark) {
+    throw new Error(`Runtime ${caseReport.runtime} did not report benchmark case: ${caseName}`)
+  }
+
+  if (!sample) {
+    return {
+      ...caseReport,
+      benchmarks: {
+        [caseName]: benchmark,
+      },
+    }
+  }
+
+  return {
+    ...sample,
+    benchmarks: {
+      ...sample.benchmarks,
+      [caseName]: benchmark,
+    },
+  }
+}
+
+function runRuntimeCase(runtime: RuntimeName, caseName: string): BenchReport {
+  const env = { PYTHON_PARITY_CASE: caseName }
+  if (runtime === 'python') {
+    return runJson([python, 'bench/python-parity/python_bench.py'], root, env)
+  }
+
+  return runJson([process.execPath, 'run', 'bench/python-parity/ts_bench.ts'], root, env)
 }
 
 function aggregateReport(reports: BenchReport[]): BenchReport {
@@ -161,11 +211,14 @@ for (let i = 0; i < sampleCount; i++) {
   let pythonSample: BenchReport | undefined
   let tsSample: BenchReport | undefined
 
-  for (const runtime of order) {
-    if (runtime === 'python') {
-      pythonSample = runJson([python, 'bench/python-parity/python_bench.py'], root)
-    } else {
-      tsSample = runJson([process.execPath, 'run', 'bench/python-parity/ts_bench.ts'], root)
+  for (const caseName of benchmarkCaseNames) {
+    for (const runtime of order) {
+      const caseReport = runRuntimeCase(runtime, caseName)
+      if (runtime === 'python') {
+        pythonSample = mergeCaseReport(pythonSample, caseName, caseReport)
+      } else {
+        tsSample = mergeCaseReport(tsSample, caseName, caseReport)
+      }
     }
   }
 
@@ -193,7 +246,6 @@ const rows = Object.keys(pythonReport.benchmarks).map((name) => {
     throw new Error(`Missing @sylphx/numpy benchmark case: ${name}`)
   }
 
-  const slowdown = tsCase.time_ms / pythonCase.time_ms
   const checksum_pass = tsSamples.every((sample, index) => {
     const tsSample = sample.benchmarks[name]
     const pythonSample = pythonSamples[index]?.benchmarks[name]
@@ -208,6 +260,8 @@ const rows = Object.keys(pythonReport.benchmarks).map((name) => {
     const pythonMs = pythonMsSamples[index]
     return typeof pythonMs === 'number' ? tsMs / pythonMs : Number.NaN
   })
+  const slowdownStats = summaryStats(pairedSlowdownSamples)
+  const slowdown = slowdownStats.median
 
   return {
     name,
@@ -219,7 +273,7 @@ const rows = Object.keys(pythonReport.benchmarks).map((name) => {
     sample_stats: {
       python_ms: summaryStats(pythonMsSamples),
       ts_ms: summaryStats(tsMsSamples),
-      slowdown: summaryStats(pairedSlowdownSamples),
+      slowdown: slowdownStats,
     },
     slowdown,
     speed_pass: slowdown <= maxSlowdown,
@@ -239,7 +293,9 @@ const output = {
   max_slowdown: maxSlowdown,
   sample_count: sampleCount,
   sampling: {
-    strategy: 'paired-alternating-runtime-order',
+    strategy: 'paired-alternating-runtime-order-with-case-process-isolation',
+    case_isolation: 'fresh process per runtime/case/sample',
+    cases: benchmarkCaseNames,
     python_command: python,
     ts_command: `${process.execPath} run bench/python-parity/ts_bench.ts`,
     sample_pairs: samplePairs.map((pair) => ({
