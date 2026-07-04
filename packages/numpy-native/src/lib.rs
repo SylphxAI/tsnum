@@ -342,6 +342,19 @@ fn add_into(left: &[f64], right: &[f64], output: &mut [f64]) -> Result<()> {
         ));
     }
 
+    #[cfg(target_arch = "aarch64")]
+    unsafe {
+        add_into_neon(left, right, output);
+    }
+
+    #[cfg(not(target_arch = "aarch64"))]
+    add_into_unrolled(left, right, output);
+
+    Ok(())
+}
+
+#[cfg(not(target_arch = "aarch64"))]
+fn add_into_unrolled(left: &[f64], right: &[f64], output: &mut [f64]) {
     let len = left.len();
     let unrolled_len = len - (len % 4);
     let mut i = 0;
@@ -358,8 +371,42 @@ fn add_into(left: &[f64], right: &[f64], output: &mut [f64]) -> Result<()> {
         output[i] = left[i] + right[i];
         i += 1;
     }
+}
 
-    Ok(())
+#[cfg(target_arch = "aarch64")]
+unsafe fn add_into_neon(left: &[f64], right: &[f64], output: &mut [f64]) {
+    use std::arch::aarch64::{vaddq_f64, vld1q_f64, vst1q_f64};
+
+    // The public wrappers validate equal input/output lengths before reaching this hot loop.
+    let len = left.len();
+    let vector_len = len - (len % 8);
+    let left_ptr = left.as_ptr();
+    let right_ptr = right.as_ptr();
+    let output_ptr = output.as_mut_ptr();
+    let mut i = 0;
+
+    while i < vector_len {
+        let left0 = vld1q_f64(left_ptr.add(i));
+        let left1 = vld1q_f64(left_ptr.add(i + 2));
+        let left2 = vld1q_f64(left_ptr.add(i + 4));
+        let left3 = vld1q_f64(left_ptr.add(i + 6));
+        let right0 = vld1q_f64(right_ptr.add(i));
+        let right1 = vld1q_f64(right_ptr.add(i + 2));
+        let right2 = vld1q_f64(right_ptr.add(i + 4));
+        let right3 = vld1q_f64(right_ptr.add(i + 6));
+
+        vst1q_f64(output_ptr.add(i), vaddq_f64(left0, right0));
+        vst1q_f64(output_ptr.add(i + 2), vaddq_f64(left1, right1));
+        vst1q_f64(output_ptr.add(i + 4), vaddq_f64(left2, right2));
+        vst1q_f64(output_ptr.add(i + 6), vaddq_f64(left3, right3));
+
+        i += 8;
+    }
+
+    while i < len {
+        *output_ptr.add(i) = *left_ptr.add(i) + *right_ptr.add(i);
+        i += 1;
+    }
 }
 
 fn transpose_into(input: &[f64], rows: usize, cols: usize, output: &mut [f64]) {

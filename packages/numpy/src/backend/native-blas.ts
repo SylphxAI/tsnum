@@ -83,6 +83,7 @@ type NativeKernelModule = {
   addScalarF64Buffer?: (input: Float64Array, scalar: number, output: Uint8Array) => Uint8Array
   addScalarF64Buffers?: (input: Uint8Array, scalar: number, output: Uint8Array) => Uint8Array
   addScalarF64BuffersInto?: (input: Uint8Array, scalar: number, output: Uint8Array) => void
+  addF64BuffersInto?: (left: Uint8Array, right: Uint8Array, output: Uint8Array) => void
   mulScalarF64BuffersInto?: (input: Uint8Array, scalar: number, output: Uint8Array) => void
   transposeF64Buffer?: (
     input: Float64Array,
@@ -219,6 +220,12 @@ export class NativeBLASBackend extends TypeScriptBackend {
   readonly isReady = true
 
   addFloat64Into(a: Float64Array, b: Float64Array, out: Float64Array): void {
+    const native = getNativeKernels()
+    if (native?.addF64BuffersInto) {
+      native.addF64BuffersInto(bytesFor(a), bytesFor(b), bytesFor(out))
+      return
+    }
+
     writeVdspAdd(a, b, pointerFor(out))
   }
 
@@ -467,7 +474,7 @@ export class NativeBLASBackend extends TypeScriptBackend {
   }
 
   matmulFloat64(a: Float64Array, b: Float64Array, m: number, k: number, n: number): NDArrayData {
-    const output = new Float64Array(m * n)
+    const output = createNativeOutput(m * n)
     this.writeNativeMatmul(a, b, m, k, n, ptr(output))
     const layout = getMatmulLayout(m, n)
 
