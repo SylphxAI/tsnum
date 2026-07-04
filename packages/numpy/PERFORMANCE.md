@@ -86,7 +86,8 @@ publish readiness still depends on `bench:python-parity:enforce`.
 
 - TypeScript backend: always-available reference implementation and fallback.
 - Native kernel package: `@sylphx/numpy-native` provides Rust/N-API float64
-  vector kernels for the NumPy-compatible package path.
+  vector kernels and a macOS Accelerate matmul bridge for the NumPy-compatible
+  package path.
 - Native BLAS backend: Bun/macOS Accelerate path for covered float64 reductions,
   matrix operations, and fallback kernels.
 - WASM backend: portable acceleration path for supported operations.
