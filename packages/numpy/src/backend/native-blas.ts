@@ -224,6 +224,11 @@ export class NativeBLASBackend extends TypeScriptBackend {
 
   addScalarFloat64Into(a: Float64Array, scalar: number, out: Float64Array): void {
     const native = getNativeKernels()
+    if (native?.addScalarF64Buffer) {
+      native.addScalarF64Buffer(a, scalar, bytesFor(out))
+      return
+    }
+
     if (native?.addScalarF64BuffersInto) {
       native.addScalarF64BuffersInto(bytesFor(a), scalar, bytesFor(out))
       return
@@ -326,6 +331,11 @@ export class NativeBLASBackend extends TypeScriptBackend {
     if (typeof b === 'number') {
       this.validateElementwiseOutput(out, 'float64', a.shape, a.buffer.length)
       const native = getNativeKernels()
+      if (native?.addScalarF64Buffer) {
+        native.addScalarF64Buffer(a.buffer, b, bytesFor(out.buffer))
+        return out
+      }
+
       if (native?.addScalarF64BuffersInto) {
         native.addScalarF64BuffersInto(bytesFor(a.buffer), b, bytesFor(out.buffer))
         return out

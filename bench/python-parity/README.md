@@ -88,7 +88,10 @@ Python parity `*_out` cases preallocate both the output array and the
 TypeScript options object during case setup. The timed body measures the
 preallocated `out` call path, matching the intended hot-loop contract instead of
 charging a fresh JavaScript options-object allocation to every numeric kernel
-iteration.
+iteration. The scalar `out` rows use 2000 measured iterations and 100 warmups per
+sample because their timed bodies are sub-millisecond on GitHub macOS runners;
+the longer sample reduces timer and runner-noise sensitivity without changing
+the 1.05x speed threshold.
 
 ## Contract
 

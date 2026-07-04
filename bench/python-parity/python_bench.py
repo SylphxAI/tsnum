@@ -48,7 +48,7 @@ def main() -> None:
     def add_scalar_1m_out() -> tuple[int, int, Callable[[], object]]:
         data = vector()
         out = np.empty_like(data)
-        return 100, 20, lambda: np.add(data, 5.0, out=out)
+        return 2000, 100, lambda: np.add(data, 5.0, out=out)
 
     def add_arrays_1m() -> tuple[int, int, Callable[[], object]]:
         left = vector()
@@ -68,7 +68,7 @@ def main() -> None:
     def mul_scalar_1m_out() -> tuple[int, int, Callable[[], object]]:
         data = vector()
         out = np.empty_like(data)
-        return 100, 20, lambda: np.multiply(data, 2.0, out=out)
+        return 2000, 100, lambda: np.multiply(data, 2.0, out=out)
 
     def sum_1m() -> tuple[int, int, Callable[[], object]]:
         data = vector()

@@ -62,7 +62,7 @@ const cases: Record<string, BenchCaseFactory> = {
     const vector = array(range(1_000_000, 0.001), { dtype: 'float64' })
     const out = empty([1_000_000], { dtype: 'float64' })
     const options = { out }
-    return [100, 20, () => add(vector, 5, options)]
+    return [2000, 100, () => add(vector, 5, options)]
   },
   add_arrays_1m: () => {
     const vector = array(range(1_000_000, 0.001), { dtype: 'float64' })
@@ -84,7 +84,7 @@ const cases: Record<string, BenchCaseFactory> = {
     const vector = array(range(1_000_000, 0.001), { dtype: 'float64' })
     const out = empty([1_000_000], { dtype: 'float64' })
     const options = { out }
-    return [100, 20, () => mul(vector, 2, options)]
+    return [2000, 100, () => mul(vector, 2, options)]
   },
   sum_1m: () => {
     const vector = array(range(1_000_000, 0.001), { dtype: 'float64' })
