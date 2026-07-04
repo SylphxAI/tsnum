@@ -31,12 +31,17 @@
   },
   "keywords": [
     "numpy",
+    "numpy-compatible",
+    "python",
     "ndarray",
     "matrix",
     "linear-algebra",
+    "data-science",
     "native",
+    "blas",
     "wasm",
     "typescript",
+    "tensor",
     "machine-learning"
   ],
   "repository": {

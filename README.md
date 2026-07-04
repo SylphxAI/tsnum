@@ -1,14 +1,18 @@
-# @sylphx/numpy
+# @sylphx/numpy - NumPy for TypeScript
 
-NumPy-compatible numerical computing for TypeScript. This repository was
-started as `tsnum`; the public package contract is now `@sylphx/numpy`, with
-`np` as the canonical import alias.
+NumPy-compatible numerical computing for TypeScript. The repository started as
+`tsnum`; the public package contract is now `@sylphx/numpy`, with `np` as the
+canonical import alias.
 
 The mission is direct: make Python-grade numerical computing available inside
 TypeScript without forcing teams to run a Python sidecar for every model,
 agent, dashboard, or server workflow. The API target is NumPy spelling and
 semantics; the performance target is NumPy-class native execution, admitted by
 repository-local Python parity benchmarks.
+
+This is not a JavaScript math toy. The TypeScript layer is the public developer
+experience; hot paths are designed to drop into Rust/N-API kernels, native BLAS,
+WASM, and future GPU backends while preserving a Python-recognizable `np` API.
 
 Release gate: `@sylphx/numpy` npm publication must pass
 `bun run bench:python-parity:enforce` and npm registry readback first. Until
@@ -20,8 +24,12 @@ API direction and is not affiliated with, endorsed by, or sponsored by NumPy.
 
 ## Why Star This
 
-- **Python ecosystem migration path** - Python users should recognize the API,
-  shapes, dtypes, broadcasting, and numerical vocabulary immediately.
+- **Python ecosystem migration path** - Python users should recognize the
+  namespace, function names, shapes, dtypes, broadcasting, and numerical
+  vocabulary immediately.
+- **Train and serve closer to your TypeScript stack** - the target is to make
+  model training, simulation, analytics, and agent workflows viable without a
+  permanent Python sidecar when the covered native backend path is enough.
 - **Native-speed target, not JavaScript-only ambition** - TypeScript is the
   public language surface; hot operations are designed to route through
   Rust/N-API native kernels, native BLAS, WASM, and future GPU backends when the
@@ -44,8 +52,50 @@ benchmark gate passes on the same machine against Python/NumPy.
 | Benchmarks | `bench/python-parity` compares TypeScript and NumPy on identical inputs. |
 | Native path | Bun/macOS can initialize Rust/N-API and native BLAS fast paths for float64 hot loops. |
 | Dispatch evidence | `bun run bench:native-dispatch` separates kernel, backend, and public API overhead before performance changes are promoted. |
-| Proven today | Covered benchmark checksums pass across recent CI runs, and native-backed rows often beat NumPy on reductions and vector scalar operations. |
-| Not claimed yet | Recent CI artifacts include both reporting-mode speed passes and failures; PR #28 proved `bench:python-parity:enforce` is not stable enough for admission yet, and local `release:preflight` still fails. Full NumPy API coverage, repeatable all-op speed parity, and npm publication are still launch gates. |
+| Proven today | Covered benchmark checksums pass across recent CI runs, and native-backed rows often beat NumPy on reductions, transpose, and vector scalar operations on macOS arm64 native BLAS. |
+| Not claimed yet | Latest main CI after PR #37 still fails the strict speed gate on `matmul_128`; full NumPy API coverage, repeatable all-op speed parity, and npm publication are still launch gates. |
+
+Latest main CI snapshot after reverting the slower native-addon matmul bridge
+(run `28695180293`, macOS arm64, Python 3.12.10, NumPy 2.5.0, Bun 1.3.14):
+
+| Case | Speed vs NumPy | Status |
+| --- | ---: | --- |
+| `add_arrays_1m` | `0.67x` | pass |
+| `add_scalar_1m` | `0.66x` | pass |
+| `matmul_128` | `1.18x` | fail |
+| `mean_1m` | `0.52x` | pass |
+| `mul_scalar_1m` | `0.64x` | pass |
+| `sum_1m` | `0.62x` | pass |
+| `transpose_512` | `0.81x` | pass |
+
+All covered checksums passed in that run. The release rule remains stricter
+than the marketing copy: no full-speed claim and no npm publish until
+`bun run bench:python-parity:enforce` passes repeatably on the release path.
+
+## Python-To-TypeScript Contract
+
+The public syntax intentionally follows NumPy names instead of inventing a new
+math DSL:
+
+```python
+# Python
+import numpy as np
+
+x = np.arange(1_000_000, dtype=np.float64)
+y = np.mean(np.multiply(x, 2.0))
+```
+
+```typescript
+// TypeScript
+import * as np from '@sylphx/numpy'
+
+const x = np.arange(1_000_000, { dtype: 'float64' })
+const y = np.mean(np.multiply(x, 2.0))
+```
+
+Where JavaScript syntax cannot match Python operators directly, the contract is
+NumPy function spelling (`np.matmul`, `np.multiply`, `np.reshape`,
+`np.zeros_like`) and Python-style array semantics.
 
 **Features:**
 - 🎯 **NumPy-compatible DX** - Python spelling and behavior are the target

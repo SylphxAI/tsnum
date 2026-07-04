@@ -1,10 +1,15 @@
-# @sylphx/numpy
+# @sylphx/numpy - NumPy for TypeScript
 
 > NumPy-compatible TypeScript numerical engine with a Python parity performance gate
 
 This package is the public NumPy-compatible TypeScript surface. The repository
 started as `tsnum`; `@sylphx/numpy` is now the package contract, with `np` as
 the canonical import alias.
+
+The product direction is deliberately familiar: make Python-style numerical
+computing available in TypeScript with `np` syntax, native-backed hot paths, and
+benchmark evidence against Python/NumPy. The package should feel obvious to
+Python users, not like a new DSL.
 
 Release gate: `@sylphx/numpy` npm publication must pass
 `bun run bench:python-parity:enforce` and npm registry readback first. Until
@@ -31,12 +36,39 @@ Current truth:
 - Evidence tools: Python parity benchmark plus native dispatch probe for
   kernel/wrapper/public-API timing.
 - Recorded benchmark evidence: recent CI artifacts consistently pass checksum
-  parity, and native-backed reductions plus vector scalar operations often beat
-  NumPy on macOS arm64 native BLAS.
-- Release gate evidence: recent reporting-mode speed rows are volatile, and PR
-  #28 proved `bench:python-parity:enforce` is not stable enough for admission
-  yet, so npm publication remains blocked.
+  parity, and native-backed reductions, transpose, and vector scalar operations
+  often beat NumPy on macOS arm64 native BLAS.
+- Latest main CI after PR #37: checksum parity passed for every covered row;
+  `add_arrays_1m`, `add_scalar_1m`, `mean_1m`, `mul_scalar_1m`, `sum_1m`, and
+  `transpose_512` passed the 1.05x speed target; `matmul_128` still failed at
+  `1.18x`, so the package is not claiming full speed parity yet.
+- Release gate evidence: `bench:python-parity:enforce` and `release:preflight`
+  remain admission blockers until every covered speed row passes repeatably, so
+  npm publication remains blocked.
 - Claim boundary: full NumPy parity is the target, not a completed claim.
+
+## Python-To-TypeScript Contract
+
+```python
+# Python
+import numpy as np
+
+x = np.arange(1_000_000, dtype=np.float64)
+y = np.mean(np.multiply(x, 2.0))
+```
+
+```typescript
+// TypeScript
+import * as np from '@sylphx/numpy'
+
+const x = np.arange(1_000_000, { dtype: 'float64' })
+const y = np.mean(np.multiply(x, 2.0))
+```
+
+Where TypeScript cannot mirror Python operators, `@sylphx/numpy` uses NumPy
+function spelling and Python-style array semantics: `np.matmul`,
+`np.multiply`, `np.reshape`, `np.zeros_like`, `np.mean`, and the `A.T`
+transpose property.
 
 ## Features
 
@@ -452,15 +484,15 @@ bun run bench:python-parity:enforce
 bun run bench:native-dispatch
 ```
 
-Current CI evidence after the Rust/N-API unrolled vector kernels and native
-add-buffer dispatch path:
+Current CI evidence after PR #37:
 
 - Checksum parity: all covered benchmark cases pass.
-- Reporting-mode speed evidence: main CI run `28693587707` passed all covered
-  rows, but later main CI run `28693839561` failed `matmul_128` and transpose.
-- Release gate evidence: PR #28 run `28693698365` failed enforced speed
-  admission for add arrays, `matmul_128`, and transpose. Full speed parity is
-  not marketed until the release gate passes repeatably.
+- Reporting-mode speed evidence: main CI run `28695180293` passed six of seven
+  covered speed rows and failed `matmul_128` at `1.18x` slowdown against the
+  strict `1.05x` target.
+- Release gate evidence: `bench:python-parity:enforce` and `release:preflight`
+  remain blockers until every covered speed row passes repeatably. Full speed
+  parity is not marketed until that release gate passes.
 - Diagnostic evidence: `bench:native-dispatch` separates Rust/N-API kernel,
   TypeScript backend, NativeBLAS backend, and public API overhead before backend
   dispatch changes are promoted.
