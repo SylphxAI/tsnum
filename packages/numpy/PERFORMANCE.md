@@ -40,7 +40,7 @@ parity is always enforced. Each run writes JSON and Markdown evidence under
 `bench/python-parity/results/`; CI checks the generated Markdown report and
 uploads both files as the `python-parity-report` artifact.
 
-Latest main CI evidence after the Rust/N-API unrolled vector kernels and native
+Recorded main CI evidence after the Rust/N-API unrolled vector kernels and native
 add-buffer dispatch path:
 
 - CI run `28693429159` at `0187bbc` uploaded `python-parity-report` artifact

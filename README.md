@@ -552,7 +552,7 @@ bun run lint
 
 **Status:** Broad NumPy-compatible surface with 251+ implemented operations and
 an explicit Python parity performance gate, native dispatch diagnostics, and
-release readback wiring. The latest main CI parity artifact passes checksum
+release readback wiring. A recorded main CI parity artifact passes checksum
 parity and 6 of 7 covered speed rows; `matmul_128`, full NumPy API coverage,
 and first npm publication remain launch gates, not completed claims.
 
