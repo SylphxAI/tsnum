@@ -310,7 +310,7 @@ if (!nativeBinding) {
   throw new Error(`Failed to load native binding`)
 }
 
-const { addScalarF64, mulScalarF64, addF64, addScalarF64Buffer, mulScalarF64Buffer, addF64Buffer, addScalarF64Buffers, mulScalarF64Buffers, addF64Buffers, transposeF64Buffer } = nativeBinding
+const { addScalarF64, mulScalarF64, addF64, addScalarF64Buffer, mulScalarF64Buffer, addF64Buffer, addScalarF64Buffers, addScalarF64BuffersInto, mulScalarF64Buffers, mulScalarF64BuffersInto, addF64Buffers, addF64BuffersInto, transposeF64Buffer } = nativeBinding
 
 module.exports.addScalarF64 = addScalarF64
 module.exports.mulScalarF64 = mulScalarF64
@@ -319,6 +319,9 @@ module.exports.addScalarF64Buffer = addScalarF64Buffer
 module.exports.mulScalarF64Buffer = mulScalarF64Buffer
 module.exports.addF64Buffer = addF64Buffer
 module.exports.addScalarF64Buffers = addScalarF64Buffers
+module.exports.addScalarF64BuffersInto = addScalarF64BuffersInto
 module.exports.mulScalarF64Buffers = mulScalarF64Buffers
+module.exports.mulScalarF64BuffersInto = mulScalarF64BuffersInto
 module.exports.addF64Buffers = addF64Buffers
+module.exports.addF64BuffersInto = addF64BuffersInto
 module.exports.transposeF64Buffer = transposeF64Buffer

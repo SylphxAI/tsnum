@@ -3,12 +3,15 @@ import {
   addF64,
   addF64Buffer,
   addF64Buffers,
+  addF64BuffersInto,
   addScalarF64,
   addScalarF64Buffer,
   addScalarF64Buffers,
+  addScalarF64BuffersInto,
   mulScalarF64,
   mulScalarF64Buffer,
   mulScalarF64Buffers,
+  mulScalarF64BuffersInto,
   transposeF64Buffer,
 } from '../index.js'
 
@@ -52,6 +55,21 @@ test('native all-buffer kernels fill caller-owned output buffers', () => {
   expect(Array.from(output)).toEqual([2, 4, 6])
 
   addF64Buffers(bytes(a), bytes(b), bytes(output))
+  expect(Array.from(output)).toEqual([5, 7, 9])
+})
+
+test('native void all-buffer kernels fill caller-owned output buffers', () => {
+  const a = new Float64Array([1, 2, 3])
+  const b = new Float64Array([4, 5, 6])
+  const output = new Float64Array(3)
+
+  addScalarF64BuffersInto(bytes(a), 10, bytes(output))
+  expect(Array.from(output)).toEqual([11, 12, 13])
+
+  mulScalarF64BuffersInto(bytes(a), 2, bytes(output))
+  expect(Array.from(output)).toEqual([2, 4, 6])
+
+  addF64BuffersInto(bytes(a), bytes(b), bytes(output))
   expect(Array.from(output)).toEqual([5, 7, 9])
 })
 

@@ -74,6 +74,8 @@ const pointerCache = new WeakMap<Float64Array, ReturnType<typeof ptr>>()
 type NativeKernelModule = {
   addScalarF64Buffer?: (input: Float64Array, scalar: number, output: Uint8Array) => Uint8Array
   addScalarF64Buffers?: (input: Uint8Array, scalar: number, output: Uint8Array) => Uint8Array
+  addScalarF64BuffersInto?: (input: Uint8Array, scalar: number, output: Uint8Array) => void
+  mulScalarF64BuffersInto?: (input: Uint8Array, scalar: number, output: Uint8Array) => void
   transposeF64Buffer?: (
     input: Float64Array,
     rows: number,
@@ -201,6 +203,17 @@ export class NativeBLASBackend extends TypeScriptBackend {
       // CI native-dispatch evidence shows the Rust buffer bridge is faster
       // than vDSP_vsaddD when scalar-add output allocation is included.
       const native = getNativeKernels()
+      if (native?.addScalarF64BuffersInto) {
+        const output = createNativeOutputBuffer(a.buffer.length)
+        native.addScalarF64BuffersInto(bytesFor(a.buffer), b, output.bytes)
+        return {
+          buffer: output.array,
+          shape: a.shape,
+          strides: a.strides,
+          dtype: 'float64',
+        }
+      }
+
       if (native?.addScalarF64Buffers) {
         const output = createNativeOutputBuffer(a.buffer.length)
         native.addScalarF64Buffers(bytesFor(a.buffer), b, output.bytes)
@@ -260,6 +273,11 @@ export class NativeBLASBackend extends TypeScriptBackend {
     if (typeof b === 'number') {
       this.validateElementwiseOutput(out, 'float64', a.shape, a.buffer.length)
       const native = getNativeKernels()
+      if (native?.addScalarF64BuffersInto) {
+        native.addScalarF64BuffersInto(bytesFor(a.buffer), b, bytesFor(out.buffer))
+        return out
+      }
+
       if (native?.addScalarF64Buffers) {
         native.addScalarF64Buffers(bytesFor(a.buffer), b, bytesFor(out.buffer))
         return out
@@ -284,6 +302,18 @@ export class NativeBLASBackend extends TypeScriptBackend {
     }
 
     if (typeof b === 'number') {
+      const native = getNativeKernels()
+      if (native?.mulScalarF64BuffersInto) {
+        const output = createNativeOutputBuffer(a.buffer.length)
+        native.mulScalarF64BuffersInto(bytesFor(a.buffer), b, output.bytes)
+        return {
+          buffer: output.array,
+          shape: a.shape,
+          strides: a.strides,
+          dtype: 'float64',
+        }
+      }
+
       const output = createNativeOutput(a.buffer.length)
       writeVdspScalarMul(a.buffer, b, ptr(output))
       return {
@@ -309,6 +339,12 @@ export class NativeBLASBackend extends TypeScriptBackend {
 
     if (typeof b === 'number') {
       this.validateElementwiseOutput(out, 'float64', a.shape, a.buffer.length)
+      const native = getNativeKernels()
+      if (native?.mulScalarF64BuffersInto) {
+        native.mulScalarF64BuffersInto(bytesFor(a.buffer), b, bytesFor(out.buffer))
+        return out
+      }
+
       writeVdspScalarMul(a.buffer, b, pointerFor(out.buffer))
       return out
     }

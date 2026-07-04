@@ -61,7 +61,8 @@ const cases: Record<string, BenchCaseFactory> = {
   add_scalar_1m_out: () => {
     const vector = array(range(1_000_000, 0.001), { dtype: 'float64' })
     const out = empty([1_000_000], { dtype: 'float64' })
-    return [100, 20, () => add(vector, 5, { out })]
+    const options = { out }
+    return [100, 20, () => add(vector, 5, options)]
   },
   add_arrays_1m: () => {
     const vector = array(range(1_000_000, 0.001), { dtype: 'float64' })
@@ -72,7 +73,8 @@ const cases: Record<string, BenchCaseFactory> = {
     const vector = array(range(1_000_000, 0.001), { dtype: 'float64' })
     const vectorB = array(range(1_000_000, 0.002), { dtype: 'float64' })
     const out = empty([1_000_000], { dtype: 'float64' })
-    return [100, 20, () => add(vector, vectorB, { out })]
+    const options = { out }
+    return [100, 20, () => add(vector, vectorB, options)]
   },
   mul_scalar_1m: () => {
     const vector = array(range(1_000_000, 0.001), { dtype: 'float64' })
@@ -81,7 +83,8 @@ const cases: Record<string, BenchCaseFactory> = {
   mul_scalar_1m_out: () => {
     const vector = array(range(1_000_000, 0.001), { dtype: 'float64' })
     const out = empty([1_000_000], { dtype: 'float64' })
-    return [100, 20, () => mul(vector, 2, { out })]
+    const options = { out }
+    return [100, 20, () => mul(vector, 2, options)]
   },
   sum_1m: () => {
     const vector = array(range(1_000_000, 0.001), { dtype: 'float64' })
