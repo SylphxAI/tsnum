@@ -2,6 +2,7 @@ import { performance } from 'node:perf_hooks'
 import {
   add,
   array,
+  empty,
   getBackendInfo,
   initNativeBLAS,
   matmul,
@@ -57,14 +58,30 @@ const cases: Record<string, BenchCaseFactory> = {
     const vector = array(range(1_000_000, 0.001), { dtype: 'float64' })
     return [100, 20, () => add(vector, 5)]
   },
+  add_scalar_1m_out: () => {
+    const vector = array(range(1_000_000, 0.001), { dtype: 'float64' })
+    const out = empty([1_000_000], { dtype: 'float64' })
+    return [100, 20, () => add(vector, 5, { out })]
+  },
   add_arrays_1m: () => {
     const vector = array(range(1_000_000, 0.001), { dtype: 'float64' })
     const vectorB = array(range(1_000_000, 0.002), { dtype: 'float64' })
     return [100, 20, () => add(vector, vectorB)]
   },
+  add_arrays_1m_out: () => {
+    const vector = array(range(1_000_000, 0.001), { dtype: 'float64' })
+    const vectorB = array(range(1_000_000, 0.002), { dtype: 'float64' })
+    const out = empty([1_000_000], { dtype: 'float64' })
+    return [100, 20, () => add(vector, vectorB, { out })]
+  },
   mul_scalar_1m: () => {
     const vector = array(range(1_000_000, 0.001), { dtype: 'float64' })
     return [100, 20, () => mul(vector, 2)]
+  },
+  mul_scalar_1m_out: () => {
+    const vector = array(range(1_000_000, 0.001), { dtype: 'float64' })
+    const out = empty([1_000_000], { dtype: 'float64' })
+    return [100, 20, () => mul(vector, 2, { out })]
   },
   sum_1m: () => {
     const vector = array(range(1_000_000, 0.001), { dtype: 'float64' })

@@ -48,10 +48,13 @@ const sampleCount = Number.isFinite(configuredSampleCount)
   : 7
 const benchmarkCaseNames = [
   'add_arrays_1m',
+  'add_arrays_1m_out',
   'add_scalar_1m',
+  'add_scalar_1m_out',
   'matmul_128',
   'mean_1m',
   'mul_scalar_1m',
+  'mul_scalar_1m_out',
   'sum_1m',
   'transpose_512',
 ]

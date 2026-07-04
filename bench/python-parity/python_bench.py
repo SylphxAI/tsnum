@@ -45,14 +45,30 @@ def main() -> None:
         data = vector()
         return 100, 20, lambda: data + 5.0
 
+    def add_scalar_1m_out() -> tuple[int, int, Callable[[], object]]:
+        data = vector()
+        out = np.empty_like(data)
+        return 100, 20, lambda: np.add(data, 5.0, out=out)
+
     def add_arrays_1m() -> tuple[int, int, Callable[[], object]]:
         left = vector()
         right = vector_b()
         return 100, 20, lambda: left + right
 
+    def add_arrays_1m_out() -> tuple[int, int, Callable[[], object]]:
+        left = vector()
+        right = vector_b()
+        out = np.empty_like(left)
+        return 100, 20, lambda: np.add(left, right, out=out)
+
     def mul_scalar_1m() -> tuple[int, int, Callable[[], object]]:
         data = vector()
         return 100, 20, lambda: data * 2.0
+
+    def mul_scalar_1m_out() -> tuple[int, int, Callable[[], object]]:
+        data = vector()
+        out = np.empty_like(data)
+        return 100, 20, lambda: np.multiply(data, 2.0, out=out)
 
     def sum_1m() -> tuple[int, int, Callable[[], object]]:
         data = vector()
@@ -72,8 +88,11 @@ def main() -> None:
 
     cases: dict[str, Callable[[], tuple[int, int, Callable[[], object]]]] = {
         "add_scalar_1m": add_scalar_1m,
+        "add_scalar_1m_out": add_scalar_1m_out,
         "add_arrays_1m": add_arrays_1m,
+        "add_arrays_1m_out": add_arrays_1m_out,
         "mul_scalar_1m": mul_scalar_1m,
+        "mul_scalar_1m_out": mul_scalar_1m_out,
         "sum_1m": sum_1m,
         "mean_1m": mean_1m,
         "transpose_512": transpose_512,
