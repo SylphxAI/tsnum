@@ -25,6 +25,7 @@ type NativeKernelModule = {
   mulScalarF64: (input: Float64Array, scalar: number) => Float64Array
   mulScalarF64Buffer: (input: Float64Array, scalar: number, output: Buffer) => Buffer
   mulScalarF64Buffers: (input: Buffer, scalar: number, output: Buffer) => Buffer
+  transposeF64Buffer: (input: Float64Array, rows: number, cols: number, output: Buffer) => Buffer
 }
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))))
@@ -126,10 +127,24 @@ const leftBytes = bytes(left)
 const rightBytes = bytes(right)
 const outputBytes = bytes(output)
 
+const matrixSize = 512
+const matrixLength = matrixSize * matrixSize
+const matrix = range(matrixLength, 0.001)
+const matrixOutput = new Float64Array(matrixLength)
+const matrixBytes = bytes(matrix)
+const matrixOutputBytes = bytes(matrixOutput)
+
 const leftArray = array(Array.from(left), { dtype: 'float64' })
 const rightArray = array(Array.from(right), { dtype: 'float64' })
+const matrixArray = array(
+  Array.from({ length: matrixSize }, (_, row) =>
+    Array.from(matrix.subarray(row * matrixSize, (row + 1) * matrixSize)),
+  ),
+  { dtype: 'float64' },
+)
 const leftData = leftArray.getData()
 const rightData = rightArray.getData()
+const matrixData = matrixArray.getData()
 const tsBackend = new TypeScriptBackend()
 const nativeBackendInit = await initNativeBLAS()
 const nativeBackend = new NativeBLASBackend()
@@ -162,12 +177,18 @@ const results = [
     native.mulScalarF64Buffers(leftBytes, 2, outputBytes)
     return output
   }),
+  measure('native.transposeF64.buffer', () => {
+    native.transposeF64Buffer(matrix, matrixSize, matrixSize, matrixOutputBytes)
+    return matrixOutput
+  }),
   measure('backend.typescript.addScalar', () => tsBackend.add(leftData, 5)),
   measure('backend.typescript.addArrays', () => tsBackend.add(leftData, rightData)),
   measure('backend.typescript.mulScalar', () => tsBackend.mul(leftData, 2)),
+  measure('backend.typescript.transpose512', () => tsBackend.transpose(matrixData)),
   measure('backend.native-blas.addScalar', () => nativeBackend.add(leftData, 5)),
   measure('backend.native-blas.addArrays', () => nativeBackend.add(leftData, rightData)),
   measure('backend.native-blas.mulScalar', () => nativeBackend.mul(leftData, 2)),
+  measure('backend.native-blas.transpose512', () => nativeBackend.transpose(matrixData)),
   measure('public.addScalar', () => add(leftArray, 5)),
   measure('public.addArrays', () => add(leftArray, rightArray)),
   measure('public.mulScalar', () => mul(leftArray, 2)),

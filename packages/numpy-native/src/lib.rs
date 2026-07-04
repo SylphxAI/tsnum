@@ -86,6 +86,35 @@ pub fn add_f64_buffers(mut left: Buffer, mut right: Buffer, mut output: Buffer) 
     Ok(output)
 }
 
+#[napi]
+pub fn transpose_f64_buffer(
+    input: &[f64],
+    rows: u32,
+    cols: u32,
+    mut output: Buffer,
+) -> Result<Buffer> {
+    let rows = rows as usize;
+    let cols = cols as usize;
+    let expected_len = rows
+        .checked_mul(cols)
+        .ok_or_else(|| Error::new(Status::InvalidArg, "Matrix dimensions overflow".to_string()))?;
+
+    if input.len() != expected_len {
+        return Err(Error::new(
+            Status::InvalidArg,
+            format!(
+                "Expected input length {}, got {}",
+                expected_len,
+                input.len()
+            ),
+        ));
+    }
+
+    let output_slice = output_as_f64_mut(&mut output, expected_len)?;
+    transpose_into(input, rows, cols, output_slice);
+    Ok(output)
+}
+
 fn buffer_as_f64(buffer: &mut Buffer, expected_len: usize) -> Result<&[f64]> {
     let bytes = buffer.as_mut();
     validate_f64_bytes(bytes, expected_len)?;
@@ -209,4 +238,37 @@ fn add_into(left: &[f64], right: &[f64], output: &mut [f64]) -> Result<()> {
     }
 
     Ok(())
+}
+
+fn transpose_into(input: &[f64], rows: usize, cols: usize, output: &mut [f64]) {
+    debug_assert_eq!(input.len(), output.len());
+
+    const TILE: usize = 32;
+
+    let mut row_block = 0;
+    while row_block < rows {
+        let row_max = (row_block + TILE).min(rows);
+        let mut col_block = 0;
+
+        while col_block < cols {
+            let col_max = (col_block + TILE).min(cols);
+            let mut row = row_block;
+
+            while row < row_max {
+                let input_offset = row * cols;
+                let mut col = col_block;
+
+                while col < col_max {
+                    output[col * rows + row] = input[input_offset + col];
+                    col += 1;
+                }
+
+                row += 1;
+            }
+
+            col_block += TILE;
+        }
+
+        row_block += TILE;
+    }
 }
