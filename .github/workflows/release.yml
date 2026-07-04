@@ -1,0 +1,25 @@
+name: Release
+
+# This repo supplies package-specific release gates. The reusable Sylphx workflow
+# owns changesets/action version PR handling, npm publish orchestration, OIDC
+# posture, and provenance/attestation evidence expectations. postpublish runs
+# release:readback for npm registry readback through Bun.
+
+on:
+  workflow_dispatch:
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+permissions:
+  actions: write
+  contents: write
+  id-token: write
+  pull-requests: write
+
+jobs:
+  release:
+    uses: SylphxAI/.github/.github/workflows/release.yml@main
+    with:
+      build: bun run release:preflight
+      postpublish: bun run release:readback
+    secrets: inherit

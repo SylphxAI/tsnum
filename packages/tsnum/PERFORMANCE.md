@@ -66,5 +66,6 @@ Latest local evidence after the native reduction path:
 
 - Close the remaining add/mul/matmul speed gaps against NumPy.
 - Produce a generated benchmark report or freshness gate for README claims.
-- Add a release workflow that publishes packages only after CI, benchmark, and
-  registry-readback proof.
+- Prove the release workflow with a successful package publish, npm registry
+  readback, changelog evidence, and consumer smoke evidence after the enforced
+  parity benchmark passes.

@@ -79,6 +79,11 @@
         "location": ".github/workflows/ci.yml"
       },
       {
+        "type": "workflow",
+        "name": "Package release",
+        "location": ".github/workflows/release.yml"
+      },
+      {
         "type": "status-context",
         "name": "Build, test, and benchmark",
         "location": "GitHub Actions CI"
@@ -133,21 +138,17 @@
   "delivery": {
     "ciModel": "legacy-ci",
     "requiredContexts": ["Build, test, and benchmark"],
-    "deployPath": "Repo-local GitHub Actions CI validates pull requests and main pushes with Bun install, build, tests, and the Python parity benchmark. Package publication is not yet declared and must be added through release intent, bot-owned versioning, protected workflow publication, and registry readback before publish.",
+    "deployPath": "Repo-local GitHub Actions CI validates pull requests and main pushes with Bun install, build, tests, and the Python parity benchmark. Package publication is manually triggered through .github/workflows/release.yml, delegates to the central Sylphx release workflow, and runs release:preflight before publish plus release:readback after publish.",
     "productionProof": "Merged package changes require green CI on the PR and main push. Published package changes additionally require benchmark evidence for performance-sensitive claims, package registry readback after release, and consumer smoke proof for affected exports.",
     "recoveryClass": "forward-fix-only",
     "packageRelease": {
       "publishesPackages": true,
       "ecosystems": ["npm"],
-      "releaseIntent": "Changesets under .changeset/ are the intended release-intent source. Direct root release is disabled; package publication must go through a protected workflow.",
-      "versionPr": "Missing: bot-owned Changesets version PR workflow is not declared yet.",
-      "publisher": "Missing: protected npm trusted-publishing/OIDC workflow identity is not declared yet.",
-      "requiredContexts": [
-        "Build, test, and benchmark",
-        "release-evidence/pass (planned; producer not declared yet)",
-        "supply-chain/provenance (planned; producer not declared yet)"
-      ],
-      "publishProof": "Required before publish: registry version/gitHead readback, benchmark evidence for performance claims, changelog evidence, and consumer smoke proof for affected exports."
+      "releaseIntent": "Changesets under .changeset/ are the release-intent source. Direct root release is disabled; package publication must go through the manual Release workflow.",
+      "versionPr": "Declared through the central Sylphx reusable release workflow, which runs changesets/action to create GitHub Actions bot-authored version PRs when release intent exists. A dedicated Sylphx release-bot/GitHub App identity remains a release-hardening gap before commercial-grade publish.",
+      "publisher": "Declared through the protected central Sylphx reusable release workflow with id-token: write OIDC posture and inherited bounded NPM_TOKEN fallback.",
+      "requiredContexts": ["Build, test, and benchmark", "release:preflight", "release:readback"],
+      "publishProof": "Required before publish: release:preflight must pass build, tests, and bench:python-parity:enforce. Required after publish: release:readback must verify the npm registry version. Provenance/attestation evidence, changelog evidence, and consumer smoke proof are still required for affected exports."
     }
   },
   "adoption": {
@@ -160,8 +161,14 @@
         "target": "Before full adoption"
       },
       {
-        "id": "release-proof-missing",
-        "description": "Document package release, npm readback, changelog, and consumer smoke evidence required after publishing tsnum.",
+        "id": "release-workflow-unproven",
+        "description": "Manual release workflow, preflight, and npm readback are declared, but no successful tsnum publish/readback has been observed yet. Current Python speed parity gaps intentionally block release:preflight.",
+        "owner": "SylphxAI/tsnum",
+        "target": "Before commercial-grade library operation"
+      },
+      {
+        "id": "release-bot-identity-unproven",
+        "description": "The central reusable workflow runs Changesets automation, but a dedicated Sylphx release-bot/GitHub App version-PR identity is not proven from this repo-local evidence.",
         "owner": "SylphxAI/tsnum",
         "target": "Before commercial-grade library operation"
       },

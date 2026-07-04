@@ -10,6 +10,8 @@
     "lint": "biome check .",
     "bench:python-parity": "bun run bench/python-parity/compare.ts",
     "bench:python-parity:enforce": "bun run bench/python-parity/compare.ts --enforce",
+    "release:preflight": "bun run scripts/release-preflight.ts",
+    "release:readback": "bun run scripts/verify-npm-readback.ts",
     "format": "biome format --write .",
     "changeset": "changeset",
     "version": "changeset version",
