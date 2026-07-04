@@ -52,8 +52,16 @@ applications or separate adapter packages.
 
 The repo-local GitHub Actions CI workflow runs install, build, tests, and the
 Python parity benchmark on pull requests and `main` pushes. Package changes
-still require local evidence plus CI evidence before merge. Published package
-changes require a documented release path, package registry readback, and
-consumer smoke evidence because source revert alone does not undo a release.
+still require local evidence plus CI evidence before merge.
+
+Publishing is manually triggered through `.github/workflows/release.yml`, which
+delegates to the central Sylphx release workflow and its `changesets/action`
+versioning path. The release workflow runs `release:preflight` before publish,
+and that preflight runs install, build, tests, and
+`bench:python-parity:enforce`. Current speed gaps intentionally block
+publication until the enforced benchmark passes. After publish, `release:readback`
+must verify the npm registry version, and release evidence must include
+provenance/attestation, changelog, and consumer smoke proof because source revert
+alone does not undo a release.
 
 The authoritative control-plane record is `.doctrine/project.json`.
