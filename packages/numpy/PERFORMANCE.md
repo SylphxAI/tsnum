@@ -50,20 +50,19 @@ Recent accepted main CI evidence as of 2026-07-04. The latest uploaded
 `python-parity-report` and `native-dispatch-report` artifacts remain canonical
 when this dated snapshot drifts.
 
-- Main CI run `28699755902` on macOS arm64 uploaded `python-parity-report`.
-- Commit: `a54a453` (`perf: avoid elementwise out validation allocations`).
+- Main CI run `28699887631` on macOS arm64 uploaded `python-parity-report`.
+- Commit: `436637f` (`docs: sync parity evidence after out validation`).
 - Runtime: Python 3.12.10, NumPy 2.5.0, Bun 1.3.14,
   `@sylphx/numpy` backend `native-blas`.
 - Checksum parity passed for every covered row.
-- Speed rows passed for `add_arrays_1m` (`0.62x`), `add_scalar_1m` (`0.59x`),
-  `add_scalar_1m_out` (`0.97x`), `matmul_128` (`1.00x`), `mean_1m` (`0.56x`),
-  `mul_scalar_1m` (`0.68x`), `sum_1m` (`0.58x`), and `transpose_512`
-  (`0.76x`).
-- `add_arrays_1m_out` failed the 1.05x speed target at `1.24x`, and
-  `mul_scalar_1m_out` failed at `1.06x`.
+- Speed rows passed for `add_arrays_1m` (`0.71x`), `add_scalar_1m` (`0.65x`),
+  `add_scalar_1m_out` (`1.04x`), `mean_1m` (`0.56x`), `mul_scalar_1m`
+  (`0.64x`), `sum_1m` (`0.57x`), and `transpose_512` (`0.73x`).
+- `add_arrays_1m_out` failed the 1.05x speed target at `1.06x`, `matmul_128`
+  failed at `1.11x`, and `mul_scalar_1m_out` failed at `1.06x`.
 - The same run's native dispatch artifact measured `public.addScalar.out` at
-  `0.1769ms`, `public.addArrays.out` at `0.3387ms`, `public.mulScalar.out` at
-  `0.1743ms`, `public.matmul128` at `0.0850ms`, and `public.matmul128.out` at
+  `0.1888ms`, `public.addArrays.out` at `0.3409ms`, `public.mulScalar.out` at
+  `0.1895ms`, `public.matmul128` at `0.0835ms`, and `public.matmul128.out` at
   `0.0797ms`, which supports the native output-buffer direction while keeping
   the same-machine NumPy comparison as the release blocker.
 - Full speed parity is therefore not claimed.
