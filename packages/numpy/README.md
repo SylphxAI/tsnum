@@ -16,6 +16,9 @@ Release gate: `@sylphx/numpy` npm publication must pass
 that readback exists, treat the install command below as the post-release
 package contract rather than current registry availability.
 
+Launch and marketing claims are governed by the repository
+[Python parity launch contract](https://github.com/SylphxAI/tsnum/blob/main/docs/adl/0001-python-parity-launch-contract.md).
+
 NumPy is a project of the NumPy community. This package is NumPy-compatible in
 API direction and is not affiliated with, endorsed by, or sponsored by NumPy.
 
@@ -35,14 +38,17 @@ Current truth:
   paths.
 - Evidence tools: Python parity benchmark plus native dispatch probe for
   kernel/wrapper/public-API timing.
-- Recorded benchmark evidence: recent CI artifacts consistently pass checksum
-  parity, and native-backed reductions plus vector scalar operations often beat
-  NumPy on macOS arm64 native BLAS.
-- Recent main CI: checksum parity passed for every covered row; vector and
-  reduction rows pass the 1.05x speed target, while matrix/transpose rows remain
-  volatile. Run `28695468644` failed `matmul_128` at `1.12x` and
-  `transpose_512` at `1.11x`; the prior run `28695393008` failed only
-  `matmul_128` at `1.23x`. Full speed parity is not claimed.
+- Recorded benchmark evidence: latest accepted main CI run `28697134621`
+  passes checksum parity for every covered row and passes the 1.05x speed
+  target on six of seven covered rows.
+- Recent main CI: `add_arrays_1m` (`0.69x`), `add_scalar_1m` (`0.63x`),
+  `mean_1m` (`0.55x`), `mul_scalar_1m` (`0.55x`), `sum_1m` (`0.61x`), and
+  `transpose_512` (`0.78x`) pass the speed target. `matmul_128` remains the
+  release blocker at `1.08x`. Full speed parity is not claimed.
+- Native dispatch evidence: the same run measured `public.matmul128` at
+  `0.0976ms` versus the TypeScript backend at `0.7513ms`, confirming that the
+  native BLAS path is the right performance direction while `matmul_128` still
+  needs to clear the NumPy release threshold.
 - Release gate evidence: `bench:python-parity:enforce` and `release:preflight`
   remain admission blockers until every covered speed row passes repeatably, so
   npm publication remains blocked.
