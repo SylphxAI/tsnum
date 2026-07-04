@@ -17,9 +17,10 @@ repository-local Python parity benchmarks.
 - **Native-speed target, not JavaScript-only ambition** - TypeScript is the
   public language surface; hot operations can run through native BLAS, WASM, or
   GPU backends when the workload demands it.
-- **Evidence-gated marketing** - this repo now carries a NumPy comparison gate
-  (`bun run bench:python-parity:enforce`) so public performance claims are tied
-  to reproducible local measurements instead of README optimism.
+- **Evidence-gated marketing** - this repo carries a NumPy comparison gate
+  (`bun run bench:python-parity:enforce`) and a generated CI report artifact, so
+  public performance claims are tied to reproducible measurements instead of
+  README optimism.
 - **Commercial package direction** - `tsnum` is the implementation codename; the
   intended public package/DX is `@sylphx/numpy` imported as `np`.
 
@@ -33,7 +34,7 @@ benchmark gate passes on the same machine against Python/NumPy.
 | API direction | NumPy-compatible spelling and behavior are the target. |
 | Benchmarks | `bench/python-parity` compares TypeScript and NumPy on identical inputs. |
 | Native path | Bun/macOS can initialize a native BLAS-backed fast path for float64 hot loops. |
-| Proven today | Checksum parity passes for the covered benchmark cases; speed parity is reported per run and is not complete yet. |
+| Proven today | Checksum parity passes for the covered benchmark cases; CI uploads the generated Python parity report; speed parity is not complete yet. |
 | Not claimed yet | Full NumPy API coverage, all-op 1.05x performance parity, and npm rename completion. |
 
 **Features:**

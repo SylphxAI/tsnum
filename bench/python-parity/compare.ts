@@ -1,6 +1,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { renderMarkdownReport } from './report'
 
 type BenchCase = {
   time_ms: number
@@ -157,8 +158,10 @@ const output = {
 }
 
 const resultPath = join(root, 'bench/python-parity/results/latest.json')
+const reportPath = join(root, 'bench/python-parity/results/latest.md')
 mkdirSync(dirname(resultPath), { recursive: true })
 writeFileSync(resultPath, `${JSON.stringify(output, null, 2)}\n`)
+writeFileSync(reportPath, renderMarkdownReport(output))
 
 console.log(
   `Python parity benchmark: max slowdown ${maxSlowdown.toFixed(2)}x, median of ${sampleCount} sample${sampleCount === 1 ? '' : 's'}`,
@@ -174,6 +177,7 @@ for (const row of rows) {
   )
 }
 console.log(`Result: ${output.passed ? 'pass' : 'fail'} (${resultPath})`)
+console.log(`Report: ${reportPath}`)
 
 if (!checksumsPassed || (enforce && !output.passed)) {
   process.exit(1)

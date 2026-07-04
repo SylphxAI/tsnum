@@ -51,8 +51,11 @@ applications or separate adapter packages.
 ## Delivery
 
 The repo-local GitHub Actions CI workflow runs install, build, tests, and the
-Python parity benchmark on pull requests and `main` pushes. Package changes
-still require local evidence plus CI evidence before merge.
+Python parity benchmark on pull requests and `main` pushes. The benchmark writes
+JSON and Markdown evidence under `bench/python-parity/results/`; CI checks the
+Markdown report freshness and uploads both files as the `python-parity-report`
+artifact. Package changes still require local evidence plus CI evidence before
+merge.
 
 Publishing is manually triggered through `.github/workflows/release.yml`, which
 delegates to the central Sylphx release workflow and its `changesets/action`
