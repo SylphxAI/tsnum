@@ -1,5 +1,6 @@
 import { expect, test } from 'bun:test'
 import {
+  accelerateMatmulF64Buffer,
   addF64,
   addF64Buffer,
   addF64Buffers,
@@ -24,6 +25,8 @@ test('native float64 scalar and vector kernels match NumPy-style outputs', () =>
 function bytes(array: Float64Array): Buffer {
   return Buffer.from(array.buffer, array.byteOffset, array.byteLength)
 }
+
+const macOSTest = process.platform === 'darwin' ? test : test.skip
 
 test('native buffer kernels fill caller-owned output buffers', () => {
   const a = new Float64Array([1, 2, 3])
@@ -81,4 +84,24 @@ test('native transpose buffer kernel rejects invalid dimensions', () => {
   const output = new Float64Array(3)
 
   expect(() => transposeF64Buffer(input, 2, 2, bytes(output))).toThrow('Expected input length')
+})
+
+macOSTest('native Accelerate matmul buffer kernel matches row-major NumPy output', () => {
+  const left = new Float64Array([1, 2, 3, 4, 5, 6])
+  const right = new Float64Array([7, 8, 9, 10, 11, 12])
+  const output = new Float64Array(4)
+
+  accelerateMatmulF64Buffer(left, right, 2, 3, 2, bytes(output))
+
+  expect(Array.from(output)).toEqual([58, 64, 139, 154])
+})
+
+macOSTest('native Accelerate matmul buffer kernel rejects invalid dimensions', () => {
+  const left = new Float64Array([1, 2, 3])
+  const right = new Float64Array([4, 5, 6])
+  const output = new Float64Array(4)
+
+  expect(() => accelerateMatmulF64Buffer(left, right, 2, 2, 2, bytes(output))).toThrow(
+    'Expected left length',
+  )
 })

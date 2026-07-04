@@ -3,6 +3,34 @@
 use napi::bindgen_prelude::{Buffer, Float64Array};
 use napi::{Error, Result, Status};
 use napi_derive::napi;
+#[cfg(target_os = "macos")]
+use std::os::raw::c_int;
+
+#[cfg(target_os = "macos")]
+#[link(name = "Accelerate", kind = "framework")]
+extern "C" {
+    fn cblas_dgemm(
+        order: c_int,
+        trans_a: c_int,
+        trans_b: c_int,
+        m: c_int,
+        n: c_int,
+        k: c_int,
+        alpha: f64,
+        a: *const f64,
+        lda: c_int,
+        b: *const f64,
+        ldb: c_int,
+        beta: f64,
+        c: *mut f64,
+        ldc: c_int,
+    );
+}
+
+#[cfg(target_os = "macos")]
+const CBLAS_COLUMN_MAJOR: c_int = 102;
+#[cfg(target_os = "macos")]
+const CBLAS_NO_TRANS: c_int = 111;
 
 fn uninit_vec(len: usize) -> Vec<f64> {
     vec![0.0; len]
@@ -113,6 +141,93 @@ pub fn transpose_f64_buffer(
     let output_slice = output_as_f64_mut(&mut output, expected_len)?;
     transpose_into(input, rows, cols, output_slice);
     Ok(output)
+}
+
+#[napi]
+pub fn accelerate_matmul_f64_buffer(
+    left: &[f64],
+    right: &[f64],
+    rows: u32,
+    inner: u32,
+    cols: u32,
+    mut output: Buffer,
+) -> Result<Buffer> {
+    #[cfg(not(target_os = "macos"))]
+    {
+        let _ = (left, right, rows, inner, cols, output);
+        return Err(Error::new(
+            Status::GenericFailure,
+            "Accelerate matmul requires macOS".to_string(),
+        ));
+    }
+
+    #[cfg(target_os = "macos")]
+    {
+        let rows = rows as usize;
+        let inner = inner as usize;
+        let cols = cols as usize;
+        let left_len = checked_matrix_len(rows, inner)?;
+        let right_len = checked_matrix_len(inner, cols)?;
+        let output_len = checked_matrix_len(rows, cols)?;
+
+        if left.len() != left_len {
+            return Err(Error::new(
+                Status::InvalidArg,
+                format!("Expected left length {}, got {}", left_len, left.len()),
+            ));
+        }
+
+        if right.len() != right_len {
+            return Err(Error::new(
+                Status::InvalidArg,
+                format!("Expected right length {}, got {}", right_len, right.len()),
+            ));
+        }
+
+        let c_rows = to_c_int(rows, "rows")?;
+        let c_inner = to_c_int(inner, "inner")?;
+        let c_cols = to_c_int(cols, "cols")?;
+        let output_slice = output_as_f64_mut(&mut output, output_len)?;
+
+        unsafe {
+            // Row-major C = A x B has the same memory layout as column-major
+            // C^T = B^T x A^T.
+            cblas_dgemm(
+                CBLAS_COLUMN_MAJOR,
+                CBLAS_NO_TRANS,
+                CBLAS_NO_TRANS,
+                c_cols,
+                c_rows,
+                c_inner,
+                1.0,
+                right.as_ptr(),
+                c_cols,
+                left.as_ptr(),
+                c_inner,
+                0.0,
+                output_slice.as_mut_ptr(),
+                c_cols,
+            );
+        }
+
+        Ok(output)
+    }
+}
+
+#[cfg(target_os = "macos")]
+fn checked_matrix_len(rows: usize, cols: usize) -> Result<usize> {
+    rows.checked_mul(cols)
+        .ok_or_else(|| Error::new(Status::InvalidArg, "Matrix dimensions overflow".to_string()))
+}
+
+#[cfg(target_os = "macos")]
+fn to_c_int(value: usize, name: &str) -> Result<c_int> {
+    c_int::try_from(value).map_err(|_| {
+        Error::new(
+            Status::InvalidArg,
+            format!("Matrix dimension {name} is too large for cblas"),
+        )
+    })
 }
 
 fn buffer_as_f64(buffer: &mut Buffer, expected_len: usize) -> Result<&[f64]> {

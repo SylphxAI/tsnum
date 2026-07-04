@@ -23,6 +23,14 @@ type BenchResult = {
 }
 
 type NativeKernelModule = {
+  accelerateMatmulF64Buffer: (
+    left: Float64Array,
+    right: Float64Array,
+    rows: number,
+    inner: number,
+    cols: number,
+    output: Buffer,
+  ) => Buffer
   addF64: (left: Float64Array, right: Float64Array) => Float64Array
   addF64Buffer: (left: Float64Array, right: Float64Array, output: Buffer) => Buffer
   addF64Buffers: (left: Buffer, right: Buffer, output: Buffer) => Buffer
@@ -143,6 +151,8 @@ const matmulSize = 128
 const matmulLength = matmulSize * matmulSize
 const matmulLeft = range(matmulLength, 0.001)
 const matmulRight = range(matmulLength, 0.002)
+const matmulOutput = new Float64Array(matmulLength)
+const matmulOutputBytes = bytes(matmulOutput)
 
 const leftArray = array(Array.from(left), { dtype: 'float64' })
 const rightArray = array(Array.from(right), { dtype: 'float64' })
@@ -204,6 +214,17 @@ const results = [
   measure('native.transposeF64.buffer', () => {
     native.transposeF64Buffer(matrix, matrixSize, matrixSize, matrixOutputBytes)
     return matrixOutput
+  }),
+  measure('native.accelerateMatmulF64.buffer', () => {
+    native.accelerateMatmulF64Buffer(
+      matmulLeft,
+      matmulRight,
+      matmulSize,
+      matmulSize,
+      matmulSize,
+      matmulOutputBytes,
+    )
+    return matmulOutput
   }),
   measure('backend.typescript.addScalar', () => tsBackend.add(leftData, 5)),
   measure('backend.typescript.addArrays', () => tsBackend.add(leftData, rightData)),
