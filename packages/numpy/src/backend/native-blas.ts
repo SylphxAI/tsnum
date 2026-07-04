@@ -10,7 +10,7 @@ declare const Buffer: {
   from(buffer: ArrayBufferLike, byteOffset?: number, length?: number): Uint8Array
 }
 
-const CBLAS_COLUMN_MAJOR = 102
+const CBLAS_ROW_MAJOR = 101
 const CBLAS_NO_TRANS = 111
 
 const accelerate = dlopen('/System/Library/Frameworks/Accelerate.framework/Accelerate', {
@@ -419,20 +419,18 @@ export class NativeBLASBackend extends TypeScriptBackend {
     n: number,
     outPointer: ReturnType<typeof ptr>,
   ): void {
-    // Row-major C = A x B has the same memory layout as column-major
-    // C^T = B^T x A^T, which avoids the cblas row-major adapter path.
     accelerate.symbols.cblas_dgemm(
-      CBLAS_COLUMN_MAJOR,
+      CBLAS_ROW_MAJOR,
       CBLAS_NO_TRANS,
       CBLAS_NO_TRANS,
-      n,
       m,
+      n,
       k,
       1.0,
-      pointerFor(bBuffer),
-      n,
       pointerFor(aBuffer),
       k,
+      pointerFor(bBuffer),
+      n,
       0.0,
       outPointer,
       n,
