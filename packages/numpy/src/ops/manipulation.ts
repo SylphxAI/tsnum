@@ -61,6 +61,10 @@ export function concat<T extends DType>(arrays: NDArray<T>[], axis = 0): NDArray
   throw new Error('concat only supports axis=0 for now')
 }
 
+export function concatenate<T extends DType>(arrays: NDArray<T>[], axis = 0): NDArray<T> {
+  return concat(arrays, axis)
+}
+
 /**
  * Stack arrays vertically (row-wise)
  */

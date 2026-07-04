@@ -101,14 +101,14 @@ NumPy snake_case helpers such as `zeros_like`, `ones_like`, `full_like`, and
 
 ### Arithmetic Operations
 ```typescript
-import { add, divide, multiply, pow, subtract } from '@sylphx/numpy'
+import { add, divide, multiply, power, subtract } from '@sylphx/numpy'
 
 const a = array([1, 2, 3])
 
 // Functional API (primary)
 const b = add(a, 5)               // [6, 7, 8]
 const c = multiply(a, 2)          // [2, 4, 6]
-const d = pow(a, 2)               // [1, 4, 9]
+const d = power(a, 2)             // [1, 4, 9]
 const e = subtract(c, a)          // [1, 2, 3]
 const f = divide(c, 2)            // [1, 2, 3]
 
@@ -118,8 +118,8 @@ const y = array([4, 5, 6])
 const z = add(x, y)               // [5, 7, 9]
 ```
 
-`sub`, `mul`, and `div` remain supported aliases; the canonical public spelling
-tracks NumPy's `subtract`, `multiply`, and `divide`.
+`sub`, `mul`, `div`, and `pow` remain supported aliases; the canonical public
+spelling tracks NumPy's `subtract`, `multiply`, `divide`, and `power`.
 
 ### Reductions
 ```typescript

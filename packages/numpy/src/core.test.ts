@@ -1,8 +1,10 @@
 import { describe, expect, test } from 'bun:test'
+import * as np from './index'
 import {
   add,
   arange,
   array,
+  concatenate,
   div,
   divide,
   empty_like,
@@ -24,6 +26,7 @@ import {
   ones_like,
   pipe,
   pow,
+  power,
   reshape,
   std,
   sub,
@@ -142,6 +145,11 @@ describe('Arithmetic Operations (Functional)', () => {
     const b = pow(a, 2)
     expect(sum(b)).toBe(29) // 4+9+16
   })
+
+  test('NumPy canonical power alias', () => {
+    const a = array([2, 3, 4])
+    expect(sum(power(a, 2))).toBe(29)
+  })
 })
 
 describe('Comparison Operations (Functional)', () => {
@@ -240,6 +248,23 @@ describe('Shape Operations (Functional)', () => {
     const b = a.T
     expect(b.shape).toEqual([2, 2])
     expect(sum(b)).toBe(10)
+  })
+})
+
+describe('NumPy Canonical Manipulation Aliases', () => {
+  test('concatenate aliases concat semantics', () => {
+    const a = array([1, 2])
+    const b = array([3, 4])
+    const result = concatenate([a, b])
+    expect(result.shape).toEqual([4])
+    expect(sum(result)).toBe(10)
+  })
+
+  test('namespace delete aliases deleteArr semantics', () => {
+    const a = array([1, 2, 3, 4])
+    const result = np.delete(a, [1, 3])
+    expect(result.shape).toEqual([2])
+    expect(sum(result)).toBe(4)
   })
 })
 

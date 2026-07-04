@@ -50,3 +50,7 @@ export function pow<T extends DType>(a: NDArray<T>, exponent: number): NDArray<T
   const aData = a.getData()
   return new NDArray(backend.pow(aData, exponent))
 }
+
+export function power<T extends DType>(a: NDArray<T>, exponent: number): NDArray<T> {
+  return pow(a, exponent)
+}

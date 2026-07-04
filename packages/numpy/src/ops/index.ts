@@ -1,7 +1,7 @@
 // ===== Functional API (Pure Functions) =====
 
 // Arithmetic
-export { add, div, divide, mul, multiply, pow, sub, subtract } from './arithmetic'
+export { add, div, divide, mul, multiply, pow, power, sub, subtract } from './arithmetic'
 
 // Comparison
 export {
@@ -98,6 +98,7 @@ export { argmax, argmin, argsort, sort } from './sorting'
 // Array manipulation
 export {
   concat,
+  concatenate,
   hstack,
   hsplit,
   repeat,
@@ -110,6 +111,7 @@ export {
   rot90,
   pad,
   moveaxis,
+  deleteArr as delete,
   deleteArr,
   insert,
   append,
