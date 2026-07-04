@@ -107,6 +107,26 @@
         "type": "manifest",
         "name": "Project control-plane manifest",
         "location": ".doctrine/project.json"
+      },
+      {
+        "type": "manifest",
+        "name": "Vendor-neutral project manifest",
+        "location": "project.manifest.json"
+      },
+      {
+        "type": "test",
+        "name": "Project-control boundary test",
+        "location": "test/project-control.node-test.mjs"
+      },
+      {
+        "type": "documentation",
+        "name": "Project-control gate spec",
+        "location": "docs/specs/project-control-gate.md"
+      },
+      {
+        "type": "documentation",
+        "name": "Python parity launch contract",
+        "location": "docs/adr/0001-python-parity-launch-contract.md"
       }
     ],
     "allowedDependencies": [
@@ -114,6 +134,11 @@
         "repo": "SylphxAI/doctrine",
         "surface": "project manifest schema, standards, and rollout audit",
         "direction": "downward"
+      },
+      {
+        "repo": "SylphxAI/groundatlas",
+        "surface": "Released GroundAtlas package/action for vendor-neutral project manifest validation and fleet dogfooding.",
+        "direction": "peer-public"
       }
     ],
     "forbiddenCouplings": [
@@ -126,18 +151,18 @@
   "documentation": {
     "adr": {
       "path": "docs/adr/",
-      "status": "planned"
+      "status": "present"
     },
     "specs": {
-      "path": "packages/numpy/README.md",
+      "path": "docs/specs/ and README.md",
       "status": "present"
     },
     "catalog": {
-      "path": ".doctrine/project.json",
+      "path": ".doctrine/project.json and project.manifest.json",
       "status": "present"
     },
     "runbooks": {
-      "path": "packages/numpy/PERFORMANCE.md",
+      "path": "README.md, PROJECT.md, AGENTS.md, and SECURITY.md",
       "status": "present"
     },
     "generatedReferences": {
@@ -146,10 +171,10 @@
     }
   },
   "delivery": {
-    "ciModel": "legacy-ci",
+    "ciModel": "legacy-ci-with-groundatlas",
     "requiredContexts": ["Build, test, and benchmark"],
-    "deployPath": "Repo-local GitHub Actions CI validates pull requests, merge queue candidates, and main pushes with Bun install, build, tests, the Python parity benchmark, and generated report freshness. Package publication is manually triggered through .github/workflows/release.yml. That workflow runs repo-local release:preflight on macOS for the native BLAS Python parity gate, then delegates versioning and npm publication to the central Sylphx release workflow, and runs release:readback after publish.",
-    "productionProof": "Merged package changes require green CI on the PR and main push, including the uploaded Python parity report artifact. Published package changes additionally require a passing macOS release:preflight run with bench:python-parity:repeatability, all-public-package registry readback after release, provenance/attestation evidence, and consumer smoke proof for affected exports.",
+    "deployPath": "Repo-local GitHub Actions CI validates pull requests, merge queue candidates, and main pushes with Bun install, build, tests, Python parity benchmark, generated report freshness, project-control test, and GroundAtlas package dogfood. Package publication remains manually triggered through .github/workflows/release.yml after release:preflight passes.",
+    "productionProof": "Merged package changes require green CI on the PR and main push, including the uploaded Python parity report artifact, project-control test, and GroundAtlas package dogfood. Published package changes additionally require a passing macOS release:preflight run with bench:python-parity:repeatability, all-public-package registry readback after release, provenance/attestation evidence, and consumer smoke proof for affected exports.",
     "recoveryClass": "forward-fix-only",
     "packageRelease": {
       "publishesPackages": true,
@@ -158,15 +183,16 @@
       "versionPr": "Declared through the central Sylphx reusable release workflow, which runs changesets/action to create GitHub Actions bot-authored version PRs when release intent exists. A dedicated Sylphx release-bot/GitHub App identity remains a release-hardening gap before commercial-grade publish.",
       "publisher": "Declared through the protected central Sylphx reusable release workflow with id-token: write OIDC posture and inherited bounded NPM_TOKEN fallback.",
       "requiredContexts": ["Build, test, and benchmark", "release:preflight", "release:readback"],
-      "publishProof": "Required before publish: repo-local macOS release:preflight must pass install, build, tests, and bench:python-parity:repeatability. Required during central publish: the workspace must still build through the protected reusable release workflow. Required after publish: release:readback must verify every public workspace npm package version. Provenance/attestation evidence, changelog evidence, and consumer smoke proof are still required for affected exports."
-    }
+      "publishProof": "Required before publish: repo-local macOS release:preflight must pass install, build, tests, and bench:python-parity:repeatability. Required during central publish: the workspace must still build through the protected reusable release workflow. Required after publish: release:readback must verify every public workspace npm package version. Provenance/attestation evidence, changelog evidence, consumer smoke proof, and GroundAtlas project-control evidence are required for affected exports."
+    },
+    "localContexts": ["CI includes GroundAtlas package dogfood and project-control boundary test"]
   },
   "adoption": {
-    "status": "baseline",
+    "status": "adopted",
     "gaps": [
       {
         "id": "ci-admission-not-adr29",
-        "description": "Repo-local CI validates pull requests, merge queue candidates, and main pushes, but full doctrine adoption still needs stable fan-in admission contexts, Sylphx runner profile policy, and workflow sanity checks.",
+        "description": "Repo-local CI validates pull requests, merge queue candidates, main pushes, and now GroundAtlas project-control dogfood, but full doctrine adoption still needs stable ADR-29 fan-in admission contexts, Sylphx runner profile policy, and workflow sanity checks.",
         "owner": "SylphxAI/tsnum",
         "target": "Before full adoption"
       },
@@ -187,6 +213,12 @@
         "description": "Recent CI evidence consistently passes checksum parity, but 1.05x covered speed parity is volatile across reporting and enforced runs. PR #28 proved bench:python-parity:enforce is not stable enough for admission yet, and release preflight remains intentionally blocked until covered-operation speed parity passes repeatably on the release preflight runner.",
         "owner": "SylphxAI/tsnum",
         "target": "Before package publication or full Python-speed marketing"
+      },
+      {
+        "id": "groundatlas-fleet-ruleset",
+        "description": "Organization-wide mandatory GroundAtlas enforcement belongs in the owning fleet control plane, not this numerical package repo.",
+        "owner": "SylphxAI/groundatlas",
+        "target": "fleet control-plane rollout"
       }
     ]
   }

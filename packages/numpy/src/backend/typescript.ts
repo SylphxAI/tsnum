@@ -462,7 +462,7 @@ export class TypeScriptBackend implements Backend {
     this.fftRecursive(real, imag, n)
 
     // Interleave real and imaginary parts
-    const result = createTypedArray(n * 2, a.dtype)
+    const result = createTypedArray(n * 2, 'float64')
     for (let i = 0; i < n; i++) {
       result[i * 2] = real[i]
       result[i * 2 + 1] = imag[i]
@@ -506,7 +506,7 @@ export class TypeScriptBackend implements Backend {
     this.fftRecursive(real, imag, n)
 
     // Conjugate and scale
-    const result = createTypedArray(n * 2, a.dtype)
+    const result = createTypedArray(n * 2, 'float64')
     for (let i = 0; i < n; i++) {
       result[i * 2] = real[i] / n
       result[i * 2 + 1] = -imag[i] / n
@@ -733,7 +733,8 @@ export class TypeScriptBackend implements Backend {
     const newBuffer = createTypedArray(a.buffer.length, a.dtype)
 
     for (let i = 0; i < a.buffer.length; i++) {
-      newBuffer[i] = Math.round(a.buffer[i])
+      const value = a.buffer[i]
+      newBuffer[i] = value < 0 ? -Math.round(-value) : Math.round(value)
     }
 
     return {

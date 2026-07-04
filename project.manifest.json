@@ -1,0 +1,160 @@
+{
+  "$schema": "https://raw.githubusercontent.com/SylphxAI/groundatlas/main/schemas/project.manifest.schema.json",
+  "schemaVersion": 1,
+  "project": {
+    "id": "tsnum",
+    "name": "tsnum / @sylphx/numpy",
+    "summary": "TypeScript numerical computing library family around the @sylphx/numpy public API, with TypeScript, native, and WASM backend paths plus Python parity benchmark evidence.",
+    "lifecycle": "active",
+    "visibility": "open-source",
+    "repository": "https://github.com/SylphxAI/tsnum",
+    "homepage": "https://github.com/SylphxAI/tsnum#readme",
+    "tags": ["typescript", "numpy", "numeric-computing", "benchmark-gated", "foundation-library"]
+  },
+  "truth": {
+    "humanProjectFile": "PROJECT.md",
+    "agentAdapter": "AGENTS.md",
+    "specs": [
+      "README.md",
+      "packages/numpy/README.md",
+      "packages/numpy/PERFORMANCE.md",
+      "bench/python-parity/README.md",
+      "bench/python-parity/results/latest.md",
+      "docs/specs/project-control-gate.md"
+    ],
+    "adrs": ["docs/adr/0001-python-parity-launch-contract.md", ".sylphx/decisions/"],
+    "source": [
+      "packages/numpy/src/",
+      "packages/numpy-native/",
+      "packages/numpy/wasm/",
+      "bench/python-parity/",
+      "package.json",
+      "bun.lock",
+      "turbo.json",
+      "biome.json",
+      ".github/workflows/ci.yml",
+      ".github/workflows/release.yml"
+    ],
+    "tests": [
+      "packages/numpy/src/**/*.test.ts",
+      "bench/python-parity/",
+      "test/project-control.node-test.mjs",
+      ".github/workflows/ci.yml"
+    ],
+    "runbooks": [
+      "README.md",
+      "PROJECT.md",
+      "AGENTS.md",
+      "docs/specs/project-control-gate.md",
+      "SECURITY.md"
+    ]
+  },
+  "surfaces": [
+    {
+      "type": "package",
+      "name": "@sylphx/numpy",
+      "path": "packages/numpy/package.json",
+      "description": "Primary public npm package contract for NumPy-compatible TypeScript APIs."
+    },
+    {
+      "type": "package",
+      "name": "@sylphx/numpy-native",
+      "path": "packages/numpy-native/package.json",
+      "description": "Optional Rust/N-API native acceleration package for covered backend paths."
+    },
+    {
+      "type": "package",
+      "name": "@sylphx/numpy-wasm",
+      "path": "packages/numpy/wasm/package.json",
+      "description": "WASM backend package metadata and generated package surface."
+    },
+    {
+      "type": "api",
+      "name": "TypeScript implementation and backend contracts",
+      "path": "packages/numpy/src/",
+      "description": "Public implementation source, operations, linear algebra, backend dispatch, and tests."
+    },
+    {
+      "type": "docs",
+      "name": "README and package docs",
+      "path": "README.md",
+      "description": "Public package positioning, installation boundary, examples, and parity status."
+    },
+    {
+      "type": "docs",
+      "name": "Python parity launch contract",
+      "path": "docs/adr/0001-python-parity-launch-contract.md",
+      "description": "Benchmark-gated launch contract and claim ladder for public parity/release claims."
+    },
+    {
+      "type": "docs",
+      "name": "Generated Python parity report",
+      "path": "bench/python-parity/results/latest.md",
+      "description": "Generated benchmark evidence uploaded by CI as the python-parity-report artifact."
+    },
+    {
+      "type": "workflow",
+      "name": "CI",
+      "path": ".github/workflows/ci.yml",
+      "description": "macOS build, tests, Python parity benchmark, report freshness, project-control test, and GroundAtlas package dogfood."
+    },
+    {
+      "type": "workflow",
+      "name": "Release",
+      "path": ".github/workflows/release.yml",
+      "description": "Manual parity-gated release workflow; publication remains blocked until release:preflight passes."
+    },
+    {
+      "type": "docs",
+      "name": "Doctrine adapter manifest",
+      "path": ".doctrine/project.json",
+      "description": "Sylphx Doctrine adapter and org-local governance catalog; not the vendor-neutral GroundAtlas default."
+    }
+  ],
+  "commands": [
+    {
+      "name": "install",
+      "command": "bun install --frozen-lockfile",
+      "purpose": "Install locked Bun workspace dependencies without lockfile drift."
+    },
+    {
+      "name": "build",
+      "command": "bun run build",
+      "purpose": "Build workspace packages through Turbo."
+    },
+    {
+      "name": "test",
+      "command": "bun run test",
+      "purpose": "Run workspace tests through Turbo."
+    },
+    {
+      "name": "bench:python-parity",
+      "command": "bun run bench:python-parity",
+      "purpose": "Generate same-machine Python/NumPy parity benchmark evidence."
+    },
+    {
+      "name": "bench:python-parity:report:check",
+      "command": "bun run bench:python-parity:report:check",
+      "purpose": "Verify committed parity report freshness."
+    },
+    {
+      "name": "test:project-control",
+      "command": "node --test test/project-control.node-test.mjs",
+      "purpose": "Verify neutral manifest, Doctrine adapter, CI gate, and release-publication boundary."
+    },
+    {
+      "name": "groundatlas:fleet",
+      "command": "npm exec --yes --package groundatlas@0.1.2 -- ga fleet . --out .groundatlas-pilot --require-atlas --strict --json",
+      "purpose": "Prove the vendor-neutral manifest is selected and generated GroundAtlas files are navigation-only."
+    },
+    {
+      "name": "release:readback",
+      "command": "bun run release:readback",
+      "purpose": "Read back every public npm package version after a future parity-gated release."
+    }
+  ],
+  "adoption": {
+    "status": "adopted",
+    "notes": "Vendor-neutral GroundAtlas manifest for project-control dogfooding. .doctrine/project.json remains the Sylphx Doctrine adapter and local governance catalog. Generated .groundatlas* reports are evidence/navigation only, not source of truth. npm publication remains intentionally blocked until release:preflight proves repeatable parity and release readback succeeds."
+  }
+}

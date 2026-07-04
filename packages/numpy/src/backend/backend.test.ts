@@ -1,9 +1,17 @@
-import { describe, expect, test } from 'bun:test'
+import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 import { array } from '../creation'
 import { add, mul, sum } from '../ops'
-import { getBackendInfo } from './manager'
+import { backendManager, getBackendInfo } from './manager'
 
 describe('Backend System', () => {
+  beforeEach(() => {
+    backendManager.useTypeScript()
+  })
+
+  afterEach(() => {
+    backendManager.useTypeScript()
+  })
+
   test('TypeScript backend is active by default', () => {
     const info = getBackendInfo()
     expect(info.name).toBe('typescript')
