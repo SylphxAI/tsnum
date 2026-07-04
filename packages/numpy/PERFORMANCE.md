@@ -30,6 +30,7 @@ Run from the repository root:
 ```bash
 bun run bench:python-parity
 bun run bench:python-parity:enforce
+bun run bench:python-parity:repeatability
 bun run bench:python-parity:report:check
 bun run bench:native-dispatch
 ```
@@ -45,6 +46,10 @@ alternating runtime order, records the exact Python and TS commands, and reports
 raw samples plus median, p95, and relative standard deviation for every row.
 That evidence separates true backend gaps from process-order or runner variance
 without relaxing the checksum or speed gates.
+
+The release path uses `bench:python-parity:repeatability`, which runs the
+enforced benchmark multiple times and fails unless every attempt passes. This
+turns repeatability into a release gate rather than a README promise.
 
 Recent accepted main CI evidence as of 2026-07-04. The latest uploaded
 `python-parity-report` and `native-dispatch-report` artifacts remain canonical
@@ -79,7 +84,7 @@ when this dated snapshot drifts.
 - PR #59's native 1D `out` validation fast path was closed after repeat CI
   artifacts did not support merging: attempt 1 was 7/10 and attempt 2 was 6/10
   against the 1.05x speed target, despite lower steady-state dispatch overhead.
-- `bench:python-parity:enforce` and release preflight remain publication
+- `bench:python-parity:repeatability` and release preflight remain publication
   blockers until covered-operation speed parity is repeatable across the
   expanded covered row set.
 - Current JSON output is written to `bench/python-parity/results/latest.json`.
@@ -100,7 +105,7 @@ The probe writes ignored local reports under `bench/python-parity/results/` and
 separates kernel speed from output allocation, wrapper, and public API overhead.
 CI uploads the same files as the `native-dispatch-report` artifact. It is useful
 for optimization triage, but it is not release evidence by itself: publish
-readiness still depends on `bench:python-parity:enforce`.
+readiness still depends on `bench:python-parity:repeatability`.
 
 The `matmul128` probe rows use the same default sample count, warmup, and
 iteration count as the Python parity benchmark so the CI artifact can separate
@@ -136,5 +141,5 @@ small-matrix native overhead from runner noise.
   by the native dispatch probe; negative microbench experiments should not
   become public API.
 - Prove the release workflow with a successful package publish, npm registry
-  readback, changelog evidence, and consumer smoke evidence after the enforced
-  parity benchmark passes.
+  readback, changelog evidence, and consumer smoke evidence after the
+  repeatable enforced parity benchmark passes.

@@ -12,8 +12,8 @@ benchmark evidence against Python/NumPy. The package should feel obvious to
 Python users, not like a new DSL.
 
 Release gate: `@sylphx/numpy` npm publication must pass
-`bun run bench:python-parity:enforce` and npm registry readback first. Until
-that readback exists, treat the install command below as the post-release
+`bun run bench:python-parity:repeatability` and npm registry readback first.
+Until that readback exists, treat the install command below as the post-release
 package contract rather than current registry availability.
 
 Launch and marketing claims are governed by the repository
@@ -27,8 +27,9 @@ API direction and is not affiliated with, endorsed by, or sponsored by NumPy.
 This package is the NumPy migration path for TypeScript: Python
 function names, Python-like array semantics, and native-backed performance
 where JavaScript hot loops are not enough. Performance claims are admitted by
-`bun run bench:python-parity:enforce`, which compares the same operations
-against Python/NumPy on the same machine.
+`bun run bench:python-parity:enforce`; release claims require
+`bun run bench:python-parity:repeatability`, which runs the enforced benchmark
+repeatedly on the same machine.
 
 Current truth:
 
@@ -54,9 +55,9 @@ Current truth:
   `0.1917ms`, confirming that native output-buffer paths are the right
   direction while the NumPy release threshold still needs to clear repeatably
   for every covered row.
-- Release gate evidence: `bench:python-parity:enforce` and `release:preflight`
-  remain admission blockers until every covered speed row passes repeatably, so
-  npm publication remains blocked.
+- Release gate evidence: `bench:python-parity:repeatability` and
+  `release:preflight` remain admission blockers until every covered speed row
+  passes repeatably, so npm publication remains blocked.
 - Claim boundary: full NumPy parity is the target, not a completed claim.
 
 ## Python-To-TypeScript Contract
@@ -493,6 +494,7 @@ Run the Python parity benchmark before making public performance claims:
 ```bash
 bun run bench:python-parity
 bun run bench:python-parity:enforce
+bun run bench:python-parity:repeatability
 bun run bench:native-dispatch
 ```
 
@@ -504,9 +506,9 @@ Recent CI evidence:
   (`1.08x`) remain over the strict `1.05x` target. The preceding accepted main
   run `28700015980` passed nine of ten rows, so repeatability remains a release
   blocker rather than a marketing claim.
-- Release gate evidence: `bench:python-parity:enforce` and `release:preflight`
-  remain blockers until every covered speed row passes repeatably. Full speed
-  parity is not marketed until that release gate passes.
+- Release gate evidence: `bench:python-parity:repeatability` and
+  `release:preflight` remain blockers until every covered speed row passes
+  repeatably. Full speed parity is not marketed until that release gate passes.
 - Diagnostic evidence: `bench:native-dispatch` separates Rust/N-API kernel,
   TypeScript backend, NativeBLAS backend, and public API overhead before backend
   dispatch changes are promoted.

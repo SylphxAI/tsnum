@@ -15,8 +15,8 @@ experience; hot paths are designed to drop into Rust/N-API kernels, native BLAS,
 WASM, and future GPU backends while preserving a Python-recognizable `np` API.
 
 Release gate: `@sylphx/numpy` npm publication must pass
-`bun run bench:python-parity:enforce` and npm registry readback first. Until
-that readback exists, treat the install command below as the post-release
+`bun run bench:python-parity:repeatability` and npm registry readback first.
+Until that readback exists, treat the install command below as the post-release
 package contract rather than current registry availability.
 
 Launch and marketing claims are governed by
@@ -37,10 +37,10 @@ API direction and is not affiliated with, endorsed by, or sponsored by NumPy.
   public language surface; hot operations are designed to route through
   Rust/N-API native kernels, native BLAS, WASM, and future GPU backends when the
   workload demands it.
-- **Evidence-gated marketing** - this repo carries a NumPy comparison gate
-  (`bun run bench:python-parity:enforce`) and a generated CI report artifact, so
-  public performance claims are tied to reproducible measurements instead of
-  README optimism.
+- **Evidence-gated marketing** - this repo carries a NumPy comparison gate, a
+  release repeatability gate, and generated CI report artifacts, so public
+  performance claims are tied to reproducible measurements instead of README
+  optimism.
 - **Commercial package contract** - public examples, package metadata, release
   readback, and benchmark reports now point at `@sylphx/numpy`.
 
@@ -594,8 +594,8 @@ console.log(info.usingWASM)  // true if WASM loaded
 - **TypeScript backend**: Always-available fallback with tuned hot loops
 - **Native dispatch probe**: `bun run bench:native-dispatch` shows whether a
   proposed backend change improves native kernel, backend, or public API timing
-- **Python parity gate**: Run `bun run bench:python-parity:enforce` before
-  publishing NumPy-speed claims
+- **Python parity gate**: Run `bun run bench:python-parity:repeatability`
+  before publishing NumPy-speed claims
 - **Tree-shakeable**: Only bundle what you use
 - **Functional API**: operations are exposed as composable functions over a thin
   NDArray container
@@ -636,7 +636,7 @@ but 1.05x speed parity is still volatile across reporting and enforced runs.
 Full NumPy API coverage, repeatable all-op speed parity, and first npm
 publication remain launch gates, not completed claims.
 
-Next: make `bench:python-parity:enforce` repeatably pass on the release path,
+Next: make `bench:python-parity:repeatability` pass on the release path,
 harden GPU acceleration contract, and add more decompositions (LU,
 eigendecomposition).
 

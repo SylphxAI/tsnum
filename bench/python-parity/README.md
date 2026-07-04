@@ -16,6 +16,7 @@ python -m pip install -r bench/python-parity/requirements.txt
 ```bash
 bun run bench:python-parity
 bun run bench:python-parity:enforce
+bun run bench:python-parity:repeatability
 bun run bench:python-parity:report:check
 bun run bench:native-dispatch
 ```
@@ -25,6 +26,7 @@ Without activating the venv:
 ```bash
 PYTHON=.venv/bin/python bun run bench:python-parity
 PYTHON=.venv/bin/python bun run bench:python-parity:enforce
+PYTHON=.venv/bin/python bun run bench:python-parity:repeatability
 ```
 
 To debug one row directly:
@@ -50,6 +52,14 @@ The Markdown report is generated from the JSON output. CI runs
 `bench:python-parity:report:check` after the benchmark and uploads both files as
 the `python-parity-report` artifact.
 
+`bench:python-parity:repeatability` is the release-path gate. It runs
+`bench/python-parity/compare.ts --enforce` multiple times and fails unless every
+attempt passes. The default is three attempts, configurable with
+`PYTHON_PARITY_REPEAT_ATTEMPTS=5`. It writes ignored local release evidence:
+
+- `bench/python-parity/results/repeatability-latest.json`
+- `bench/python-parity/results/repeatability-latest.md`
+
 `bench:native-dispatch` is a diagnostic probe for backend work. It measures the
 same float64 vector operations at the native N-API kernel layer, TypeScript
 backend layer, NativeBLAS backend layer, and public API layer. Use it before
@@ -67,8 +77,8 @@ The vector-operation probe defaults to short samples so CI remains fast. The
 iterations, and 1000 measured iterations so small-matrix overhead can be
 compared against the Python parity report on the same runner.
 
-This probe does not replace `bench:python-parity:enforce`; publish readiness
-still depends on the Python parity gate.
+This probe does not replace `bench:python-parity:repeatability`; publish
+readiness still depends on the release Python parity gate.
 
 ## Contract
 
@@ -82,6 +92,8 @@ still depends on the Python parity gate.
 - Override: `PYTHON_PARITY_MAX_SLOWDOWN=1.10`.
 - Default samples per runtime: `7`.
 - Sample override: `PYTHON_PARITY_RUNS=5`.
+- Default release repeatability attempts: `3`.
+- Repeatability override: `PYTHON_PARITY_REPEAT_ATTEMPTS=5`.
 - Native dispatch matmul overrides:
   `NATIVE_DISPATCH_PROBE_MATMUL_SAMPLES`,
   `NATIVE_DISPATCH_PROBE_MATMUL_WARMUP`, and

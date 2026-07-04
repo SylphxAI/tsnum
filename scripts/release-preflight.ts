@@ -19,8 +19,8 @@ const steps: Step[] = [
     command: [process.execPath, 'run', 'test'],
   },
   {
-    name: 'Enforce Python parity benchmark',
-    command: [process.execPath, 'run', 'bench:python-parity:enforce'],
+    name: 'Enforce repeatable Python parity benchmark',
+    command: [process.execPath, 'run', 'bench:python-parity:repeatability'],
   },
 ]
 

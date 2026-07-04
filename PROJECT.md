@@ -71,7 +71,7 @@ The central publish job still builds the workspace before publishing, and
 postpublish runs `release:readback`.
 
 `release:preflight` runs install, build, tests, and
-`bench:python-parity:enforce`. Current speed gaps intentionally block
+`bench:python-parity:repeatability`. Current speed gaps intentionally block
 publication until the enforced benchmark passes repeatably on the release
 preflight runner. After publish, `release:readback` must verify every public
 workspace npm package, and release evidence must include provenance/attestation,
