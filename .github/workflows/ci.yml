@@ -40,6 +40,9 @@ jobs:
       - name: Python parity benchmark
         run: bun run bench:python-parity
 
+      - name: Native dispatch probe
+        run: bun run bench:native-dispatch
+
       - name: Python parity report freshness
         run: bun run bench:python-parity:report:check
 
@@ -51,4 +54,14 @@ jobs:
           path: |
             bench/python-parity/results/latest.json
             bench/python-parity/results/latest.md
+          if-no-files-found: ignore
+
+      - name: Upload native dispatch report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-dispatch-report
+          path: |
+            bench/python-parity/results/native-dispatch-latest.json
+            bench/python-parity/results/native-dispatch-latest.md
           if-no-files-found: ignore

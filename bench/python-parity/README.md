@@ -59,6 +59,9 @@ kernel speed. It writes ignored local reports:
 - `bench/python-parity/results/native-dispatch-latest.json`
 - `bench/python-parity/results/native-dispatch-latest.md`
 
+CI also uploads these files as the `native-dispatch-report` artifact whenever
+the probe runs.
+
 This probe does not replace `bench:python-parity:enforce`; publish readiness
 still depends on the Python parity gate.
 
@@ -68,7 +71,8 @@ still depends on the Python parity gate.
 - Native backend: Bun/macOS runs attempt `initNativeBLAS()` before measuring.
 - Case isolation: default runs spawn a fresh Python or Bun process per
   runtime/case/sample using `PYTHON_PARITY_CASE`.
-- Slowdown metric: median paired `@sylphx/numpy` / Python sample ratio.
+- Slowdown metric: `@sylphx/numpy` median time divided by Python median time.
+  Paired slowdown p95 is kept as diagnostic runner-volatility evidence.
 - Default max slowdown: `1.05`.
 - Override: `PYTHON_PARITY_MAX_SLOWDOWN=1.10`.
 - Default samples per runtime: `7`.
