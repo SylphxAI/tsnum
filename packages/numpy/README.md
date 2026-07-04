@@ -40,19 +40,19 @@ Current truth:
 - Evidence tools: Python parity benchmark plus native dispatch probe for
   kernel/wrapper/public-API timing.
 - Recorded benchmark evidence: accepted main CI runs pass checksum parity for
-  every covered row and recently pass the 1.05x speed target on eight to nine
+  every covered row and recently pass the 1.05x speed target on seven to nine
   of ten covered rows. The latest uploaded main `python-parity-report` artifact
   is canonical when this dated snapshot drifts.
-- Latest main CI: `add_arrays_1m` (`0.75x`), `add_arrays_1m_out` (`0.87x`),
-  `add_scalar_1m` (`0.62x`), `mean_1m` (`0.74x`), `mul_scalar_1m` (`0.65x`),
-  `mul_scalar_1m_out` (`0.95x`), `sum_1m` (`0.63x`), and `transpose_512`
-  (`0.84x`) pass the speed target. `add_scalar_1m_out` (`1.33x`) and
-  `matmul_128` (`1.08x`) miss the latest-artifact release target. Full speed
+- Latest main CI: `add_arrays_1m` (`0.75x`), `add_scalar_1m` (`0.59x`),
+  `mean_1m` (`0.57x`), `mul_scalar_1m` (`0.55x`), `mul_scalar_1m_out`
+  (`1.04x`), `sum_1m` (`0.57x`), and `transpose_512` (`0.72x`) pass the speed
+  target. `add_arrays_1m_out` (`1.25x`), `add_scalar_1m_out` (`1.05x`), and
+  `matmul_128` (`1.10x`) miss the latest-artifact release target. Full speed
   parity is not claimed.
 - Native dispatch evidence: the same run measured `public.addScalar.out` at
-  `0.4459ms`, `public.addArrays.out` at `0.6398ms`, `public.mulScalar.out` at
-  `0.2948ms`, `public.matmul128` at `0.2027ms`, and `public.matmul128.out` at
-  `0.1917ms`, confirming that native output-buffer paths are the right
+  `0.2121ms`, `public.addArrays.out` at `0.4782ms`, `public.mulScalar.out` at
+  `0.1846ms`, `public.matmul128` at `0.0843ms`, and `public.matmul128.out` at
+  `0.0763ms`, confirming that native output-buffer paths are the right
   direction while the NumPy release threshold still needs to clear repeatably
   for every covered row.
 - Release gate evidence: `bench:python-parity:repeatability` and
@@ -501,11 +501,12 @@ bun run bench:native-dispatch
 Recent CI evidence:
 
 - Checksum parity: all covered benchmark cases pass.
-- Reporting-mode speed evidence: latest main CI run `28700645799` passed eight
-  of ten covered speed rows. `add_scalar_1m_out` (`1.33x`) and `matmul_128`
-  (`1.08x`) remain over the strict `1.05x` target. The preceding accepted main
-  run `28700015980` passed nine of ten rows, so repeatability remains a release
-  blocker rather than a marketing claim.
+- Reporting-mode speed evidence: latest main CI run `28701383776` passed seven
+  of ten covered speed rows. `add_arrays_1m_out` (`1.25x`),
+  `add_scalar_1m_out` (`1.05x`), and `matmul_128` (`1.10x`) remain over the
+  strict `1.05x` target. Recent accepted main snapshots have ranged from seven
+  to nine speed-passing rows, so repeatability remains a release blocker rather
+  than a marketing claim.
 - Release gate evidence: `bench:python-parity:repeatability` and
   `release:preflight` remain blockers until every covered speed row passes
   repeatably. Full speed parity is not marketed until that release gate passes.
