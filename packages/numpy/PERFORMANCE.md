@@ -46,17 +46,22 @@ raw samples plus median, p95, and relative standard deviation for every row.
 That evidence separates true backend gaps from process-order or runner variance
 without relaxing the checksum or speed gates.
 
-Current main CI evidence after PR #38:
+Recent main CI evidence:
 
-- Main CI run `28695393008` on macOS arm64 uploaded `python-parity-report`.
+- Main CI run `28695468644` on macOS arm64 uploaded `python-parity-report`.
 - Runtime: Python 3.12.10, NumPy 2.5.0, Bun 1.3.14,
   `@sylphx/numpy` backend `native-blas`.
 - Checksum parity passed for every covered row.
-- Speed rows passed for `add_arrays_1m` (`0.91x`), `add_scalar_1m` (`0.63x`),
-  `mean_1m` (`0.55x`), `mul_scalar_1m` (`0.57x`), `sum_1m` (`0.56x`), and
-  `transpose_512` (`0.77x`).
-- `matmul_128` failed the 1.05x speed target at `1.23x` slowdown, with paired
-  slowdown p95 at `1.24x`; full speed parity is therefore not claimed.
+- Speed rows passed for `add_arrays_1m` (`0.90x`), `add_scalar_1m` (`0.75x`),
+  `mean_1m` (`0.59x`), `mul_scalar_1m` (`0.71x`), and `sum_1m` (`0.60x`).
+- `matmul_128` failed the 1.05x speed target at `1.12x` slowdown, with paired
+  slowdown p95 at `1.40x`.
+- `transpose_512` failed the 1.05x speed target at `1.11x` slowdown, with
+  paired slowdown p95 at `1.29x`.
+- The prior main run `28695393008` passed six of seven rows and failed
+  `matmul_128` at `1.23x`; this volatility is why the latest CI artifact and
+  the enforced release gate are canonical, not any single README table.
+- Full speed parity is therefore not claimed.
 - PR #36's native-addon Accelerate matmul bridge regressed `matmul_128` to
   `1.50x` on main CI run `28695093346`; PR #37 reverted that path and restored
   the column-major native BLAS route.
