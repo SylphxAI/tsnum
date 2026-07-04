@@ -53,7 +53,7 @@ gaps from process-order or runner variance, and does not relax the checksum or
 speed gates.
 
 The release path uses `bench:python-parity:repeatability`, which runs the
-comparison once as a non-enforcing warmup, then runs the enforced benchmark
+comparison twice as a non-enforcing warmup, then runs the enforced benchmark
 multiple times and fails unless every enforced attempt passes. This turns
 repeatability into a release gate rather than a README promise.
 

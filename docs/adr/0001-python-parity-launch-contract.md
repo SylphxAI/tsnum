@@ -185,7 +185,7 @@ bun run release:preflight
 ```
 
 `bench:python-parity:repeatability` runs the enforced benchmark three times by
-default after one non-enforcing warmup comparison and fails unless every
+default after two non-enforcing warmup comparisons and fails unless every
 enforced attempt passes. Override the release proof count with
 `PYTHON_PARITY_REPEAT_ATTEMPTS=5`; override warmups with
 `PYTHON_PARITY_REPEAT_WARMUP_ATTEMPTS=2`.

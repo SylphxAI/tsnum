@@ -57,9 +57,9 @@ The Markdown report is generated from the JSON output. CI runs
 the `python-parity-report` artifact.
 
 `bench:python-parity:repeatability` is the release-path gate. It runs
-one non-enforcing warmup comparison, then
+two non-enforcing warmup comparisons, then
 `bench/python-parity/compare.ts --enforce` multiple times and fails unless every
-enforced attempt passes. The default is one warmup and three enforced attempts,
+enforced attempt passes. The default is two warmups and three enforced attempts,
 configurable with `PYTHON_PARITY_REPEAT_WARMUP_ATTEMPTS=2` and
 `PYTHON_PARITY_REPEAT_ATTEMPTS=5`. It writes ignored local release evidence:
 
@@ -122,7 +122,7 @@ runner-noise sensitivity without changing the 1.05x speed threshold.
 - Sample override: `PYTHON_PARITY_RUNS=5`.
 - Default release repeatability attempts: `3`.
 - Repeatability override: `PYTHON_PARITY_REPEAT_ATTEMPTS=5`.
-- Default repeatability warmup attempts: `1`.
+- Default repeatability warmup attempts: `2`.
 - Repeatability warmup override: `PYTHON_PARITY_REPEAT_WARMUP_ATTEMPTS=2`.
 - Native dispatch matmul overrides:
   `NATIVE_DISPATCH_PROBE_MATMUL_SAMPLES`,

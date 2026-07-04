@@ -44,7 +44,7 @@ function readPositiveInt(name: string, fallback: number): number {
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))))
 const attempts = readPositiveInt('PYTHON_PARITY_REPEAT_ATTEMPTS', 3)
-const warmupAttempts = readPositiveInt('PYTHON_PARITY_REPEAT_WARMUP_ATTEMPTS', 1)
+const warmupAttempts = readPositiveInt('PYTHON_PARITY_REPEAT_WARMUP_ATTEMPTS', 2)
 const resultPath = join(root, 'bench/python-parity/results/latest.json')
 const repeatabilityJsonPath = join(root, 'bench/python-parity/results/repeatability-latest.json')
 const repeatabilityMarkdownPath = join(root, 'bench/python-parity/results/repeatability-latest.md')
