@@ -83,7 +83,7 @@ canonical when this dated snapshot drifts.
 Current truthful public statement:
 
 `@sylphx/numpy` has checksum parity on the covered benchmark set and passes the
-speed target on seven of ten covered rows in the latest accepted main CI
+speed target on seven of ten covered rows in the recorded accepted main CI
 artifact. Recent accepted main snapshots have ranged from seven to nine
 speed-passing rows, so full covered-operation speed parity is not claimed
 because `add_arrays_1m_out`, `add_scalar_1m_out`, `matmul_128`, and every
@@ -154,7 +154,7 @@ After publish, release completion also requires:
 - The API target is Python/NumPy spelling and semantics.
 - Covered benchmark checksums pass in the dated accepted main CI artifact.
 - Seven of ten covered speed rows pass the current `1.05x` NumPy comparison
-  target in the latest dated accepted main CI artifact; recent accepted main
+  target in the recorded dated accepted main CI artifact; recent accepted main
   snapshots have ranged from seven to nine speed-passing rows.
 - Native-backed public hot paths and preallocated output buffers are measured in
   the accepted native dispatch probe.
