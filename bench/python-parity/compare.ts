@@ -16,6 +16,26 @@ type BenchReport = {
   benchmarks: Record<string, BenchCase>
 }
 
+type RuntimeName = 'python' | 'ts'
+
+type SamplePair = {
+  index: number
+  order: RuntimeName[]
+  python: BenchReport
+  ts: BenchReport
+}
+
+type SummaryStats = {
+  min: number
+  median: number
+  p75: number
+  p95: number
+  max: number
+  mean: number
+  stddev: number
+  relative_stddev: number
+}
+
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))))
 const enforce = process.argv.includes('--enforce')
 const python = process.env.PYTHON ?? 'python3'
@@ -39,6 +59,44 @@ function median(values: number[]): number {
     return sorted[middle]
   }
   return (sorted[middle - 1] + sorted[middle]) / 2
+}
+
+function percentile(values: number[], percentileRank: number): number {
+  if (values.length === 0) {
+    return Number.NaN
+  }
+
+  const sorted = values.toSorted((a, b) => a - b)
+  const index = Math.ceil((percentileRank / 100) * sorted.length) - 1
+  return sorted[Math.max(0, Math.min(sorted.length - 1, index))]
+}
+
+function mean(values: number[]): number {
+  if (values.length === 0) {
+    return Number.NaN
+  }
+
+  return values.reduce((total, value) => total + value, 0) / values.length
+}
+
+function summaryStats(values: number[]): SummaryStats {
+  const average = mean(values)
+  const variance =
+    values.length === 0
+      ? Number.NaN
+      : mean(values.map((value) => (value - average) * (value - average)))
+  const stddev = Math.sqrt(variance)
+
+  return {
+    min: values.length === 0 ? Number.NaN : Math.min(...values),
+    median: median(values),
+    p75: percentile(values, 75),
+    p95: percentile(values, 95),
+    max: values.length === 0 ? Number.NaN : Math.max(...values),
+    mean: average,
+    stddev,
+    relative_stddev: average === 0 ? Number.NaN : stddev / average,
+  }
 }
 
 function runJson(command: string[], cwd: string): BenchReport {
@@ -97,13 +155,34 @@ function aggregateReport(reports: BenchReport[]): BenchReport {
   }
 }
 
-const pythonSamples: BenchReport[] = []
-const tsSamples: BenchReport[] = []
+const samplePairs: SamplePair[] = []
 for (let i = 0; i < sampleCount; i++) {
-  pythonSamples.push(runJson([python, 'bench/python-parity/python_bench.py'], root))
-  tsSamples.push(runJson([process.execPath, 'run', 'bench/python-parity/ts_bench.ts'], root))
+  const order: RuntimeName[] = i % 2 === 0 ? ['python', 'ts'] : ['ts', 'python']
+  let pythonSample: BenchReport | undefined
+  let tsSample: BenchReport | undefined
+
+  for (const runtime of order) {
+    if (runtime === 'python') {
+      pythonSample = runJson([python, 'bench/python-parity/python_bench.py'], root)
+    } else {
+      tsSample = runJson([process.execPath, 'run', 'bench/python-parity/ts_bench.ts'], root)
+    }
+  }
+
+  if (!pythonSample || !tsSample) {
+    throw new Error(`Missing benchmark sample pair ${i + 1}`)
+  }
+
+  samplePairs.push({
+    index: i + 1,
+    order,
+    python: pythonSample,
+    ts: tsSample,
+  })
 }
 
+const pythonSamples = samplePairs.map((pair) => pair.python)
+const tsSamples = samplePairs.map((pair) => pair.ts)
 const pythonReport = aggregateReport(pythonSamples)
 const tsReport = aggregateReport(tsSamples)
 
@@ -123,12 +202,25 @@ const rows = Object.keys(pythonReport.benchmarks).map((name) => {
     }
     return checksumMatches(tsSample.checksum, pythonSample.checksum)
   })
+  const pythonMsSamples = pythonCase.time_ms_samples ?? []
+  const tsMsSamples = tsCase.time_ms_samples ?? []
+  const pairedSlowdownSamples = tsMsSamples.map((tsMs, index) => {
+    const pythonMs = pythonMsSamples[index]
+    return typeof pythonMs === 'number' ? tsMs / pythonMs : Number.NaN
+  })
+
   return {
     name,
     python_ms: pythonCase.time_ms,
     ts_ms: tsCase.time_ms,
-    python_ms_samples: pythonCase.time_ms_samples ?? [],
-    ts_ms_samples: tsCase.time_ms_samples ?? [],
+    python_ms_samples: pythonMsSamples,
+    ts_ms_samples: tsMsSamples,
+    paired_slowdown_samples: pairedSlowdownSamples,
+    sample_stats: {
+      python_ms: summaryStats(pythonMsSamples),
+      ts_ms: summaryStats(tsMsSamples),
+      slowdown: summaryStats(pairedSlowdownSamples),
+    },
     slowdown,
     speed_pass: slowdown <= maxSlowdown,
     checksum_pass,
@@ -146,6 +238,15 @@ const output = {
   enforce,
   max_slowdown: maxSlowdown,
   sample_count: sampleCount,
+  sampling: {
+    strategy: 'paired-alternating-runtime-order',
+    python_command: python,
+    ts_command: `${process.execPath} run bench/python-parity/ts_bench.ts`,
+    sample_pairs: samplePairs.map((pair) => ({
+      index: pair.index,
+      order: pair.order,
+    })),
+  },
   python: pythonReport,
   ts: tsReport,
   samples: {
