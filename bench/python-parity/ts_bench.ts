@@ -136,7 +136,14 @@ const cases: Record<string, BenchCaseFactory> = {
     const right = array(matrix(128, 128, 0.002), { dtype: 'float64' })
     const out = empty([128, 128], { dtype: 'float64' })
     const options = { out }
-    return [20000, 2000, () => matmul(left, right, options)]
+    return [1000, 100, () => matmul(left, right, options)]
+  },
+  matmul_256_out: () => {
+    const left = array(matrix(256, 256, 0.001), { dtype: 'float64' })
+    const right = array(matrix(256, 256, 0.002), { dtype: 'float64' })
+    const out = empty([256, 256], { dtype: 'float64' })
+    const options = { out }
+    return [2000, 200, () => matmul(left, right, options)]
   },
 }
 

@@ -36,9 +36,9 @@ def main() -> None:
     def matrix() -> np.ndarray:
         return np.arange(512 * 512, dtype=np.float64).reshape(512, 512) * 0.001
 
-    def matmul_input() -> tuple[np.ndarray, np.ndarray]:
-        left = np.arange(128 * 128, dtype=np.float64).reshape(128, 128) * 0.001
-        right = np.arange(128 * 128, dtype=np.float64).reshape(128, 128) * 0.002
+    def matmul_input(size: int = 128) -> tuple[np.ndarray, np.ndarray]:
+        left = np.arange(size * size, dtype=np.float64).reshape(size, size) * 0.001
+        right = np.arange(size * size, dtype=np.float64).reshape(size, size) * 0.002
         return left, right
 
     def add_scalar_1m() -> tuple[int, int, Callable[[], object]]:
@@ -105,7 +105,12 @@ def main() -> None:
     def matmul_128_out() -> tuple[int, int, Callable[[], object]]:
         left, right = matmul_input()
         out = np.empty((128, 128), dtype=np.float64)
-        return 20000, 2000, lambda: np.matmul(left, right, out=out)
+        return 1000, 100, lambda: np.matmul(left, right, out=out)
+
+    def matmul_256_out() -> tuple[int, int, Callable[[], object]]:
+        left, right = matmul_input(256)
+        out = np.empty((256, 256), dtype=np.float64)
+        return 2000, 200, lambda: np.matmul(left, right, out=out)
 
     cases: dict[str, Callable[[], tuple[int, int, Callable[[], object]]]] = {
         "add_scalar_1m": add_scalar_1m,
@@ -122,6 +127,7 @@ def main() -> None:
         "transpose_512": transpose_512,
         "matmul_128": matmul_128,
         "matmul_128_out": matmul_128_out,
+        "matmul_256_out": matmul_256_out,
     }
 
     selected_case = os.environ.get("PYTHON_PARITY_CASE")

@@ -156,11 +156,11 @@ small-matrix native overhead from runner noise.
 
 ## Future Optimizations (Roadmap)
 
-- Close the remaining enforced-gate volatility against NumPy by reducing
-  output-buffer wrapper overhead and proving that `add_scalar_1m_out`,
-  `matmul_128_out`, and `mul_scalar_1m_out` stay repeatably inside the 1.05x
-  gate on the release runner. Allocation-return and short rows remain
-  diagnostic until their speed is repeatable enough to promote.
+- Close the remaining diagnostic volatility against NumPy by reducing
+  output-buffer wrapper overhead and proving short output-buffer and
+  small-matrix rows stay repeatably inside the 1.05x gate before promotion.
+  Allocation-return and short rows remain diagnostic until their speed is
+  repeatable enough to promote.
 - Promote only optimizations that improve the Python parity gate or are backed
   by the native dispatch probe; negative microbench experiments should not
   become public API.

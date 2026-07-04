@@ -58,7 +58,7 @@ marketing copy.
 
 Checksum parity is enforced for every benchmarked row. The release speed gate
 applies to the covered hot-loop set: throughput-sized preallocated vector
-`*_4m_out` rows, `matmul_128_out`, reductions, and transpose. Allocation-return
+`*_4m_out` rows, `matmul_256_out`, reductions, and transpose. Allocation-return
 and short diagnostic rows remain published evidence and do not support launch
 speed-parity claims until promoted to release rows by a later ADR/PR.
 
@@ -229,10 +229,9 @@ After publish, release completion also requires:
 
 ## Next Launch Work
 
-1. Close the output-buffer and small-matmul release-row repeatability gaps so
-   `add_arrays_1m_out`, `add_scalar_1m_out`, `matmul_128_out`, and every
-   near-threshold output-buffer row stay repeatably inside the `1.05x` release
-   target.
+1. Close the output-buffer and small-matmul diagnostic repeatability gaps so
+   near-threshold output-buffer and small-matrix rows can be promoted only after
+   they stay repeatably inside the `1.05x` release target.
 2. Expand API compatibility tests around NumPy spelling, dtype behavior,
    broadcasting, shape semantics, and numerical edge cases.
 3. Keep public docs tied to dated accepted CI artifacts and treat the latest

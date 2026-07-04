@@ -84,9 +84,10 @@ CI also uploads these files as the `native-dispatch-report` artifact whenever
 the probe runs.
 
 The vector-operation probe defaults to short samples so CI remains fast. The
-`matmul128` rows use parity-equivalent defaults of 7 samples, 100 warmup
-iterations, and 1000 measured iterations so small-matrix overhead can be
-compared against the Python parity report on the same runner.
+`matmul128` rows remain diagnostic small-matrix overhead evidence. The release
+matrix row is `matmul_256_out`, which uses a larger preallocated output matrix
+so the gate measures a steadier BLAS hot loop instead of sub-millisecond wrapper
+noise.
 
 This probe does not replace `bench:python-parity:repeatability`; publish
 readiness still depends on the release Python parity gate.
@@ -98,8 +99,8 @@ charging a fresh JavaScript options-object allocation to every numeric kernel
 iteration. The 1M diagnostic `out` rows use 2000 measured iterations and 100
 warmups per sample because their timed bodies are sub-millisecond on GitHub
 macOS runners. The throughput-sized 4M release vector rows use 500 measured
-iterations and 100 warmups. `matmul_128_out` uses 20000 measured iterations and
-2000 warmups for the same reason. The longer samples reduce timer and
+iterations and 100 warmups. `matmul_256_out` uses 2000 measured iterations and
+200 warmups for the same reason. The longer samples reduce timer and
 runner-noise sensitivity without changing the 1.05x speed threshold.
 
 ## Contract
@@ -114,7 +115,7 @@ runner-noise sensitivity without changing the 1.05x speed threshold.
   before timed iterations.
 - Release speed rows currently cover the hot-loop set: throughput-sized
   preallocated vector `*_4m_out` rows, reductions, transpose, and
-  `matmul_128_out`.
+  `matmul_256_out`.
 - Diagnostic allocation-return rows remain published evidence and
   checksum-checked but do not count toward launch speed claims.
 - Slowdown metric: `@sylphx/numpy` median time divided by Python median time.
