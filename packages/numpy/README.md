@@ -38,17 +38,18 @@ Current truth:
   paths.
 - Evidence tools: Python parity benchmark plus native dispatch probe for
   kernel/wrapper/public-API timing.
-- Recorded benchmark evidence: latest accepted main CI run `28697134621`
-  passes checksum parity for every covered row and passes the 1.05x speed
-  target on six of seven covered rows.
-- Recent main CI: `add_arrays_1m` (`0.69x`), `add_scalar_1m` (`0.63x`),
-  `mean_1m` (`0.55x`), `mul_scalar_1m` (`0.55x`), `sum_1m` (`0.61x`), and
-  `transpose_512` (`0.78x`) pass the speed target. `matmul_128` remains the
-  release blocker at `1.08x`. Full speed parity is not claimed.
+- Recorded benchmark evidence: accepted main CI run `28697576618` passes
+  checksum parity for every covered row and passes the 1.05x speed target on
+  six of seven covered rows. The latest uploaded `python-parity-report`
+  artifact is canonical when this dated snapshot drifts.
+- Recent main CI: `add_arrays_1m` (`0.73x`), `add_scalar_1m` (`0.85x`),
+  `mean_1m` (`0.66x`), `mul_scalar_1m` (`0.66x`), `sum_1m` (`0.66x`), and
+  `transpose_512` (`0.75x`) pass the speed target. `matmul_128` remains the
+  release blocker at `1.19x`. Full speed parity is not claimed.
 - Native dispatch evidence: the same run measured `public.matmul128` at
-  `0.0976ms` versus the TypeScript backend at `0.7513ms`, confirming that the
-  native BLAS path is the right performance direction while `matmul_128` still
-  needs to clear the NumPy release threshold.
+  `0.2337ms` versus the TypeScript backend at `0.9590ms`, confirming that the
+  native BLAS path remains the right performance direction while `matmul_128`
+  still needs to clear the NumPy release threshold.
 - Release gate evidence: `bench:python-parity:enforce` and `release:preflight`
   remain admission blockers until every covered speed row passes repeatably, so
   npm publication remains blocked.
