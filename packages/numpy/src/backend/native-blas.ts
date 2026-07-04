@@ -79,7 +79,6 @@ type NativeKernelModule = {
   addScalarF64Buffer?: (input: Float64Array, scalar: number, output: Uint8Array) => Uint8Array
   addScalarF64Buffers?: (input: Uint8Array, scalar: number, output: Uint8Array) => Uint8Array
   mulScalarF64?: (input: Float64Array, scalar: number) => Float64Array
-  mulScalarF64Buffer?: (input: Float64Array, scalar: number, output: Uint8Array) => Uint8Array
   mulScalarF64Buffers?: (input: Uint8Array, scalar: number, output: Uint8Array) => Uint8Array
   transposeF64Buffer?: (
     input: Float64Array,
@@ -158,17 +157,6 @@ export class NativeBLASBackend extends TypeScriptBackend {
 
     if (typeof b === 'number') {
       const native = getNativeKernels()
-      if (native?.addScalarF64Buffer) {
-        const output = createNativeOutputBuffer(a.buffer.length)
-        native.addScalarF64Buffer(a.buffer, b, output.bytes)
-        return {
-          buffer: output.array,
-          shape: a.shape,
-          strides: a.strides,
-          dtype: 'float64',
-        }
-      }
-
       if (native?.addScalarF64Buffers) {
         const output = createNativeOutputBuffer(a.buffer.length)
         native.addScalarF64Buffers(bytesFor(a.buffer), b, output.bytes)
@@ -267,11 +255,6 @@ export class NativeBLASBackend extends TypeScriptBackend {
     if (typeof b === 'number') {
       this.validateElementwiseOutput(out, 'float64', a.shape, a.buffer.length)
       const native = getNativeKernels()
-      if (native?.addScalarF64Buffer) {
-        native.addScalarF64Buffer(a.buffer, b, bytesFor(out.buffer))
-        return out
-      }
-
       if (native?.addScalarF64Buffers) {
         native.addScalarF64Buffers(bytesFor(a.buffer), b, bytesFor(out.buffer))
         return out
@@ -295,11 +278,6 @@ export class NativeBLASBackend extends TypeScriptBackend {
 
     this.validateElementwiseOutput(out, 'float64', a.shape, a.buffer.length)
     const native = getNativeKernels()
-    if (native?.addF64Buffer) {
-      native.addF64Buffer(a.buffer, b.buffer, bytesFor(out.buffer))
-      return out
-    }
-
     if (native?.addF64Buffers) {
       native.addF64Buffers(bytesFor(a.buffer), bytesFor(b.buffer), bytesFor(out.buffer))
       return out
@@ -324,17 +302,6 @@ export class NativeBLASBackend extends TypeScriptBackend {
 
     if (typeof b === 'number') {
       const native = getNativeKernels()
-      if (native?.mulScalarF64Buffer) {
-        const output = createNativeOutputBuffer(a.buffer.length)
-        native.mulScalarF64Buffer(a.buffer, b, output.bytes)
-        return {
-          buffer: output.array,
-          shape: a.shape,
-          strides: a.strides,
-          dtype: 'float64',
-        }
-      }
-
       if (native?.mulScalarF64Buffers) {
         const output = createNativeOutputBuffer(a.buffer.length)
         native.mulScalarF64Buffers(bytesFor(a.buffer), b, output.bytes)
@@ -380,11 +347,6 @@ export class NativeBLASBackend extends TypeScriptBackend {
     if (typeof b === 'number') {
       this.validateElementwiseOutput(out, 'float64', a.shape, a.buffer.length)
       const native = getNativeKernels()
-      if (native?.mulScalarF64Buffer) {
-        native.mulScalarF64Buffer(a.buffer, b, bytesFor(out.buffer))
-        return out
-      }
-
       if (native?.mulScalarF64Buffers) {
         native.mulScalarF64Buffers(bytesFor(a.buffer), b, bytesFor(out.buffer))
         return out
