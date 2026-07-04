@@ -1,3 +1,4 @@
+import { FFIType, dlopen, ptr } from 'bun:ffi'
 import { Buffer } from 'node:buffer'
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
@@ -38,9 +39,33 @@ type NativeKernelModule = {
   transposeF64Buffer: (input: Float64Array, rows: number, cols: number, output: Buffer) => Buffer
 }
 
+const CBLAS_COLUMN_MAJOR = 102
+const CBLAS_NO_TRANS = 111
+
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))))
 const require = createRequire(import.meta.url)
 const native = require(join(root, 'packages/numpy-native/index.js')) as NativeKernelModule
+const accelerate = dlopen('/System/Library/Frameworks/Accelerate.framework/Accelerate', {
+  cblas_dgemm: {
+    args: [
+      FFIType.i32,
+      FFIType.i32,
+      FFIType.i32,
+      FFIType.i32,
+      FFIType.i32,
+      FFIType.i32,
+      FFIType.f64,
+      FFIType.ptr,
+      FFIType.i32,
+      FFIType.ptr,
+      FFIType.i32,
+      FFIType.f64,
+      FFIType.ptr,
+      FFIType.i32,
+    ],
+    returns: FFIType.void,
+  },
+})
 
 const length = readPositiveInt('NATIVE_DISPATCH_PROBE_LENGTH', 1_000_000)
 const iterations = readPositiveInt('NATIVE_DISPATCH_PROBE_ITERATIONS', 30)
@@ -77,6 +102,14 @@ function range(size: number, scale: number): Float64Array {
 
 function bytes(array: Float64Array): Buffer {
   return Buffer.from(array.buffer, array.byteOffset, array.byteLength)
+}
+
+function createNativeOutput(length: number): Float64Array {
+  const bytes = Buffer.allocUnsafe(length * Float64Array.BYTES_PER_ELEMENT)
+  if (bytes.byteOffset % Float64Array.BYTES_PER_ELEMENT !== 0) {
+    return new Float64Array(length)
+  }
+  return new Float64Array(bytes.buffer, bytes.byteOffset, length)
 }
 
 function checksum(value: unknown): number {
@@ -167,6 +200,32 @@ const matmulSize = 128
 const matmulLength = matmulSize * matmulSize
 const matmulLeft = range(matmulLength, 0.001)
 const matmulRight = range(matmulLength, 0.002)
+const matmulOutput = new Float64Array(matmulLength)
+const matmulLeftPointer = ptr(matmulLeft)
+const matmulRightPointer = ptr(matmulRight)
+const matmulOutputPointer = ptr(matmulOutput)
+
+function cblasDgemm128(output: Float64Array, outputPointer = ptr(output)): Float64Array {
+  // Row-major C = A x B has the same memory layout as column-major
+  // C^T = B^T x A^T, matching the NativeBLASBackend implementation.
+  accelerate.symbols.cblas_dgemm(
+    CBLAS_COLUMN_MAJOR,
+    CBLAS_NO_TRANS,
+    CBLAS_NO_TRANS,
+    matmulSize,
+    matmulSize,
+    matmulSize,
+    1.0,
+    matmulRightPointer,
+    matmulSize,
+    matmulLeftPointer,
+    matmulSize,
+    0.0,
+    outputPointer,
+    matmulSize,
+  )
+  return output
+}
 
 const leftArray = array(Array.from(left), { dtype: 'float64' })
 const rightArray = array(Array.from(right), { dtype: 'float64' })
@@ -229,6 +288,21 @@ const results = [
     native.transposeF64Buffer(matrix, matrixSize, matrixSize, matrixOutputBytes)
     return matrixOutput
   }),
+  measure(
+    'native.cblasDgemm.preallocated',
+    () => cblasDgemm128(matmulOutput, matmulOutputPointer),
+    matmulMeasureOptions,
+  ),
+  measure(
+    'native.cblasDgemm.allocFloat64',
+    () => cblasDgemm128(new Float64Array(matmulLength)),
+    matmulMeasureOptions,
+  ),
+  measure(
+    'native.cblasDgemm.allocBuffer',
+    () => cblasDgemm128(createNativeOutput(matmulLength)),
+    matmulMeasureOptions,
+  ),
   measure('backend.typescript.addScalar', () => tsBackend.add(leftData, 5)),
   measure('backend.typescript.addArrays', () => tsBackend.add(leftData, rightData)),
   measure('backend.typescript.mulScalar', () => tsBackend.mul(leftData, 2)),
