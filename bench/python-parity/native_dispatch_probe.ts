@@ -43,7 +43,7 @@ type NativeKernelModule = {
   addF64BuffersInto: (left: Buffer, right: Buffer, output: Buffer) => void
 }
 
-const CBLAS_COLUMN_MAJOR = 102
+const CBLAS_ROW_MAJOR = 101
 const CBLAS_NO_TRANS = 111
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))))
@@ -279,10 +279,8 @@ const matmulRightPointer = ptr(matmulRight)
 const matmulOutputPointer = ptr(matmulOutput)
 
 function cblasDgemm128(output: Float64Array, outputPointer = ptr(output)): Float64Array {
-  // Row-major C = A x B has the same memory layout as column-major
-  // C^T = B^T x A^T, matching the NativeBLASBackend implementation.
   accelerate.symbols.cblas_dgemm(
-    CBLAS_COLUMN_MAJOR,
+    CBLAS_ROW_MAJOR,
     CBLAS_NO_TRANS,
     CBLAS_NO_TRANS,
     matmulSize,
@@ -339,6 +337,8 @@ const matmulRightArray = array(
   { dtype: 'float64' },
 )
 const matmulOutputArray = empty([matmulSize, matmulSize], { dtype: 'float64' })
+const vectorOutputOptions = { out: vectorOutputArray }
+const matmulOutputOptions = { out: matmulOutputArray }
 const leftData = leftArray.getData()
 const rightData = rightArray.getData()
 const matrixData = matrixArray.getData()
@@ -479,11 +479,11 @@ const results = [
     matmulMeasureOptions,
   ),
   measure('public.addScalar', () => add(leftArray, 5)),
-  measure('public.addScalar.out', () => add(leftArray, 5, { out: vectorOutputArray })),
+  measure('public.addScalar.out', () => add(leftArray, 5, vectorOutputOptions)),
   measure('public.addArrays', () => add(leftArray, rightArray)),
-  measure('public.addArrays.out', () => add(leftArray, rightArray, { out: vectorOutputArray })),
+  measure('public.addArrays.out', () => add(leftArray, rightArray, vectorOutputOptions)),
   measure('public.mulScalar', () => mul(leftArray, 2)),
-  measure('public.mulScalar.out', () => mul(leftArray, 2, { out: vectorOutputArray })),
+  measure('public.mulScalar.out', () => mul(leftArray, 2, vectorOutputOptions)),
   measure(
     'public.matmul128',
     () => matmul(matmulLeftArray, matmulRightArray),
@@ -491,7 +491,7 @@ const results = [
   ),
   measure(
     'public.matmul128.out',
-    () => matmul(matmulLeftArray, matmulRightArray, { out: matmulOutputArray }),
+    () => matmul(matmulLeftArray, matmulRightArray, matmulOutputOptions),
     matmulMeasureOptions,
   ),
 ]
