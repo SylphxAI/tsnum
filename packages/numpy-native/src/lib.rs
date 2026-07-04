@@ -137,14 +137,44 @@ fn ensure_equal_len(left_len: usize, right_len: usize) -> Result<()> {
 }
 
 fn add_scalar_into(input: &[f64], scalar: f64, output: &mut [f64]) {
-    for (out, value) in output.iter_mut().zip(input.iter()) {
-        *out = *value + scalar;
+    debug_assert_eq!(input.len(), output.len());
+
+    let len = input.len();
+    let unrolled_len = len - (len % 4);
+    let mut i = 0;
+
+    while i < unrolled_len {
+        output[i] = input[i] + scalar;
+        output[i + 1] = input[i + 1] + scalar;
+        output[i + 2] = input[i + 2] + scalar;
+        output[i + 3] = input[i + 3] + scalar;
+        i += 4;
+    }
+
+    while i < len {
+        output[i] = input[i] + scalar;
+        i += 1;
     }
 }
 
 fn mul_scalar_into(input: &[f64], scalar: f64, output: &mut [f64]) {
-    for (out, value) in output.iter_mut().zip(input.iter()) {
-        *out = *value * scalar;
+    debug_assert_eq!(input.len(), output.len());
+
+    let len = input.len();
+    let unrolled_len = len - (len % 4);
+    let mut i = 0;
+
+    while i < unrolled_len {
+        output[i] = input[i] * scalar;
+        output[i + 1] = input[i + 1] * scalar;
+        output[i + 2] = input[i + 2] * scalar;
+        output[i + 3] = input[i + 3] * scalar;
+        i += 4;
+    }
+
+    while i < len {
+        output[i] = input[i] * scalar;
+        i += 1;
     }
 }
 
@@ -161,8 +191,21 @@ fn add_into(left: &[f64], right: &[f64], output: &mut [f64]) -> Result<()> {
         ));
     }
 
-    for ((out, left_value), right_value) in output.iter_mut().zip(left.iter()).zip(right.iter()) {
-        *out = *left_value + *right_value;
+    let len = left.len();
+    let unrolled_len = len - (len % 4);
+    let mut i = 0;
+
+    while i < unrolled_len {
+        output[i] = left[i] + right[i];
+        output[i + 1] = left[i + 1] + right[i + 1];
+        output[i + 2] = left[i + 2] + right[i + 2];
+        output[i + 3] = left[i + 3] + right[i + 3];
+        i += 4;
+    }
+
+    while i < len {
+        output[i] = left[i] + right[i];
+        i += 1;
     }
 
     Ok(())
