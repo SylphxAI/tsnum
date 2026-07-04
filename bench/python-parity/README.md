@@ -62,9 +62,11 @@ attempt passes. The default is three attempts, configurable with
 
 `bench:native-dispatch` is a diagnostic probe for backend work. It measures the
 same float64 vector operations at the native N-API kernel layer, TypeScript
-backend layer, NativeBLAS backend layer, and public API layer. Use it before
-changing dispatch or native kernels so wrapper overhead is separated from
-kernel speed. It writes ignored local reports:
+backend layer, NativeBLAS backend layer, and public API layer. It also records
+allocation-return rows so release-blocking non-`out` overhead can be separated
+from preallocated kernel speed. Use it before changing dispatch or native
+kernels so wrapper overhead is separated from kernel speed. It writes ignored
+local reports:
 
 - `bench/python-parity/results/native-dispatch-latest.json`
 - `bench/python-parity/results/native-dispatch-latest.md`
