@@ -80,14 +80,6 @@ type NativeKernelModule = {
   addScalarF64Buffers?: (input: Uint8Array, scalar: number, output: Uint8Array) => Uint8Array
   mulScalarF64?: (input: Float64Array, scalar: number) => Float64Array
   mulScalarF64Buffers?: (input: Uint8Array, scalar: number, output: Uint8Array) => Uint8Array
-  accelerateMatmulF64Buffer?: (
-    left: Float64Array,
-    right: Float64Array,
-    rows: number,
-    inner: number,
-    cols: number,
-    output: Uint8Array,
-  ) => Uint8Array
   transposeF64Buffer?: (
     input: Float64Array,
     rows: number,
@@ -329,17 +321,6 @@ export class NativeBLASBackend extends TypeScriptBackend {
     }
 
     const output = createNativeOutput(m * n)
-    const native = getNativeKernels()
-    if (native?.accelerateMatmulF64Buffer) {
-      native.accelerateMatmulF64Buffer(a.buffer, b.buffer, m, k, n, bytesFor(output))
-      return {
-        buffer: output,
-        shape: [m, n],
-        strides: [n, 1],
-        dtype: 'float64',
-      }
-    }
-
     // Row-major C = A x B has the same memory layout as column-major
     // C^T = B^T x A^T, which avoids the cblas row-major adapter path.
     accelerate.symbols.cblas_dgemm(

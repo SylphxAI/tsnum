@@ -13,4 +13,3 @@ export declare function addScalarF64Buffers(input: Buffer, scalar: number, outpu
 export declare function mulScalarF64Buffers(input: Buffer, scalar: number, output: Buffer): Buffer
 export declare function addF64Buffers(left: Buffer, right: Buffer, output: Buffer): Buffer
 export declare function transposeF64Buffer(input: Float64Array, rows: number, cols: number, output: Buffer): Buffer
-export declare function accelerateMatmulF64Buffer(left: Float64Array, right: Float64Array, rows: number, inner: number, cols: number, output: Buffer): Buffer
