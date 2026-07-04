@@ -44,8 +44,8 @@ benchmark gate passes on the same machine against Python/NumPy.
 | Benchmarks | `bench/python-parity` compares TypeScript and NumPy on identical inputs. |
 | Native path | Bun/macOS can initialize Rust/N-API and native BLAS fast paths for float64 hot loops. |
 | Dispatch evidence | `bun run bench:native-dispatch` separates kernel, backend, and public API overhead before performance changes are promoted. |
-| Proven today | Main CI run `28693429159` at `0187bbc` reports checksum parity and 6 of 7 covered speed rows passing on macOS arm64 native BLAS: add arrays, add scalar, multiply scalar, sum, mean, and transpose. |
-| Not claimed yet | `matmul_128` remains above the 1.05x target in that CI artifact, so full NumPy API coverage, all-op speed parity, and npm publication are still launch gates. |
+| Proven today | Main CI run `28693587707` at `6c3d481` reports checksum parity and all covered reporting-mode speed rows passing on macOS arm64 native BLAS. |
+| Not claimed yet | PR #28 proved `bench:python-parity:enforce` is not stable enough for admission yet, and local `release:preflight` still fails; full NumPy API coverage, enforced all-op speed parity, and npm publication are still launch gates. |
 
 **Features:**
 - 🎯 **NumPy-compatible DX** - Python spelling and behavior are the target
@@ -552,12 +552,14 @@ bun run lint
 
 **Status:** Broad NumPy-compatible surface with 251+ implemented operations and
 an explicit Python parity performance gate, native dispatch diagnostics, and
-release readback wiring. A recorded main CI parity artifact passes checksum
-parity and 6 of 7 covered speed rows; `matmul_128`, full NumPy API coverage,
-and first npm publication remain launch gates, not completed claims.
+release readback wiring. A recorded main CI reporting artifact passes checksum
+parity and all covered speed rows, but the enforced parity-gate experiment in
+PR #28 still failed under CI. Full NumPy API coverage, enforced all-op speed
+parity, and first npm publication remain launch gates, not completed claims.
 
-Next: close the remaining small-matrix `matmul` speed gap, harden GPU
-acceleration contract, and add more decompositions (LU, eigendecomposition).
+Next: make `bench:python-parity:enforce` repeatably pass on the release path,
+harden GPU acceleration contract, and add more decompositions (LU,
+eigendecomposition).
 
 ## Why @sylphx/numpy?
 
