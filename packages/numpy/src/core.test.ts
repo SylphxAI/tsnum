@@ -4,22 +4,27 @@ import {
   arange,
   array,
   div,
+  divide,
   equal,
   eye,
   flatten,
   greater,
+  greater_equal,
   less,
+  less_equal,
   linspace,
   max,
   mean,
   min,
   mul,
+  multiply,
   ones,
   pipe,
   pow,
   reshape,
   std,
   sub,
+  subtract,
   sum,
   transpose,
   variance,
@@ -108,6 +113,13 @@ describe('Arithmetic Operations (Functional)', () => {
     expect(sum(b)).toBe(6) // 1+2+3
   })
 
+  test('NumPy canonical arithmetic aliases', () => {
+    const a = array([10, 20, 30])
+    expect(sum(subtract(a, 5))).toBe(45)
+    expect(sum(multiply(a, 2))).toBe(120)
+    expect(sum(divide(a, 10))).toBe(6)
+  })
+
   test('power', () => {
     const a = array([2, 3, 4])
     const b = pow(a, 2)
@@ -132,6 +144,12 @@ describe('Comparison Operations (Functional)', () => {
     const a = array([1, 2, 3])
     const b = greater(a, 1)
     expect(sum(b)).toBe(2) // 2 and 3 are greater than 1
+  })
+
+  test('NumPy canonical comparison aliases', () => {
+    const a = array([1, 2, 3])
+    expect(sum(less_equal(a, 2))).toBe(2)
+    expect(sum(greater_equal(a, 2))).toBe(2)
   })
 })
 

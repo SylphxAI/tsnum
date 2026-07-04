@@ -1,15 +1,17 @@
 // ===== Functional API (Pure Functions) =====
 
 // Arithmetic
-export { add, sub, mul, div, pow } from './arithmetic'
+export { add, div, divide, mul, multiply, pow, sub, subtract } from './arithmetic'
 
 // Comparison
 export {
   equal,
   less,
+  less_equal,
   greater,
   lessEqual,
   greaterEqual,
+  greater_equal,
   not_equal,
   array_equal,
   array_equiv,
