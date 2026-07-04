@@ -17,6 +17,7 @@ python -m pip install -r bench/python-parity/requirements.txt
 bun run bench:python-parity
 bun run bench:python-parity:enforce
 bun run bench:python-parity:report:check
+bun run bench:native-dispatch
 ```
 
 Without activating the venv:
@@ -39,6 +40,18 @@ Each run writes:
 The Markdown report is generated from the JSON output. CI runs
 `bench:python-parity:report:check` after the benchmark and uploads both files as
 the `python-parity-report` artifact.
+
+`bench:native-dispatch` is a diagnostic probe for backend work. It measures the
+same float64 vector operations at the native N-API kernel layer, TypeScript
+backend layer, NativeBLAS backend layer, and public API layer. Use it before
+changing dispatch or native kernels so wrapper overhead is separated from
+kernel speed. It writes ignored local reports:
+
+- `bench/python-parity/results/native-dispatch-latest.json`
+- `bench/python-parity/results/native-dispatch-latest.md`
+
+This probe does not replace `bench:python-parity:enforce`; publish readiness
+still depends on the Python parity gate.
 
 ## Contract
 
