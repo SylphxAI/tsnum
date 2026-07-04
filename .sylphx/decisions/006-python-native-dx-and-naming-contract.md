@@ -127,5 +127,5 @@ const values = await b.tolist()
 
 - Python parity performance contract:
   `.sylphx/decisions/005-python-parity-performance-contract.md`
-- Current package metadata: `packages/tsnum/package.json`
-- Current README surfaces: `README.md`, `packages/tsnum/README.md`
+- Current package metadata: `packages/numpy/package.json`
+- Current README surfaces: `README.md`, `packages/numpy/README.md`

@@ -86,7 +86,7 @@ with performance:
 
 - **Immutable External API**: All operations return new arrays, inputs are never modified
 - **Optimized Internals**: Hot loops use mutable operations for maximum performance
-- **Zero-Copy Operations**: Views (reshape, transpose) share underlying buffers when possible
+- **Copy-aware Operations**: `reshape` reuses buffers when shape-only metadata changes are enough; operations such as `transpose` return contiguous output buffers for predictable backend performance
 - **Functional Core**: Pure functions for all computations - same input always produces same output
 - **Backend System**: TypeScript (always available), WASM, and native BLAS acceleration paths
 
@@ -96,9 +96,9 @@ const a = array([1, 2, 3])
 const b = add(a, 10)  // Returns new array [11, 12, 13]
 // a is still [1, 2, 3]
 
-// ✅ Zero-copy views
+// ✅ Shape metadata reuse where valid
 const reshaped = reshape(a, [3, 1])  // Shares buffer with a
-const transposed = A.T  // Shares buffer with A
+const transposed = A.T  // Returns a transposed array
 
 // ✅ Functional composition
 import { pipe, mean, abs, sqrt } from '@sylphx/numpy'
@@ -249,14 +249,14 @@ Complete tracking table for all operations with backend implementation status.
 |----------|:-----:|:-----------:|:----------:|:------------:|:------:|
 | **Core Ops** | 251 | 251 ✅ | 251 🟦 | 63 🟧 | 251 ✅ |
 | **WASM Coverage** | 69/251 | **27.5%** | - | - | - |
-| **Test Evidence** | 415 tests | Package suite | - | - | - |
+| **Test Evidence** | CI suite | Package and native backend tests | - | - | - |
 
 ### WASM Implementation Priority
 
-**🎯 Next Priority** (Expected Performance Gains):
-1. **Linear Algebra** (solve, qr, svd, eig) - 10-30x speedup
-2. **2D/ND FFT** (fft2, fftn, rfft2, rfftn) - 5-20x speedup
-3. **Real FFT** (rfft, irfft) - 3-5x speedup
+**🎯 Next Priority** (benchmark-gated):
+1. **Linear Algebra** (`solve`, `qr`, `svd`, `eig`) - move more operations onto native/WASM kernels and prove gains with repo benchmarks
+2. **2D/ND FFT** (`fft2`, `fftn`, `rfft2`, `rfftn`) - widen accelerated coverage without claiming speedups before evidence
+3. **Real FFT** (`rfft`, `irfft`) - close the remaining FFT coverage gaps through the same benchmark admission path
 
 **✅ Dual Backend** (63 operations):
 - Arithmetic: add, sub, mul, div, pow (5)

@@ -5,9 +5,9 @@
 
 **API style:** Functional composition (`pipe(array([1,2]), a => add(a, 3), sum)`) - tree-shakeable, composable, matches NumPy's functional core.
 
-**Data flow:** TypedArray storage → NDArrayData (pure) → NDArray (data container) → functional ops → new NDArrayData
+**Data flow:** TypedArray storage -> NDArrayData (pure) -> NDArray (data container) -> functional ops -> backend dispatch -> new NDArrayData
 
-**Monorepo structure:** Turbo-based, single package (`packages/tsnum`) initially, future WASM package separate.
+**Monorepo structure:** Turbo-based workspace with `packages/numpy` for the public TypeScript API, `packages/numpy-native` for Rust/N-API kernels, and `packages/numpy-wasm` for the portable WASM backend path.
 
 ## Key Components
 - **`src/core/`**: Pure data structures, dtype system, shape utilities
@@ -44,11 +44,10 @@
 **Example:**
 ```ts
 // Primary API (functional)
-import { add, sum } from 'tsnum'
+import { add, array, pipe, sum } from '@sylphx/numpy'
 sum(add(array([1,2,3]), 10))
 
 // Elegant composition with pipe
-import { pipe } from 'tsnum'
 pipe(
   array([1,2,3]),
   a => add(a, 10),
@@ -73,25 +72,25 @@ pipe(
 ### Pattern: Threshold-based WASM Selection (Future)
 **Why:** Small arrays have JS overhead, large arrays benefit from WASM SIMD.
 
-**Where:** Operations like `matmul`, `dot` (not yet implemented)
+**Where:** Operations like `matmul`, `dot`, reductions, and native/WASM-backed array kernels.
 
 **Trade-off:** Complexity vs performance. Threshold tuning required. Plan: <1000 elements → pure TS, ≥1000 → WASM.
 
 ## Boundaries
 **In scope (current):**
-- Pure TypeScript implementation
-- Basic operations (arithmetic, reductions, shape manipulation)
-- NumPy-compatible API surface
-- Full test coverage for core
+- Pure TypeScript implementation and fallback backend
+- Rust/N-API native kernels and macOS native BLAS paths for admitted hot loops
+- WASM backend for supported operations
+- NumPy-compatible API surface and Python parity benchmark evidence
 
 **Out of scope (current):**
-- WASM implementation (v0.2+)
-- Broadcasting (v0.2)
-- Advanced indexing/slicing (v0.2)
-- In-place operations (v0.3)
-- Linear algebra (v0.3+)
+- Sparse arrays
+- File I/O
+- Plotting and visualization
+- Distributed execution
+- Undocumented in-place mutation APIs
 
 ## SSOT References
-- Build: `turbo.json` (pipeline), `tsconfig.json` (TS config)
-- Tests: Bun test (`*.test.ts` files)
-- Package structure: `package.json` exports field
+- Build: `turbo.json` and package-local TypeScript/Rust build metadata
+- Tests: Bun test (`*.test.ts` files), Rust clippy, and Python parity benchmarks
+- Package structure: `packages/numpy/package.json`, `packages/numpy-native/package.json`, and root workspace metadata
