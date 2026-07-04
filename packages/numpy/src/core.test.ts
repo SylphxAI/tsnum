@@ -5,9 +5,11 @@ import {
   array,
   div,
   divide,
+  empty_like,
   equal,
   eye,
   flatten,
+  full_like,
   greater,
   greater_equal,
   less,
@@ -19,6 +21,7 @@ import {
   mul,
   multiply,
   ones,
+  ones_like,
   pipe,
   pow,
   reshape,
@@ -29,6 +32,7 @@ import {
   transpose,
   variance,
   zeros,
+  zeros_like,
 } from './index'
 
 describe('Array Creation', () => {
@@ -78,6 +82,19 @@ describe('Array Creation', () => {
     const a = eye(3)
     expect(a.shape).toEqual([3, 3])
     expect(sum(a)).toBe(3) // diagonal 1s
+  })
+
+  test('NumPy canonical like-creation aliases', () => {
+    const a = array([
+      [1, 2, 3],
+      [4, 5, 6],
+    ])
+
+    expect(zeros_like(a).shape).toEqual([2, 3])
+    expect(sum(zeros_like(a))).toBe(0)
+    expect(sum(ones_like(a))).toBe(6)
+    expect(sum(full_like(a, 3))).toBe(18)
+    expect(empty_like(a).shape).toEqual([2, 3])
   })
 })
 

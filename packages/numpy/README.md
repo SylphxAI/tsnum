@@ -107,7 +107,7 @@ const rms = pipe(data, x => mul(x, x), mean, sqrt)
 
 ## Feature Coverage
 
-**Current Progress: 251 / ~600 NumPy functions (~42% feature parity)**
+**Current Progress: 251 / ~600 NumPy operation families (~42% feature parity), plus compatibility aliases**
 
 ### Backend Implementation Status
 
@@ -265,11 +265,11 @@ Complete tracking table for all operations with backend implementation status.
 - FFT: fft, ifft (2)
 - Math: abs, sign, sqrt, cbrt, square, reciprocal, exp, exp2, expm1, log, log2, log10, log1p, round, floor, ceil, trunc, maximum, minimum, clip, mod, fmod, deg2rad, rad2deg, hypot, sin, cos, tan, sinh, cosh, tanh, arcsin, arccos, arctan, arctan2, asinh, acosh, atanh (38)
 
-### ✅ Implemented Functions (251)
+### ✅ Implemented Operation Families (251)
 
 #### Array Creation (28 functions)
 - **Basic**: `array`, `zeros`, `ones`, `full`, `empty`, `arange`, `linspace`, `logspace`, `geomspace`
-- **Like functions**: `zerosLike`, `onesLike`, `fullLike`, `emptyLike`
+- **Like functions**: `zeros_like`, `ones_like`, `full_like`, `empty_like` plus `zerosLike`, `onesLike`, `fullLike`, `emptyLike` aliases
 - **Special**: `eye`, `diag`, `diagflat`, `tri`, `tril`, `triu`, `meshgrid`, `fromfunction`, `indices`, `vander`
 - **Copy**: `asarray`, `copy`
 

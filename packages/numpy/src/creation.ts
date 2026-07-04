@@ -315,6 +315,10 @@ export function zerosLike<T extends DType>(a: NDArray, options?: ArrayOptions): 
   return zeros<T>([...data.shape], { dtype })
 }
 
+export function zeros_like<T extends DType>(a: NDArray, options?: ArrayOptions): NDArray<T> {
+  return zerosLike(a, options)
+}
+
 /**
  * Return a new array of given shape and type, filled with ones, matching the shape of a given array
  */
@@ -322,6 +326,10 @@ export function onesLike<T extends DType>(a: NDArray, options?: ArrayOptions): N
   const data = a.getData()
   const dtype = (options?.dtype ?? data.dtype) as T
   return ones<T>([...data.shape], { dtype })
+}
+
+export function ones_like<T extends DType>(a: NDArray, options?: ArrayOptions): NDArray<T> {
+  return onesLike(a, options)
 }
 
 /**
@@ -335,6 +343,14 @@ export function fullLike<T extends DType>(
   const data = a.getData()
   const dtype = (options?.dtype ?? data.dtype) as T
   return full<T>([...data.shape], fillValue, { dtype })
+}
+
+export function full_like<T extends DType>(
+  a: NDArray,
+  fillValue: number,
+  options?: ArrayOptions,
+): NDArray<T> {
+  return fullLike(a, fillValue, options)
 }
 
 /**
@@ -356,6 +372,10 @@ export function emptyLike<T extends DType>(a: NDArray, options?: ArrayOptions): 
   const data = a.getData()
   const dtype = (options?.dtype ?? data.dtype) as T
   return empty<T>([...data.shape], { dtype })
+}
+
+export function empty_like<T extends DType>(a: NDArray, options?: ArrayOptions): NDArray<T> {
+  return emptyLike(a, options)
 }
 
 /**

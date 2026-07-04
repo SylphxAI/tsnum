@@ -96,6 +96,9 @@ const e = linspace(0, 1, 5)       // [0, 0.25, 0.5, 0.75, 1]
 const f = eye(3)                  // 3x3 identity matrix
 ```
 
+NumPy snake_case helpers such as `zeros_like`, `ones_like`, `full_like`, and
+`empty_like` are exported alongside the existing camelCase aliases.
+
 ### Arithmetic Operations
 ```typescript
 import { add, divide, multiply, pow, subtract } from '@sylphx/numpy'
