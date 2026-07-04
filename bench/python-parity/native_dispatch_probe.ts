@@ -74,6 +74,18 @@ const accelerate = dlopen('/System/Library/Frameworks/Accelerate.framework/Accel
     args: [FFIType.ptr, FFIType.i32, FFIType.ptr, FFIType.ptr, FFIType.i32, FFIType.u64],
     returns: FFIType.void,
   },
+  vDSP_vaddD: {
+    args: [
+      FFIType.ptr,
+      FFIType.i32,
+      FFIType.ptr,
+      FFIType.i32,
+      FFIType.ptr,
+      FFIType.i32,
+      FFIType.u64,
+    ],
+    returns: FFIType.void,
+  },
 })
 
 const length = readPositiveInt('NATIVE_DISPATCH_PROBE_LENGTH', 1_000_000)
@@ -246,6 +258,7 @@ const outputBytes = bytes(output)
 const scalar = new Float64Array(1)
 const scalarPointer = ptr(scalar)
 const leftPointer = ptr(left)
+const rightPointer = ptr(right)
 const outputPointer = ptr(output)
 
 const matrixSize = 512
@@ -293,6 +306,11 @@ function vDSPScalarAdd(output: Float64Array): Float64Array {
 function vDSPScalarMul(output: Float64Array): Float64Array {
   scalar[0] = 2
   accelerate.symbols.vDSP_vsmulD(leftPointer, 1, scalarPointer, outputPointer, 1, length)
+  return output
+}
+
+function vDSPAdd(output: Float64Array): Float64Array {
+  accelerate.symbols.vDSP_vaddD(leftPointer, 1, rightPointer, 1, outputPointer, 1, length)
   return output
 }
 
@@ -389,6 +407,7 @@ const results = [
   }),
   measure('native.vDSP_vsaddD.preallocated', () => vDSPScalarAdd(output)),
   measure('native.vDSP_vsmulD.preallocated', () => vDSPScalarMul(output)),
+  measure('native.vDSP_vaddD.preallocated', () => vDSPAdd(output)),
   measure('native.transposeF64.buffer', () => {
     native.transposeF64Buffer(matrix, matrixSize, matrixSize, matrixOutputBytes)
     return matrixOutput
