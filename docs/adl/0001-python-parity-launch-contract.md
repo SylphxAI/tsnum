@@ -57,8 +57,8 @@ marketing copy.
 Accepted main evidence as of 2026-07-04. The latest uploaded CI artifacts are
 canonical when this dated snapshot drifts.
 
-- GitHub Actions run: `28700645799`
-- Commit: `424846b` (`docs: sync latest parity evidence`)
+- GitHub Actions run: `28701383776`
+- Commit: `6aec31d` (`chore: require repeatable parity for release`)
 - Platform: macOS arm64
 - Python: 3.12.10
 - NumPy: 2.5.0
@@ -70,24 +70,25 @@ canonical when this dated snapshot drifts.
 | Case | Speed vs NumPy | Status |
 | --- | ---: | --- |
 | `add_arrays_1m` | `0.75x` | pass |
-| `add_arrays_1m_out` | `0.87x` | pass |
-| `add_scalar_1m` | `0.62x` | pass |
-| `add_scalar_1m_out` | `1.33x` | fail |
-| `matmul_128` | `1.08x` | fail |
-| `mean_1m` | `0.74x` | pass |
-| `mul_scalar_1m` | `0.65x` | pass |
-| `mul_scalar_1m_out` | `0.95x` | pass |
-| `sum_1m` | `0.63x` | pass |
-| `transpose_512` | `0.84x` | pass |
+| `add_arrays_1m_out` | `1.25x` | fail |
+| `add_scalar_1m` | `0.59x` | pass |
+| `add_scalar_1m_out` | `1.05x` | fail |
+| `matmul_128` | `1.10x` | fail |
+| `mean_1m` | `0.57x` | pass |
+| `mul_scalar_1m` | `0.55x` | pass |
+| `mul_scalar_1m_out` | `1.04x` | pass |
+| `sum_1m` | `0.57x` | pass |
+| `transpose_512` | `0.72x` | pass |
 
 Current truthful public statement:
 
 `@sylphx/numpy` has checksum parity on the covered benchmark set and passes the
-speed target on eight of ten covered rows in the latest accepted main CI
-artifact. The preceding accepted main artifact passed nine of ten rows, but
-full covered-operation speed parity is not claimed because `add_scalar_1m_out`,
-`matmul_128`, and `mul_scalar_1m_out` must all stay under the `1.05x` release
-threshold repeatably on the release path.
+speed target on seven of ten covered rows in the latest accepted main CI
+artifact. Recent accepted main snapshots have ranged from seven to nine
+speed-passing rows, so full covered-operation speed parity is not claimed
+because `add_arrays_1m_out`, `add_scalar_1m_out`, `matmul_128`, and every
+near-threshold output-buffer row must stay under the `1.05x` release threshold
+repeatably on the release path.
 
 ## Native Dispatch Evidence
 
@@ -95,11 +96,11 @@ The same main run uploaded `native-dispatch-report`:
 
 | Layer | Median ms |
 | --- | ---: |
-| `public.addScalar.out` | `0.4459` |
-| `public.addArrays.out` | `0.6398` |
-| `public.mulScalar.out` | `0.2948` |
-| `public.matmul128` | `0.2027` |
-| `public.matmul128.out` | `0.1917` |
+| `public.addScalar.out` | `0.2121` |
+| `public.addArrays.out` | `0.4782` |
+| `public.mulScalar.out` | `0.1846` |
+| `public.matmul128` | `0.0843` |
+| `public.matmul128.out` | `0.0763` |
 
 This supports the current technical direction: native-backed dispatch and
 preallocated output buffers are the right hot-path shape. The remaining release
@@ -152,9 +153,9 @@ After publish, release completion also requires:
 - `@sylphx/numpy` is the public NumPy-compatible TypeScript package contract.
 - The API target is Python/NumPy spelling and semantics.
 - Covered benchmark checksums pass in the dated accepted main CI artifact.
-- Eight of ten covered speed rows pass the current `1.05x` NumPy comparison
-  target in the latest dated accepted main CI artifact; the preceding accepted
-  main artifact passed nine of ten rows.
+- Seven of ten covered speed rows pass the current `1.05x` NumPy comparison
+  target in the latest dated accepted main CI artifact; recent accepted main
+  snapshots have ranged from seven to nine speed-passing rows.
 - Native-backed public hot paths and preallocated output buffers are measured in
   the accepted native dispatch probe.
 
@@ -170,8 +171,9 @@ After publish, release completion also requires:
 ## Next Launch Work
 
 1. Close the output-buffer and small-matmul repeatability gaps so
-   `add_scalar_1m_out`, `matmul_128`, and `mul_scalar_1m_out` stay repeatably
-   inside the `1.05x` release target.
+   `add_arrays_1m_out`, `add_scalar_1m_out`, `matmul_128`, and every
+   near-threshold output-buffer row stay repeatably inside the `1.05x` release
+   target.
 2. Expand API compatibility tests around NumPy spelling, dtype behavior,
    broadcasting, shape semantics, and numerical edge cases.
 3. Keep public docs tied to dated accepted CI artifacts and treat the latest
