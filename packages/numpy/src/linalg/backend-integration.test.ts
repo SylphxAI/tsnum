@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test'
-import { array } from '../creation'
+import { array, empty } from '../creation'
 import { dot, matmul } from './index'
 
 describe('Linear Algebra Backend Integration', () => {
@@ -96,6 +96,45 @@ describe('Linear Algebra Backend Integration', () => {
       ]) // 3x2
 
       expect(() => matmul(a, b)).toThrow('Shape mismatch')
+    })
+
+    test('writes matrix multiplication into provided out array', () => {
+      const a = array(
+        [
+          [1, 2],
+          [3, 4],
+        ],
+        { dtype: 'float64' },
+      )
+      const b = array(
+        [
+          [5, 6],
+          [7, 8],
+        ],
+        { dtype: 'float64' },
+      )
+      const out = empty([2, 2], { dtype: 'float64' })
+
+      const result = matmul(a, b, { out })
+
+      expect(result).toBe(out)
+      expect(Array.from(out.getData().buffer)).toEqual([19, 22, 43, 50])
+    })
+
+    test('throws error for incompatible out shape', () => {
+      const a = array([[1, 2]], { dtype: 'float64' })
+      const b = array([[3], [4]], { dtype: 'float64' })
+      const out = empty([1, 2], { dtype: 'float64' })
+
+      expect(() => matmul(a, b, { out })).toThrow('matmul out shape mismatch')
+    })
+
+    test('throws error for incompatible out dtype', () => {
+      const a = array([[1, 2]], { dtype: 'float64' })
+      const b = array([[3], [4]], { dtype: 'float64' })
+      const out = empty([1, 1], { dtype: 'float32' })
+
+      expect(() => matmul(a, b, { out })).toThrow('matmul out dtype mismatch')
     })
 
     test('large matrix multiplication (100x100)', () => {
