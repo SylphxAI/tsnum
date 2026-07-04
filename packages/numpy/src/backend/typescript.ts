@@ -351,10 +351,12 @@ export class TypeScriptBackend implements Backend {
     shape: readonly number[],
     length: number,
   ): void {
-    if (
-      out.shape.length !== shape.length ||
-      out.shape.some((dimension, index) => dimension !== shape[index])
-    ) {
+    let shapeMatches = out.shape.length === shape.length
+    for (let i = 0; shapeMatches && i < shape.length; i++) {
+      shapeMatches = out.shape[i] === shape[i]
+    }
+
+    if (!shapeMatches) {
       throw new Error(
         `operation out shape mismatch: expected (${shape.join(', ')}), got (${out.shape.join(', ')})`,
       )
@@ -370,11 +372,14 @@ export class TypeScriptBackend implements Backend {
       )
     }
 
-    const expectedStrides = computeStrides(shape)
-    if (
-      out.strides.length !== expectedStrides.length ||
-      out.strides.some((stride, index) => stride !== expectedStrides[index])
-    ) {
+    let stridesMatch = out.strides.length === shape.length
+    let expectedStride = 1
+    for (let i = shape.length - 1; stridesMatch && i >= 0; i--) {
+      stridesMatch = out.strides[i] === expectedStride
+      expectedStride *= shape[i]
+    }
+
+    if (!stridesMatch) {
       throw new Error('operation out must be C-contiguous')
     }
   }
