@@ -53,7 +53,7 @@ benchmark gate passes on the same machine against Python/NumPy.
 | Native path | Bun/macOS can initialize Rust/N-API and native BLAS fast paths for float64 hot loops. |
 | Dispatch evidence | `bun run bench:native-dispatch` separates kernel, backend, and public API overhead before performance changes are promoted. |
 | Proven today | Covered benchmark checksums pass across recent CI runs, and native-backed reductions plus vector scalar operations often beat NumPy on macOS arm64 native BLAS. |
-| Not claimed yet | Recent main CI still fails the strict speed gate on matrix/transpose rows; full NumPy API coverage, repeatable all-op speed parity, and npm publication are still launch gates. |
+| Not claimed yet | Recent main CI has shown matrix/transpose speed volatility; full NumPy API coverage, repeatable all-op speed parity, and npm publication are still launch gates. |
 
 Recorded recent main CI snapshot
 (run `28695468644`, macOS arm64, Python 3.12.10, NumPy 2.5.0, Bun 1.3.14):
