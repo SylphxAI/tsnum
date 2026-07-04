@@ -52,25 +52,28 @@ benchmark gate passes on the same machine against Python/NumPy.
 | Benchmarks | `bench/python-parity` compares TypeScript and NumPy on identical inputs. |
 | Native path | Bun/macOS can initialize Rust/N-API and native BLAS fast paths for float64 hot loops. |
 | Dispatch evidence | `bun run bench:native-dispatch` separates kernel, backend, and public API overhead before performance changes are promoted. |
-| Proven today | Covered benchmark checksums pass across recent CI runs, and native-backed rows often beat NumPy on reductions, transpose, and vector scalar operations on macOS arm64 native BLAS. |
-| Not claimed yet | Latest main CI after PR #38 still fails the strict speed gate on `matmul_128`; full NumPy API coverage, repeatable all-op speed parity, and npm publication are still launch gates. |
+| Proven today | Covered benchmark checksums pass across recent CI runs, and native-backed reductions plus vector scalar operations often beat NumPy on macOS arm64 native BLAS. |
+| Not claimed yet | Recent main CI still fails the strict speed gate on matrix/transpose rows; full NumPy API coverage, repeatable all-op speed parity, and npm publication are still launch gates. |
 
-Latest main CI snapshot after the public positioning update
-(run `28695393008`, macOS arm64, Python 3.12.10, NumPy 2.5.0, Bun 1.3.14):
+Recorded recent main CI snapshot
+(run `28695468644`, macOS arm64, Python 3.12.10, NumPy 2.5.0, Bun 1.3.14):
 
 | Case | Speed vs NumPy | Status |
 | --- | ---: | --- |
-| `add_arrays_1m` | `0.91x` | pass |
-| `add_scalar_1m` | `0.63x` | pass |
-| `matmul_128` | `1.23x` | fail |
-| `mean_1m` | `0.55x` | pass |
-| `mul_scalar_1m` | `0.57x` | pass |
-| `sum_1m` | `0.56x` | pass |
-| `transpose_512` | `0.77x` | pass |
+| `add_arrays_1m` | `0.90x` | pass |
+| `add_scalar_1m` | `0.75x` | pass |
+| `matmul_128` | `1.12x` | fail |
+| `mean_1m` | `0.59x` | pass |
+| `mul_scalar_1m` | `0.71x` | pass |
+| `sum_1m` | `0.60x` | pass |
+| `transpose_512` | `1.11x` | fail |
 
-All covered checksums passed in that run. The release rule remains stricter
-than the marketing copy: no full-speed claim and no npm publish until
-`bun run bench:python-parity:enforce` passes repeatably on the release path.
+All covered checksums passed in that run. The prior main run `28695393008`
+passed six of seven speed rows and failed `matmul_128` at `1.23x`; this
+run-to-run movement is exactly why the current CI artifact and
+`bench:python-parity:enforce` are the canonical release evidence. The release
+rule remains stricter than the marketing copy: no full-speed claim and no npm
+publish until the enforced gate passes repeatably on the release path.
 
 ## Python-To-TypeScript Contract
 

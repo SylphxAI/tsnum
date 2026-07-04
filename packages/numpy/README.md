@@ -36,12 +36,13 @@ Current truth:
 - Evidence tools: Python parity benchmark plus native dispatch probe for
   kernel/wrapper/public-API timing.
 - Recorded benchmark evidence: recent CI artifacts consistently pass checksum
-  parity, and native-backed reductions, transpose, and vector scalar operations
-  often beat NumPy on macOS arm64 native BLAS.
-- Latest main CI after PR #38: checksum parity passed for every covered row;
-  `add_arrays_1m`, `add_scalar_1m`, `mean_1m`, `mul_scalar_1m`, `sum_1m`, and
-  `transpose_512` passed the 1.05x speed target; `matmul_128` still failed at
-  `1.23x`, so the package is not claiming full speed parity yet.
+  parity, and native-backed reductions plus vector scalar operations often beat
+  NumPy on macOS arm64 native BLAS.
+- Recent main CI: checksum parity passed for every covered row; vector and
+  reduction rows pass the 1.05x speed target, while matrix/transpose rows remain
+  volatile. Run `28695468644` failed `matmul_128` at `1.12x` and
+  `transpose_512` at `1.11x`; the prior run `28695393008` failed only
+  `matmul_128` at `1.23x`. Full speed parity is not claimed.
 - Release gate evidence: `bench:python-parity:enforce` and `release:preflight`
   remain admission blockers until every covered speed row passes repeatably, so
   npm publication remains blocked.
@@ -484,12 +485,14 @@ bun run bench:python-parity:enforce
 bun run bench:native-dispatch
 ```
 
-Current CI evidence after PR #38:
+Recent CI evidence:
 
 - Checksum parity: all covered benchmark cases pass.
-- Reporting-mode speed evidence: main CI run `28695393008` passed six of seven
-  covered speed rows and failed `matmul_128` at `1.23x` slowdown against the
-  strict `1.05x` target.
+- Reporting-mode speed evidence: main CI run `28695468644` passed five of seven
+  covered speed rows, failed `matmul_128` at `1.12x`, and failed
+  `transpose_512` at `1.11x` against the strict `1.05x` target. The prior main
+  run `28695393008` passed six of seven rows and failed `matmul_128` at
+  `1.23x`.
 - Release gate evidence: `bench:python-parity:enforce` and `release:preflight`
   remain blockers until every covered speed row passes repeatably. Full speed
   parity is not marketed until that release gate passes.
