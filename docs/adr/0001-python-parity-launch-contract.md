@@ -54,53 +54,80 @@ marketing copy.
 
 ## Evidence Snapshot
 
-Accepted main evidence as of 2026-07-04. The latest uploaded CI artifacts are
+Accepted evidence as of 2026-07-04. The latest uploaded CI artifacts are
 canonical when this dated snapshot drifts.
 
-- GitHub Actions run: `28701383776`
-- Commit: `6aec31d` (`chore: require repeatable parity for release`)
+- PR #76 run: `28705663337`
+- Commit: `6435456` (`bench: measure parity in steady-state runtime samples`)
+- Result: every covered row passed once, with checksum parity, on the pull
+  request runner.
+- Merged main run: `28705714377`
+- Commit: `154a285` (`bench: measure parity in steady-state runtime samples`)
+- Result: checksum parity passed, but speed parity failed on near-threshold
+  rows after merge.
+- Subsequent PR validation run: `28706160711`
+- Result: required CI passed, but the non-enforcing `python-parity-report`
+  failed `add_scalar_1m_out` at `1.16x`, reinforcing the repeatability blocker.
 - Platform: macOS arm64
 - Python: 3.12.10
 - NumPy: 2.5.0
 - Bun: 1.3.14
 - Backend: `native-blas`
-- Checksum parity: pass for every covered row
+- Checksum parity: pass for every covered row in both runs
 - Speed target: maximum `1.05x` slowdown vs Python/NumPy
+
+PR #76 passing artifact:
 
 | Case | Speed vs NumPy | Status |
 | --- | ---: | --- |
-| `add_arrays_1m` | `0.75x` | pass |
-| `add_arrays_1m_out` | `1.25x` | fail |
-| `add_scalar_1m` | `0.59x` | pass |
-| `add_scalar_1m_out` | `1.05x` | fail |
-| `matmul_128` | `1.10x` | fail |
-| `mean_1m` | `0.57x` | pass |
-| `mul_scalar_1m` | `0.55x` | pass |
-| `mul_scalar_1m_out` | `1.04x` | pass |
+| `add_arrays_1m` | `0.71x` | pass |
+| `add_arrays_1m_out` | `0.99x` | pass |
+| `add_scalar_1m` | `0.66x` | pass |
+| `add_scalar_1m_out` | `0.98x` | pass |
+| `matmul_128` | `0.93x` | pass |
+| `mean_1m` | `0.53x` | pass |
+| `mul_scalar_1m` | `0.59x` | pass |
+| `mul_scalar_1m_out` | `0.90x` | pass |
+| `sum_1m` | `0.53x` | pass |
+| `transpose_512` | `0.67x` | pass |
+
+Merged main artifact after the same code landed:
+
+| Case | Speed vs NumPy | Status |
+| --- | ---: | --- |
+| `add_arrays_1m` | `0.71x` | pass |
+| `add_arrays_1m_out` | `1.06x` | fail |
+| `add_scalar_1m` | `0.66x` | pass |
+| `add_scalar_1m_out` | `1.04x` | pass |
+| `matmul_128` | `1.07x` | fail |
+| `mean_1m` | `0.56x` | pass |
+| `mul_scalar_1m` | `0.77x` | pass |
+| `mul_scalar_1m_out` | `1.05x` | fail |
 | `sum_1m` | `0.57x` | pass |
 | `transpose_512` | `0.72x` | pass |
 
 Current truthful public statement:
 
-`@sylphx/numpy` has checksum parity on the covered benchmark set and passes the
-speed target on seven of ten covered rows in the recorded accepted main CI
-artifact. Recent accepted main snapshots move the failing rows around the
-output-buffer and small-matmul boundary, so full covered-operation speed parity
-is not claimed because `add_arrays_1m_out`, `add_scalar_1m_out`, `matmul_128`,
-and every near-threshold output-buffer row must stay under the `1.05x` release
-threshold repeatably on the release path.
+`@sylphx/numpy` has checksum parity on the covered benchmark set, and PR #76
+proved that every covered row can pass the configured `1.05x` speed target on
+the GitHub macOS runner. Merged main still shows near-threshold volatility in
+`add_arrays_1m_out`, `matmul_128`, and `mul_scalar_1m_out`; therefore full
+covered-operation speed parity is not claimed until `release:preflight` proves
+the result repeatably on the release path. Later non-enforcing CI artifacts may
+fail different near-threshold rows and must be treated as volatility evidence,
+not as public speed-parity proof.
 
 ## Native Dispatch Evidence
 
-The same main run uploaded `native-dispatch-report`:
+The merged main run uploaded `native-dispatch-report`:
 
 | Layer | Median ms |
 | --- | ---: |
-| `public.addScalar.out` | `0.2121` |
-| `public.addArrays.out` | `0.4782` |
-| `public.mulScalar.out` | `0.1846` |
-| `public.matmul128` | `0.0843` |
-| `public.matmul128.out` | `0.0763` |
+| `public.addScalar.out` | `0.2210` |
+| `public.addArrays.out` | `0.3911` |
+| `public.mulScalar.out` | `0.2057` |
+| `public.matmul128` | `0.0904` |
+| `public.matmul128.out` | `0.0673` |
 
 This supports the current technical direction: native-backed dispatch and
 preallocated output buffers are the right hot-path shape. The remaining release
@@ -121,6 +148,16 @@ Example: PR #59 (`perf: fast path native 1d out validation`) lowered
 steady-state native dispatch overhead, but repeat CI artifacts did not support
 merging: attempt 1 passed seven of ten rows and attempt 2 passed six of ten rows
 against the strict `1.05x` target. That PR was closed instead of merged.
+
+Example: PR #77 (`perf: widen native parity margin`) added aarch64 array-add
+and native-buffer matmul allocation experiments, but CI artifact `28705817623`
+regressed the release-blocking rows: `add_arrays_1m_out` at `1.10x`,
+`matmul_128` at `1.21x`, and `mul_scalar_1m_out` at `1.08x`.
+
+Example: PR #78 (`perf: route scalar out through vdsp`) improved
+`mul_scalar_1m_out`, but CI artifact `28705919522` regressed
+`add_scalar_1m_out` to `1.41x` and still failed `add_arrays_1m_out` and
+`matmul_128`.
 
 This is intentional. Benchmark-shaped changes that do not improve accepted
 evidence should stay out of `main`, even when CI itself is green.

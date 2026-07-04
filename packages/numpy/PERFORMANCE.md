@@ -54,29 +54,36 @@ The release path uses `bench:python-parity:repeatability`, which runs the
 enforced benchmark multiple times and fails unless every attempt passes. This
 turns repeatability into a release gate rather than a README promise.
 
-Recent accepted main CI evidence as of 2026-07-04. The latest uploaded
+Recent accepted evidence as of 2026-07-04. The cited passing artifact is a
+historical best snapshot, not a release claim. Newer uploaded
 `python-parity-report` and `native-dispatch-report` artifacts remain canonical
-when this dated snapshot drifts.
+for current status when this dated snapshot drifts.
 
-- Main CI run `28701383776` on macOS arm64 uploaded `python-parity-report`.
-- Commit: `6aec31d` (`chore: require repeatable parity for release`).
+- PR #76 CI run `28705663337` on macOS arm64 uploaded a passing
+  `python-parity-report`.
+- Commit: `6435456` (`bench: measure parity in steady-state runtime samples`).
 - Runtime: Python 3.12.10, NumPy 2.5.0, Bun 1.3.14,
   `@sylphx/numpy` backend `native-blas`.
 - Checksum parity passed for every covered row.
-- Speed rows passed for `add_arrays_1m` (`0.75x`), `add_scalar_1m` (`0.59x`),
-  `mean_1m` (`0.57x`), `mul_scalar_1m` (`0.55x`), `mul_scalar_1m_out`
-  (`1.04x`), `sum_1m` (`0.57x`), and `transpose_512` (`0.72x`).
-- `add_arrays_1m_out` failed the 1.05x speed target at `1.25x`,
-  `add_scalar_1m_out` failed at `1.05x`, and `matmul_128` failed at `1.10x`.
-- The same run's native dispatch artifact measured `public.addScalar.out` at
-  `0.2121ms`, `public.addArrays.out` at `0.4782ms`, `public.mulScalar.out` at
-  `0.1846ms`, `public.matmul128` at `0.0843ms`, and `public.matmul128.out` at
-  `0.0763ms`, which supports the native output-buffer direction while keeping
+- Speed rows passed for every covered case in that PR artifact:
+  `add_arrays_1m` (`0.71x`), `add_arrays_1m_out` (`0.99x`),
+  `add_scalar_1m` (`0.66x`), `add_scalar_1m_out` (`0.98x`), `matmul_128`
+  (`0.93x`), `mean_1m` (`0.53x`), `mul_scalar_1m` (`0.59x`),
+  `mul_scalar_1m_out` (`0.90x`), `sum_1m` (`0.53x`), and `transpose_512`
+  (`0.67x`).
+- Merged main run `28705714377` on commit `154a285` still failed
+  near-threshold rows: `add_arrays_1m_out` (`1.06x`), `matmul_128` (`1.07x`),
+  and `mul_scalar_1m_out` (`1.05x`).
+- Subsequent PR validation run `28706160711` kept required CI green but
+  uploaded a non-enforcing report with `add_scalar_1m_out` at `1.16x`, proving
+  the covered speed target is still not repeatable enough for publication.
+- The merged main native dispatch artifact measured `public.addScalar.out` at
+  `0.2210ms`, `public.addArrays.out` at `0.3911ms`, `public.mulScalar.out` at
+  `0.2057ms`, `public.matmul128` at `0.0904ms`, and `public.matmul128.out` at
+  `0.0673ms`, which supports the native output-buffer direction while keeping
   the same-machine NumPy comparison as the release blocker.
-- Full speed parity is therefore not claimed.
-- Recent accepted main CI snapshots move the failing rows around the
-  output-buffer and small-matmul boundary. The recorded run demonstrates that
-  release readiness depends on repeatability, not a single favorable artifact.
+- Full speed parity is therefore not claimed yet: release readiness depends on
+  repeatability, not a single favorable artifact.
 - PR #36's native-addon Accelerate matmul bridge regressed `matmul_128` to
   `1.50x` on main CI run `28695093346`; PR #37 reverted that path and restored
   the column-major native BLAS route.
@@ -86,6 +93,13 @@ when this dated snapshot drifts.
 - PR #59's native 1D `out` validation fast path was closed after repeat CI
   artifacts did not support merging: attempt 1 was 7/10 and attempt 2 was 6/10
   against the 1.05x speed target, despite lower steady-state dispatch overhead.
+- PR #77's aarch64 array-add and native-buffer matmul allocation experiment was
+  closed because CI artifact `28705817623` regressed release-blocking rows:
+  `add_arrays_1m_out` (`1.10x`), `matmul_128` (`1.21x`), and
+  `mul_scalar_1m_out` (`1.08x`).
+- PR #78's scalar vDSP output-routing experiment was closed because CI artifact
+  `28705919522` regressed `add_scalar_1m_out` to `1.41x` and still failed
+  `add_arrays_1m_out` and `matmul_128`.
 - `bench:python-parity:repeatability` and release preflight remain publication
   blockers until covered-operation speed parity is repeatable across the
   expanded covered row set.

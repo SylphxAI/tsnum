@@ -72,12 +72,13 @@ The central publish job still builds the workspace before publishing, and
 postpublish runs `release:readback`.
 
 `release:preflight` runs install, build, tests, and
-`bench:python-parity:repeatability`. Current speed gaps intentionally block
-publication until the enforced benchmark passes repeatably on the release
-preflight runner. After publish, `release:readback` must verify every public
-workspace npm package, and release evidence must include provenance/attestation,
-changelog, and consumer smoke proof because source revert alone does not undo a
-release.
+`bench:python-parity:repeatability`. PR #76 proved one all-row passing covered
+speed artifact, but merged main still shows near-threshold volatility.
+Publication remains intentionally blocked until the enforced benchmark passes
+repeatably on the release preflight runner. After publish, `release:readback`
+must verify every public workspace package, and release evidence must include
+provenance/attestation, changelog, and consumer smoke proof because source
+revert alone does not undo a release.
 
 The first `@sylphx/numpy` npm publication is not complete yet. Public docs may
 show the final package contract, but release status must continue to say that
