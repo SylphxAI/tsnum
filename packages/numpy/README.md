@@ -28,6 +28,8 @@ Current truth:
 - Public package: `@sylphx/numpy`.
 - Acceleration: TypeScript fallback plus WASM, Rust/N-API, and native BLAS
   paths.
+- Evidence tools: Python parity benchmark plus native dispatch probe for
+  kernel/wrapper/public-API timing.
 - Latest benchmark evidence: checksum parity passes for covered operations;
   speed parity is reported per benchmark run and is not complete yet.
 - Claim boundary: full NumPy parity is the target, not a completed claim.
@@ -443,15 +445,19 @@ Run the Python parity benchmark before making public performance claims:
 ```bash
 bun run bench:python-parity
 bun run bench:python-parity:enforce
+bun run bench:native-dispatch
 ```
 
-Current local evidence after the native reduction path:
+Current local evidence after the native dispatch path:
 
 - Checksum parity: all covered benchmark cases pass.
 - Speed parity at 1.05x: reported per run in
   `bench/python-parity/results/latest.json`.
 - Remaining speed work: covered operations still miss the 1.05x target in some
   local runs, so full speed parity is not marketed yet.
+- Diagnostic evidence: `bench:native-dispatch` separates Rust/N-API kernel,
+  TypeScript backend, NativeBLAS backend, and public API overhead before backend
+  dispatch changes are promoted.
 
 See [PERFORMANCE.md](./PERFORMANCE.md) for detailed benchmarks and methodology.
 
@@ -580,15 +586,16 @@ bun run bench:python-parity
 
 ## Testing
 
-417 tests covering implemented features and native backend semantics:
+430 package tests plus native backend tests cover implemented features and
+backend semantics:
 
 ```bash
 bun run test
 
 # Output:
-# ✓ 417 pass
+# ✓ 430 package tests pass
+# ✓ native backend tests pass
 # ✓ 0 fail
-# ✓ 1689 expect() calls
 ```
 
 ## License
