@@ -9,7 +9,7 @@ import {
   mul,
   sum,
   transpose,
-} from '../../packages/tsnum/src/index'
+} from '../../packages/numpy/src/index'
 
 type BenchValue = number | { size: number; getData: () => { buffer: ArrayLike<number> } }
 
@@ -79,7 +79,7 @@ for (const [name, [iterations, warmup, fn]] of Object.entries(cases)) {
 
 console.log(
   JSON.stringify({
-    runtime: 'bun-tsnum',
+    runtime: 'bun-sylphx-numpy',
     bun: Bun.version,
     platform: process.platform,
     arch: process.arch,

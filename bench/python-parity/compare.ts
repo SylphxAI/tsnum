@@ -111,7 +111,7 @@ const rows = Object.keys(pythonReport.benchmarks).map((name) => {
   const pythonCase = pythonReport.benchmarks[name]
   const tsCase = tsReport.benchmarks[name]
   if (!tsCase) {
-    throw new Error(`Missing tsnum benchmark case: ${name}`)
+    throw new Error(`Missing @sylphx/numpy benchmark case: ${name}`)
   }
 
   const slowdown = tsCase.time_ms / pythonCase.time_ms
@@ -166,7 +166,7 @@ writeFileSync(reportPath, renderMarkdownReport(output))
 console.log(
   `Python parity benchmark: max slowdown ${maxSlowdown.toFixed(2)}x, median of ${sampleCount} sample${sampleCount === 1 ? '' : 's'}`,
 )
-console.log('case                 python ms   tsnum ms   slowdown   speed   checksum')
+console.log('case                 python ms   TS ms      slowdown   speed   checksum')
 for (const row of rows) {
   console.log(
     `${row.name.padEnd(20)} ${row.python_ms.toFixed(4).padStart(9)} ${row.ts_ms
