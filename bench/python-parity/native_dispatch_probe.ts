@@ -297,19 +297,19 @@ function cblasDgemm128(output: Float64Array, outputPointer = ptr(output)): Float
   return output
 }
 
-function vDSPScalarAdd(output: Float64Array): Float64Array {
+function vDSPScalarAdd(output: Float64Array, outputPointer = ptr(output)): Float64Array {
   scalar[0] = 5
   accelerate.symbols.vDSP_vsaddD(leftPointer, 1, scalarPointer, outputPointer, 1, length)
   return output
 }
 
-function vDSPScalarMul(output: Float64Array): Float64Array {
+function vDSPScalarMul(output: Float64Array, outputPointer = ptr(output)): Float64Array {
   scalar[0] = 2
   accelerate.symbols.vDSP_vsmulD(leftPointer, 1, scalarPointer, outputPointer, 1, length)
   return output
 }
 
-function vDSPAdd(output: Float64Array): Float64Array {
+function vDSPAdd(output: Float64Array, outputPointer = ptr(output)): Float64Array {
   accelerate.symbols.vDSP_vaddD(leftPointer, 1, rightPointer, 1, outputPointer, 1, length)
   return output
 }
@@ -405,9 +405,12 @@ const results = [
     native.mulScalarF64Buffers(leftBytes, 2, allocated.bytes)
     return allocated.array
   }),
-  measure('native.vDSP_vsaddD.preallocated', () => vDSPScalarAdd(output)),
-  measure('native.vDSP_vsmulD.preallocated', () => vDSPScalarMul(output)),
-  measure('native.vDSP_vaddD.preallocated', () => vDSPAdd(output)),
+  measure('native.vDSP_vsaddD.preallocated', () => vDSPScalarAdd(output, outputPointer)),
+  measure('native.vDSP_vsaddD.allocBuffer', () => vDSPScalarAdd(createNativeOutput(length))),
+  measure('native.vDSP_vsmulD.preallocated', () => vDSPScalarMul(output, outputPointer)),
+  measure('native.vDSP_vsmulD.allocBuffer', () => vDSPScalarMul(createNativeOutput(length))),
+  measure('native.vDSP_vaddD.preallocated', () => vDSPAdd(output, outputPointer)),
+  measure('native.vDSP_vaddD.allocBuffer', () => vDSPAdd(createNativeOutput(length))),
   measure('native.transposeF64.buffer', () => {
     native.transposeF64Buffer(matrix, matrixSize, matrixSize, matrixOutputBytes)
     return matrixOutput
