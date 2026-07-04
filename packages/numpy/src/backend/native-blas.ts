@@ -253,7 +253,7 @@ export class NativeBLASBackend extends TypeScriptBackend {
     }
 
     if (typeof b === 'number') {
-      this.validateElementwiseOutput(out, 'float64', a.shape, a.buffer.length)
+      this.validateNativeElementwiseOutput(out, 'float64', a.shape, a.buffer.length)
       const native = getNativeKernels()
       if (native?.addScalarF64Buffers) {
         native.addScalarF64Buffers(bytesFor(a.buffer), b, bytesFor(out.buffer))
@@ -276,7 +276,7 @@ export class NativeBLASBackend extends TypeScriptBackend {
       return super.addInto(a, b, out)
     }
 
-    this.validateElementwiseOutput(out, 'float64', a.shape, a.buffer.length)
+    this.validateNativeElementwiseOutput(out, 'float64', a.shape, a.buffer.length)
     const native = getNativeKernels()
     if (native?.addF64Buffers) {
       native.addF64Buffers(bytesFor(a.buffer), bytesFor(b.buffer), bytesFor(out.buffer))
@@ -345,7 +345,7 @@ export class NativeBLASBackend extends TypeScriptBackend {
     }
 
     if (typeof b === 'number') {
-      this.validateElementwiseOutput(out, 'float64', a.shape, a.buffer.length)
+      this.validateNativeElementwiseOutput(out, 'float64', a.shape, a.buffer.length)
       const native = getNativeKernels()
       if (native?.mulScalarF64Buffers) {
         native.mulScalarF64Buffers(bytesFor(a.buffer), b, bytesFor(out.buffer))
@@ -488,6 +488,28 @@ export class NativeBLASBackend extends TypeScriptBackend {
       strides: [rows, 1],
       dtype: 'float64',
     }
+  }
+
+  private validateNativeElementwiseOutput(
+    out: NDArrayData,
+    dtype: 'float64',
+    shape: readonly number[],
+    length: number,
+  ): void {
+    if (
+      out.dtype === dtype &&
+      shape.length === 1 &&
+      out.shape.length === 1 &&
+      shape[0] === length &&
+      out.shape[0] === length &&
+      out.buffer.length === length &&
+      out.strides.length === 1 &&
+      out.strides[0] === 1
+    ) {
+      return
+    }
+
+    this.validateElementwiseOutput(out, dtype, shape, length)
   }
 
   private hasSameShape(a: NDArrayData, b: NDArrayData): boolean {
