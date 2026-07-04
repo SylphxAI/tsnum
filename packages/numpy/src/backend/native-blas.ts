@@ -301,18 +301,6 @@ export class NativeBLASBackend extends TypeScriptBackend {
     }
 
     if (typeof b === 'number') {
-      const native = getNativeKernels()
-      if (native?.mulScalarF64Buffers) {
-        const output = createNativeOutputBuffer(a.buffer.length)
-        native.mulScalarF64Buffers(bytesFor(a.buffer), b, output.bytes)
-        return {
-          buffer: output.array,
-          shape: a.shape,
-          strides: a.strides,
-          dtype: 'float64',
-        }
-      }
-
       const output = createNativeOutput(a.buffer.length)
       scalarBuffer[0] = b
       accelerate.symbols.vDSP_vsmulD(
@@ -346,12 +334,6 @@ export class NativeBLASBackend extends TypeScriptBackend {
 
     if (typeof b === 'number') {
       this.validateElementwiseOutput(out, 'float64', a.shape, a.buffer.length)
-      const native = getNativeKernels()
-      if (native?.mulScalarF64Buffers) {
-        native.mulScalarF64Buffers(bytesFor(a.buffer), b, bytesFor(out.buffer))
-        return out
-      }
-
       scalarBuffer[0] = b
       accelerate.symbols.vDSP_vsmulD(
         pointerFor(a.buffer),
