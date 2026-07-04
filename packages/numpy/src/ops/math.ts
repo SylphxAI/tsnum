@@ -19,6 +19,10 @@ export function abs<T extends DType>(a: NDArray<T>): NDArray<T> {
   return new NDArray(resultData)
 }
 
+export function absolute<T extends DType>(a: NDArray<T>): NDArray<T> {
+  return abs(a)
+}
+
 /**
  * Element-wise sign (-1, 0, or 1)
  */

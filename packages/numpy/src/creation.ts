@@ -149,6 +149,13 @@ export function eye<T extends DType = 'float64'>(n: number, options?: ArrayOptio
   return new NDArray<T>(arrayData)
 }
 
+export function identity<T extends DType = 'float64'>(
+  n: number,
+  options?: ArrayOptions,
+): NDArray<T> {
+  return eye(n, options)
+}
+
 // ===== Arange =====
 export function arange<T extends DType = 'int32'>(
   start: number,
