@@ -75,6 +75,14 @@ describe('Native BLAS backend', () => {
     expect(Array.from(backend.add(a, b).buffer)).toEqual([5, 7, 9])
     expect(Array.from(backend.add(a, 10).buffer)).toEqual([11, 12, 13])
     expect(Array.from(backend.mul(a, 2).buffer)).toEqual([2, 4, 6])
+
+    const addOut = array([0, 0, 0], { dtype: 'float64' }).getData()
+    const mulOut = array([0, 0, 0], { dtype: 'float64' }).getData()
+    expect(backend.addInto(a, b, addOut)).toBe(addOut)
+    expect(backend.mulInto(a, 2, mulOut)).toBe(mulOut)
+    expect(Array.from(addOut.buffer)).toEqual([5, 7, 9])
+    expect(Array.from(mulOut.buffer)).toEqual([2, 4, 6])
+
     expect(backend.sum(a)).toBe(6)
     expect(backend.mean(a)).toBe(2)
   })

@@ -2,7 +2,7 @@
 // Pure TS implementation (fallback and reference)
 
 import type { DType, NDArrayData } from '../core/types'
-import { broadcastShapes, broadcastTo, createTypedArray } from '../core/utils'
+import { broadcastShapes, broadcastTo, computeStrides, createTypedArray } from '../core/utils'
 import type { Backend } from './types'
 
 /**
@@ -23,6 +23,10 @@ export class TypeScriptBackend implements Backend {
     return this.elementwiseOp(a, b, (x, y) => x + y)
   }
 
+  addInto(a: NDArrayData, b: NDArrayData | number, out: NDArrayData): NDArrayData {
+    return this.arithmeticInto(a, b, out, 'add')
+  }
+
   sub(a: NDArrayData, b: NDArrayData | number): NDArrayData {
     if (typeof b === 'number') {
       return this.scalarSub(a, b)
@@ -37,6 +41,10 @@ export class TypeScriptBackend implements Backend {
     }
     if (this.sameShape(a, b)) return this.elementwiseMul(a, b)
     return this.elementwiseOp(a, b, (x, y) => x * y)
+  }
+
+  mulInto(a: NDArrayData, b: NDArrayData | number, out: NDArrayData): NDArrayData {
+    return this.arithmeticInto(a, b, out, 'mul')
   }
 
   div(a: NDArrayData, b: NDArrayData | number): NDArrayData {
@@ -334,6 +342,40 @@ export class TypeScriptBackend implements Backend {
 
     if (out.strides.length !== 2 || out.strides[0] !== n || out.strides[1] !== 1) {
       throw new Error('matmul out must be C-contiguous')
+    }
+  }
+
+  protected validateElementwiseOutput(
+    out: NDArrayData,
+    dtype: DType,
+    shape: readonly number[],
+    length: number,
+  ): void {
+    if (
+      out.shape.length !== shape.length ||
+      out.shape.some((dimension, index) => dimension !== shape[index])
+    ) {
+      throw new Error(
+        `operation out shape mismatch: expected (${shape.join(', ')}), got (${out.shape.join(', ')})`,
+      )
+    }
+
+    if (out.dtype !== dtype) {
+      throw new Error(`operation out dtype mismatch: expected ${dtype}, got ${out.dtype}`)
+    }
+
+    if (out.buffer.length !== length) {
+      throw new Error(
+        `operation out buffer length mismatch: expected ${length}, got ${out.buffer.length}`,
+      )
+    }
+
+    const expectedStrides = computeStrides(shape)
+    if (
+      out.strides.length !== expectedStrides.length ||
+      out.strides.some((stride, index) => stride !== expectedStrides[index])
+    ) {
+      throw new Error('operation out must be C-contiguous')
     }
   }
 
@@ -1425,65 +1467,102 @@ export class TypeScriptBackend implements Backend {
   ): NDArrayData {
     const input = a.buffer
     const newBuffer = createTypedArray(input.length, a.dtype)
-    const len = input.length
-    const len8 = len - (len % 8)
-    let i = 0
-
-    if (op === 'add') {
-      for (; i < len8; i += 8) {
-        newBuffer[i] = input[i] + scalar
-        newBuffer[i + 1] = input[i + 1] + scalar
-        newBuffer[i + 2] = input[i + 2] + scalar
-        newBuffer[i + 3] = input[i + 3] + scalar
-        newBuffer[i + 4] = input[i + 4] + scalar
-        newBuffer[i + 5] = input[i + 5] + scalar
-        newBuffer[i + 6] = input[i + 6] + scalar
-        newBuffer[i + 7] = input[i + 7] + scalar
-      }
-      for (; i < len; i++) newBuffer[i] = input[i] + scalar
-    } else if (op === 'sub') {
-      for (; i < len8; i += 8) {
-        newBuffer[i] = input[i] - scalar
-        newBuffer[i + 1] = input[i + 1] - scalar
-        newBuffer[i + 2] = input[i + 2] - scalar
-        newBuffer[i + 3] = input[i + 3] - scalar
-        newBuffer[i + 4] = input[i + 4] - scalar
-        newBuffer[i + 5] = input[i + 5] - scalar
-        newBuffer[i + 6] = input[i + 6] - scalar
-        newBuffer[i + 7] = input[i + 7] - scalar
-      }
-      for (; i < len; i++) newBuffer[i] = input[i] - scalar
-    } else if (op === 'mul') {
-      for (; i < len8; i += 8) {
-        newBuffer[i] = input[i] * scalar
-        newBuffer[i + 1] = input[i + 1] * scalar
-        newBuffer[i + 2] = input[i + 2] * scalar
-        newBuffer[i + 3] = input[i + 3] * scalar
-        newBuffer[i + 4] = input[i + 4] * scalar
-        newBuffer[i + 5] = input[i + 5] * scalar
-        newBuffer[i + 6] = input[i + 6] * scalar
-        newBuffer[i + 7] = input[i + 7] * scalar
-      }
-      for (; i < len; i++) newBuffer[i] = input[i] * scalar
-    } else {
-      for (; i < len8; i += 8) {
-        newBuffer[i] = input[i] / scalar
-        newBuffer[i + 1] = input[i + 1] / scalar
-        newBuffer[i + 2] = input[i + 2] / scalar
-        newBuffer[i + 3] = input[i + 3] / scalar
-        newBuffer[i + 4] = input[i + 4] / scalar
-        newBuffer[i + 5] = input[i + 5] / scalar
-        newBuffer[i + 6] = input[i + 6] / scalar
-        newBuffer[i + 7] = input[i + 7] / scalar
-      }
-      for (; i < len; i++) newBuffer[i] = input[i] / scalar
-    }
+    this.writeScalarFastPath(input, scalar, newBuffer, op)
 
     return {
       buffer: newBuffer,
       shape: a.shape,
       strides: a.strides,
       dtype: a.dtype,
+    }
+  }
+
+  private arithmeticInto(
+    a: NDArrayData,
+    b: NDArrayData | number,
+    out: NDArrayData,
+    op: 'add' | 'mul',
+  ): NDArrayData {
+    if (typeof b === 'number') {
+      this.validateElementwiseOutput(out, a.dtype, a.shape, a.buffer.length)
+      this.writeScalarFastPath(a.buffer, b, out.buffer, op)
+      return out
+    }
+
+    if (this.sameShape(a, b)) {
+      this.validateElementwiseOutput(out, a.dtype, a.shape, a.buffer.length)
+      this.writeElementwiseFastPath(a.buffer, b.buffer, out.buffer, op)
+      return out
+    }
+
+    const result = op === 'add' ? this.add(a, b) : this.mul(a, b)
+    this.copyResultIntoOutput(result, out)
+    return out
+  }
+
+  private copyResultIntoOutput(result: NDArrayData, out: NDArrayData): void {
+    this.validateElementwiseOutput(out, result.dtype, result.shape, result.buffer.length)
+    out.buffer.set(result.buffer)
+  }
+
+  private writeScalarFastPath(
+    input: NDArrayData['buffer'],
+    scalar: number,
+    outBuffer: NDArrayData['buffer'],
+    op: 'add' | 'sub' | 'mul' | 'div',
+  ): void {
+    const len = input.length
+    const len8 = len - (len % 8)
+    let i = 0
+
+    if (op === 'add') {
+      for (; i < len8; i += 8) {
+        outBuffer[i] = input[i] + scalar
+        outBuffer[i + 1] = input[i + 1] + scalar
+        outBuffer[i + 2] = input[i + 2] + scalar
+        outBuffer[i + 3] = input[i + 3] + scalar
+        outBuffer[i + 4] = input[i + 4] + scalar
+        outBuffer[i + 5] = input[i + 5] + scalar
+        outBuffer[i + 6] = input[i + 6] + scalar
+        outBuffer[i + 7] = input[i + 7] + scalar
+      }
+      for (; i < len; i++) outBuffer[i] = input[i] + scalar
+    } else if (op === 'sub') {
+      for (; i < len8; i += 8) {
+        outBuffer[i] = input[i] - scalar
+        outBuffer[i + 1] = input[i + 1] - scalar
+        outBuffer[i + 2] = input[i + 2] - scalar
+        outBuffer[i + 3] = input[i + 3] - scalar
+        outBuffer[i + 4] = input[i + 4] - scalar
+        outBuffer[i + 5] = input[i + 5] - scalar
+        outBuffer[i + 6] = input[i + 6] - scalar
+        outBuffer[i + 7] = input[i + 7] - scalar
+      }
+      for (; i < len; i++) outBuffer[i] = input[i] - scalar
+    } else if (op === 'mul') {
+      for (; i < len8; i += 8) {
+        outBuffer[i] = input[i] * scalar
+        outBuffer[i + 1] = input[i + 1] * scalar
+        outBuffer[i + 2] = input[i + 2] * scalar
+        outBuffer[i + 3] = input[i + 3] * scalar
+        outBuffer[i + 4] = input[i + 4] * scalar
+        outBuffer[i + 5] = input[i + 5] * scalar
+        outBuffer[i + 6] = input[i + 6] * scalar
+        outBuffer[i + 7] = input[i + 7] * scalar
+      }
+      for (; i < len; i++) outBuffer[i] = input[i] * scalar
+    } else {
+      for (; i < len8; i += 8) {
+        outBuffer[i] = input[i] / scalar
+        outBuffer[i + 1] = input[i + 1] / scalar
+        outBuffer[i + 2] = input[i + 2] / scalar
+        outBuffer[i + 3] = input[i + 3] / scalar
+        outBuffer[i + 4] = input[i + 4] / scalar
+        outBuffer[i + 5] = input[i + 5] / scalar
+        outBuffer[i + 6] = input[i + 6] / scalar
+        outBuffer[i + 7] = input[i + 7] / scalar
+      }
+      for (; i < len; i++) outBuffer[i] = input[i] / scalar
     }
   }
 
@@ -1511,65 +1590,74 @@ export class TypeScriptBackend implements Backend {
     const aBuffer = a.buffer
     const bBuffer = b.buffer
     const newBuffer = createTypedArray(aBuffer.length, a.dtype)
-    const len = aBuffer.length
-    const len8 = len - (len % 8)
-    let i = 0
-
-    if (op === 'add') {
-      for (; i < len8; i += 8) {
-        newBuffer[i] = aBuffer[i] + bBuffer[i]
-        newBuffer[i + 1] = aBuffer[i + 1] + bBuffer[i + 1]
-        newBuffer[i + 2] = aBuffer[i + 2] + bBuffer[i + 2]
-        newBuffer[i + 3] = aBuffer[i + 3] + bBuffer[i + 3]
-        newBuffer[i + 4] = aBuffer[i + 4] + bBuffer[i + 4]
-        newBuffer[i + 5] = aBuffer[i + 5] + bBuffer[i + 5]
-        newBuffer[i + 6] = aBuffer[i + 6] + bBuffer[i + 6]
-        newBuffer[i + 7] = aBuffer[i + 7] + bBuffer[i + 7]
-      }
-      for (; i < len; i++) newBuffer[i] = aBuffer[i] + bBuffer[i]
-    } else if (op === 'sub') {
-      for (; i < len8; i += 8) {
-        newBuffer[i] = aBuffer[i] - bBuffer[i]
-        newBuffer[i + 1] = aBuffer[i + 1] - bBuffer[i + 1]
-        newBuffer[i + 2] = aBuffer[i + 2] - bBuffer[i + 2]
-        newBuffer[i + 3] = aBuffer[i + 3] - bBuffer[i + 3]
-        newBuffer[i + 4] = aBuffer[i + 4] - bBuffer[i + 4]
-        newBuffer[i + 5] = aBuffer[i + 5] - bBuffer[i + 5]
-        newBuffer[i + 6] = aBuffer[i + 6] - bBuffer[i + 6]
-        newBuffer[i + 7] = aBuffer[i + 7] - bBuffer[i + 7]
-      }
-      for (; i < len; i++) newBuffer[i] = aBuffer[i] - bBuffer[i]
-    } else if (op === 'mul') {
-      for (; i < len8; i += 8) {
-        newBuffer[i] = aBuffer[i] * bBuffer[i]
-        newBuffer[i + 1] = aBuffer[i + 1] * bBuffer[i + 1]
-        newBuffer[i + 2] = aBuffer[i + 2] * bBuffer[i + 2]
-        newBuffer[i + 3] = aBuffer[i + 3] * bBuffer[i + 3]
-        newBuffer[i + 4] = aBuffer[i + 4] * bBuffer[i + 4]
-        newBuffer[i + 5] = aBuffer[i + 5] * bBuffer[i + 5]
-        newBuffer[i + 6] = aBuffer[i + 6] * bBuffer[i + 6]
-        newBuffer[i + 7] = aBuffer[i + 7] * bBuffer[i + 7]
-      }
-      for (; i < len; i++) newBuffer[i] = aBuffer[i] * bBuffer[i]
-    } else {
-      for (; i < len8; i += 8) {
-        newBuffer[i] = aBuffer[i] / bBuffer[i]
-        newBuffer[i + 1] = aBuffer[i + 1] / bBuffer[i + 1]
-        newBuffer[i + 2] = aBuffer[i + 2] / bBuffer[i + 2]
-        newBuffer[i + 3] = aBuffer[i + 3] / bBuffer[i + 3]
-        newBuffer[i + 4] = aBuffer[i + 4] / bBuffer[i + 4]
-        newBuffer[i + 5] = aBuffer[i + 5] / bBuffer[i + 5]
-        newBuffer[i + 6] = aBuffer[i + 6] / bBuffer[i + 6]
-        newBuffer[i + 7] = aBuffer[i + 7] / bBuffer[i + 7]
-      }
-      for (; i < len; i++) newBuffer[i] = aBuffer[i] / bBuffer[i]
-    }
+    this.writeElementwiseFastPath(aBuffer, bBuffer, newBuffer, op)
 
     return {
       buffer: newBuffer,
       shape: a.shape,
       strides: a.strides,
       dtype: a.dtype,
+    }
+  }
+
+  private writeElementwiseFastPath(
+    aBuffer: NDArrayData['buffer'],
+    bBuffer: NDArrayData['buffer'],
+    outBuffer: NDArrayData['buffer'],
+    op: 'add' | 'sub' | 'mul' | 'div',
+  ): void {
+    const len = aBuffer.length
+    const len8 = len - (len % 8)
+    let i = 0
+
+    if (op === 'add') {
+      for (; i < len8; i += 8) {
+        outBuffer[i] = aBuffer[i] + bBuffer[i]
+        outBuffer[i + 1] = aBuffer[i + 1] + bBuffer[i + 1]
+        outBuffer[i + 2] = aBuffer[i + 2] + bBuffer[i + 2]
+        outBuffer[i + 3] = aBuffer[i + 3] + bBuffer[i + 3]
+        outBuffer[i + 4] = aBuffer[i + 4] + bBuffer[i + 4]
+        outBuffer[i + 5] = aBuffer[i + 5] + bBuffer[i + 5]
+        outBuffer[i + 6] = aBuffer[i + 6] + bBuffer[i + 6]
+        outBuffer[i + 7] = aBuffer[i + 7] + bBuffer[i + 7]
+      }
+      for (; i < len; i++) outBuffer[i] = aBuffer[i] + bBuffer[i]
+    } else if (op === 'sub') {
+      for (; i < len8; i += 8) {
+        outBuffer[i] = aBuffer[i] - bBuffer[i]
+        outBuffer[i + 1] = aBuffer[i + 1] - bBuffer[i + 1]
+        outBuffer[i + 2] = aBuffer[i + 2] - bBuffer[i + 2]
+        outBuffer[i + 3] = aBuffer[i + 3] - bBuffer[i + 3]
+        outBuffer[i + 4] = aBuffer[i + 4] - bBuffer[i + 4]
+        outBuffer[i + 5] = aBuffer[i + 5] - bBuffer[i + 5]
+        outBuffer[i + 6] = aBuffer[i + 6] - bBuffer[i + 6]
+        outBuffer[i + 7] = aBuffer[i + 7] - bBuffer[i + 7]
+      }
+      for (; i < len; i++) outBuffer[i] = aBuffer[i] - bBuffer[i]
+    } else if (op === 'mul') {
+      for (; i < len8; i += 8) {
+        outBuffer[i] = aBuffer[i] * bBuffer[i]
+        outBuffer[i + 1] = aBuffer[i + 1] * bBuffer[i + 1]
+        outBuffer[i + 2] = aBuffer[i + 2] * bBuffer[i + 2]
+        outBuffer[i + 3] = aBuffer[i + 3] * bBuffer[i + 3]
+        outBuffer[i + 4] = aBuffer[i + 4] * bBuffer[i + 4]
+        outBuffer[i + 5] = aBuffer[i + 5] * bBuffer[i + 5]
+        outBuffer[i + 6] = aBuffer[i + 6] * bBuffer[i + 6]
+        outBuffer[i + 7] = aBuffer[i + 7] * bBuffer[i + 7]
+      }
+      for (; i < len; i++) outBuffer[i] = aBuffer[i] * bBuffer[i]
+    } else {
+      for (; i < len8; i += 8) {
+        outBuffer[i] = aBuffer[i] / bBuffer[i]
+        outBuffer[i + 1] = aBuffer[i + 1] / bBuffer[i + 1]
+        outBuffer[i + 2] = aBuffer[i + 2] / bBuffer[i + 2]
+        outBuffer[i + 3] = aBuffer[i + 3] / bBuffer[i + 3]
+        outBuffer[i + 4] = aBuffer[i + 4] / bBuffer[i + 4]
+        outBuffer[i + 5] = aBuffer[i + 5] / bBuffer[i + 5]
+        outBuffer[i + 6] = aBuffer[i + 6] / bBuffer[i + 6]
+        outBuffer[i + 7] = aBuffer[i + 7] / bBuffer[i + 7]
+      }
+      for (; i < len; i++) outBuffer[i] = aBuffer[i] / bBuffer[i]
     }
   }
 

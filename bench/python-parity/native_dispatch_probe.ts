@@ -262,6 +262,7 @@ function cblasDgemm128(output: Float64Array, outputPointer = ptr(output)): Float
 
 const leftArray = array(Array.from(left), { dtype: 'float64' })
 const rightArray = array(Array.from(right), { dtype: 'float64' })
+const vectorOutputArray = empty([length], { dtype: 'float64' })
 const matrixArray = array(
   Array.from({ length: matrixSize }, (_, row) =>
     Array.from(matrix.subarray(row * matrixSize, (row + 1) * matrixSize)),
@@ -356,8 +357,11 @@ const results = [
     matmulMeasureOptions,
   ),
   measure('public.addScalar', () => add(leftArray, 5)),
+  measure('public.addScalar.out', () => add(leftArray, 5, { out: vectorOutputArray })),
   measure('public.addArrays', () => add(leftArray, rightArray)),
+  measure('public.addArrays.out', () => add(leftArray, rightArray, { out: vectorOutputArray })),
   measure('public.mulScalar', () => mul(leftArray, 2)),
+  measure('public.mulScalar.out', () => mul(leftArray, 2, { out: vectorOutputArray })),
   measure(
     'public.matmul128',
     () => matmul(matmulLeftArray, matmulRightArray),
