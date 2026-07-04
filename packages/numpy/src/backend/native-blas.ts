@@ -151,9 +151,9 @@ export class NativeBLASBackend extends TypeScriptBackend {
 
     if (typeof b === 'number') {
       const native = getNativeKernels()
-      if (native?.addScalarF64Buffer) {
+      if (native?.addScalarF64Buffers) {
         const output = createNativeOutputBuffer(a.buffer.length)
-        native.addScalarF64Buffer(a.buffer, b, output.bytes)
+        native.addScalarF64Buffers(bytesFor(a.buffer), b, output.bytes)
         return {
           buffer: output.array,
           shape: a.shape,
@@ -162,9 +162,9 @@ export class NativeBLASBackend extends TypeScriptBackend {
         }
       }
 
-      if (native?.addScalarF64Buffers) {
+      if (native?.addScalarF64Buffer) {
         const output = createNativeOutputBuffer(a.buffer.length)
-        native.addScalarF64Buffers(bytesFor(a.buffer), b, output.bytes)
+        native.addScalarF64Buffer(a.buffer, b, output.bytes)
         return {
           buffer: output.array,
           shape: a.shape,
