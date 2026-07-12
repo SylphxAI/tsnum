@@ -37,10 +37,17 @@
   "scripts": {
     "build": "napi build --platform --release",
     "test": "bun test test/*.test.ts",
-    "lint": "echo \"native package lint is covered by cargo build\""
+    "lint": "biome check .",
+    "lint:fix": "biome check --write ."
   },
-  "files": ["index.js", "index.d.ts", "*.node"],
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "*.node"
+  ],
   "devDependencies": {
-    "@napi-rs/cli": "^2.18.0"
+    "@napi-rs/cli": "^2.18.0",
+    "@biomejs/biome": "^2.3.12",
+    "@sylphx/biome-config": "^0.4.1"
   }
 }
