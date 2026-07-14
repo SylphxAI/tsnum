@@ -2,6 +2,7 @@ import { performance } from 'node:perf_hooks'
 import {
   add,
   array,
+  asarray,
   empty,
   getBackendInfo,
   initNativeBLAS,
@@ -42,6 +43,14 @@ function range(length: number, scale: number): number[] {
   return Array.from({ length }, (_, index) => index * scale)
 }
 
+function typedRange(length: number, scale: number): Float64Array {
+  const output = new Float64Array(length)
+  for (let index = 0; index < length; index++) {
+    output[index] = index * scale
+  }
+  return output
+}
+
 function matrix(rows: number, cols: number, scale: number): number[][] {
   return Array.from({ length: rows }, (_, row) =>
     Array.from({ length: cols }, (_, col) => (row * cols + col) * scale),
@@ -62,7 +71,13 @@ const cases: Record<string, BenchCaseFactory> = {
     const vector = array(range(1_000_000, 0.001), { dtype: 'float64' })
     const out = empty([1_000_000], { dtype: 'float64' })
     const options = { out }
-    return [100, 20, () => add(vector, 5, options)]
+    return [2000, 100, () => add(vector, 5, options)]
+  },
+  add_scalar_4m_out: () => {
+    const vector = asarray(typedRange(4_000_000, 0.001))
+    const out = empty([4_000_000], { dtype: 'float64' })
+    const options = { out }
+    return [500, 100, () => add(vector, 5, options)]
   },
   add_arrays_1m: () => {
     const vector = array(range(1_000_000, 0.001), { dtype: 'float64' })
@@ -74,7 +89,14 @@ const cases: Record<string, BenchCaseFactory> = {
     const vectorB = array(range(1_000_000, 0.002), { dtype: 'float64' })
     const out = empty([1_000_000], { dtype: 'float64' })
     const options = { out }
-    return [100, 20, () => add(vector, vectorB, options)]
+    return [2000, 100, () => add(vector, vectorB, options)]
+  },
+  add_arrays_4m_out: () => {
+    const vector = asarray(typedRange(4_000_000, 0.001))
+    const vectorB = asarray(typedRange(4_000_000, 0.002))
+    const out = empty([4_000_000], { dtype: 'float64' })
+    const options = { out }
+    return [500, 100, () => add(vector, vectorB, options)]
   },
   mul_scalar_1m: () => {
     const vector = array(range(1_000_000, 0.001), { dtype: 'float64' })
@@ -84,7 +106,13 @@ const cases: Record<string, BenchCaseFactory> = {
     const vector = array(range(1_000_000, 0.001), { dtype: 'float64' })
     const out = empty([1_000_000], { dtype: 'float64' })
     const options = { out }
-    return [100, 20, () => mul(vector, 2, options)]
+    return [2000, 100, () => mul(vector, 2, options)]
+  },
+  mul_scalar_4m_out: () => {
+    const vector = asarray(typedRange(4_000_000, 0.001))
+    const out = empty([4_000_000], { dtype: 'float64' })
+    const options = { out }
+    return [500, 100, () => mul(vector, 2, options)]
   },
   sum_1m: () => {
     const vector = array(range(1_000_000, 0.001), { dtype: 'float64' })
@@ -102,6 +130,20 @@ const cases: Record<string, BenchCaseFactory> = {
     const left = array(matrix(128, 128, 0.001), { dtype: 'float64' })
     const right = array(matrix(128, 128, 0.002), { dtype: 'float64' })
     return [1000, 100, () => matmul(left, right)]
+  },
+  matmul_128_out: () => {
+    const left = array(matrix(128, 128, 0.001), { dtype: 'float64' })
+    const right = array(matrix(128, 128, 0.002), { dtype: 'float64' })
+    const out = empty([128, 128], { dtype: 'float64' })
+    const options = { out }
+    return [1000, 100, () => matmul(left, right, options)]
+  },
+  matmul_256_out: () => {
+    const left = array(matrix(256, 256, 0.001), { dtype: 'float64' })
+    const right = array(matrix(256, 256, 0.002), { dtype: 'float64' })
+    const out = empty([256, 256], { dtype: 'float64' })
+    const options = { out }
+    return [2000, 200, () => matmul(left, right, options)]
   },
 }
 

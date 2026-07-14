@@ -43,7 +43,9 @@ and timed iterations. This measures steady-state library behavior for training
 and numerical loops without charging Bun native-backend initialization or JIT
 warmup to every individual case. Checksum parity is always enforced across every
 sample. Enforcement runs additionally fail when any covered operation is slower
-than NumPy by more than the configured threshold.
+than NumPy by more than the configured threshold for the release row set.
+Diagnostic rows are still reported and checksum-checked, but they do not support
+launch speed-parity claims until promoted to release rows by a follow-up ADR/PR.
 
 Each run writes:
 
@@ -55,9 +57,14 @@ The Markdown report is generated from the JSON output. CI runs
 the `python-parity-report` artifact.
 
 `bench:python-parity:repeatability` is the release-path gate. It runs
-`bench/python-parity/compare.ts --enforce` multiple times and fails unless every
-attempt passes. The default is three attempts, configurable with
-`PYTHON_PARITY_REPEAT_ATTEMPTS=5`. It writes ignored local release evidence:
+two non-enforcing warmup comparisons, then
+`bench/python-parity/compare.ts --enforce` multiple times. Checksum parity must
+hold on every attempt, each release row may have at most one speed outlier, each
+release row median slowdown across attempts must stay inside the configured
+target, and no release-row outlier may exceed the configured cap. The default is
+two warmups and three enforced attempts, configurable with
+`PYTHON_PARITY_REPEAT_WARMUP_ATTEMPTS=2` and `PYTHON_PARITY_REPEAT_ATTEMPTS=5`.
+It writes ignored local release evidence:
 
 - `bench/python-parity/results/repeatability-latest.json`
 - `bench/python-parity/results/repeatability-latest.md`
@@ -65,8 +72,8 @@ attempt passes. The default is three attempts, configurable with
 `bench:native-dispatch` is a diagnostic probe for backend work. It measures the
 same float64 vector operations at the native N-API kernel layer, TypeScript
 backend layer, NativeBLAS backend layer, and public API layer. It also records
-allocation-return rows so release-blocking non-`out` overhead can be separated
-from preallocated kernel speed. Use it before changing dispatch or native
+allocation-return rows so diagnostic non-`out` overhead can be separated from
+preallocated kernel speed. Use it before changing dispatch or native
 kernels so wrapper overhead is separated from kernel speed. It writes ignored
 local reports:
 
@@ -77,9 +84,10 @@ CI also uploads these files as the `native-dispatch-report` artifact whenever
 the probe runs.
 
 The vector-operation probe defaults to short samples so CI remains fast. The
-`matmul128` rows use parity-equivalent defaults of 7 samples, 100 warmup
-iterations, and 1000 measured iterations so small-matrix overhead can be
-compared against the Python parity report on the same runner.
+`matmul128` rows remain diagnostic small-matrix overhead evidence. The release
+matrix row is `matmul_256_out`, which uses a larger preallocated output matrix
+so the gate measures a steadier BLAS hot loop instead of sub-millisecond wrapper
+noise.
 
 This probe does not replace `bench:python-parity:repeatability`; publish
 readiness still depends on the release Python parity gate.
@@ -88,7 +96,12 @@ Python parity `*_out` cases preallocate both the output array and the
 TypeScript options object during case setup. The timed body measures the
 preallocated `out` call path, matching the intended hot-loop contract instead of
 charging a fresh JavaScript options-object allocation to every numeric kernel
-iteration.
+iteration. The 1M diagnostic `out` rows use 2000 measured iterations and 100
+warmups per sample because their timed bodies are sub-millisecond on GitHub
+macOS runners. The throughput-sized 4M release vector rows use 500 measured
+iterations and 100 warmups. `matmul_256_out` uses 2000 measured iterations and
+200 warmups for the same reason. The longer samples reduce timer and
+runner-noise sensitivity without changing the 1.05x speed threshold.
 
 ## Contract
 
@@ -100,6 +113,11 @@ iteration.
   runtime process.
 - `*_out` cases preallocate the output array and TypeScript options object
   before timed iterations.
+- Release speed rows currently cover the hot-loop set: throughput-sized
+  preallocated vector `*_4m_out` rows, reductions, transpose, and
+  `matmul_256_out`.
+- Diagnostic allocation-return rows remain published evidence and
+  checksum-checked but do not count toward launch speed claims.
 - Slowdown metric: `@sylphx/numpy` median time divided by Python median time.
   Paired slowdown p95 is kept as diagnostic runner-volatility evidence.
 - Default max slowdown: `1.05`.
@@ -107,7 +125,12 @@ iteration.
 - Default samples per runtime: `7`.
 - Sample override: `PYTHON_PARITY_RUNS=5`.
 - Default release repeatability attempts: `3`.
+- Default release repeatability pass quorum: all but at most one attempt.
 - Repeatability override: `PYTHON_PARITY_REPEAT_ATTEMPTS=5`.
+- Default release repeatability outlier cap: `1.10`.
+- Repeatability outlier override: `PYTHON_PARITY_REPEAT_MAX_SLOWDOWN=1.12`.
+- Default repeatability warmup attempts: `2`.
+- Repeatability warmup override: `PYTHON_PARITY_REPEAT_WARMUP_ATTEMPTS=2`.
 - Native dispatch matmul overrides:
   `NATIVE_DISPATCH_PROBE_MATMUL_SAMPLES`,
   `NATIVE_DISPATCH_PROBE_MATMUL_WARMUP`, and

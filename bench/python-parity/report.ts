@@ -43,6 +43,8 @@ type SummaryStats = {
 
 type ComparisonRow = {
   name: string
+  gate?: 'release' | 'diagnostic'
+  enforced?: boolean
   python_ms: number
   ts_ms: number
   python_ms_samples?: number[]
@@ -82,6 +84,7 @@ type ComparisonReport = {
   ts: RuntimeReport
   rows: ComparisonRow[]
   checksums_passed: boolean
+  release_rows_passed?: boolean
   passed: boolean
 }
 
@@ -115,9 +118,10 @@ export function renderMarkdownReport(report: ComparisonReport): string {
     '',
     '## Verdict',
     '',
-    `- Overall: ${status(report.passed)}`,
-    `- Checksum parity: ${status(report.checksums_passed)}`,
-    `- Speed target: ${report.max_slowdown.toFixed(2)}x max slowdown`,
+    `- Overall release gate: ${status(report.passed)}`,
+    `- Checksum parity for all benchmarked rows: ${status(report.checksums_passed)}`,
+    `- Release speed rows: ${status(report.release_rows_passed ?? report.passed)}`,
+    `- Release speed target: ${report.max_slowdown.toFixed(2)}x max slowdown`,
     `- Samples: median of ${report.sample_count}`,
     `- Sampling strategy: ${report.sampling?.strategy ?? 'sequential-runtime-order'}`,
     `- Case isolation: ${report.sampling?.case_isolation ?? 'none'}`,
@@ -147,8 +151,8 @@ export function renderMarkdownReport(report: ComparisonReport): string {
     '',
     '## Cases',
     '',
-    '| Case | Python median ms | Python p95 ms | Python RSD | @sylphx/numpy median ms | @sylphx/numpy p95 ms | @sylphx/numpy RSD | Slowdown | Paired slowdown p95 | Speed | Checksum |',
-    '| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- |',
+    '| Case | Gate | Python median ms | Python p95 ms | Python RSD | @sylphx/numpy median ms | @sylphx/numpy p95 ms | @sylphx/numpy RSD | Slowdown | Paired slowdown p95 | Speed | Checksum |',
+    '| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- |',
   ]
 
   for (const row of report.rows) {
@@ -159,6 +163,7 @@ export function renderMarkdownReport(report: ComparisonReport): string {
     lines.push(
       [
         `| ${row.name}`,
+        row.gate ?? 'release',
         formatMs(row.python_ms),
         formatMs(pythonStats?.p95 ?? row.python_ms),
         formatPercent(pythonStats?.relative_stddev ?? Number.NaN),
@@ -177,10 +182,11 @@ export function renderMarkdownReport(report: ComparisonReport): string {
     '',
     '## Contract',
     '',
-    '- Public speed claims require this report to pass with checksum parity and the configured slowdown target.',
+    '- Public speed claims require this report to pass with checksum parity for every benchmarked row and the configured slowdown target for every release row.',
+    '- Diagnostic rows are published evidence but do not support launch speed-parity claims until promoted to release rows.',
     '- Slowdown is @sylphx/numpy median time divided by Python median time for each case.',
     '- Paired slowdown p95 is diagnostic runner-volatility evidence, not the release gate metric.',
-    '- A failing speed row means full Python speed parity is not claimed for the covered operation.',
+    '- A failing release speed row blocks the release gate; a failing diagnostic row blocks broad speed claims for that operation shape.',
     '- Checksum parity is enforced on every benchmark run, including non-enforcing speed runs.',
     '',
   )

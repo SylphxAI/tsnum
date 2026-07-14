@@ -38,7 +38,7 @@ jobs:
         run: bun run test
 
       - name: Python parity benchmark
-        run: bun run bench:python-parity
+        run: bun run bench:python-parity:repeatability
 
       - name: Native dispatch probe
         run: bun run bench:native-dispatch
@@ -54,6 +54,8 @@ jobs:
           path: |
             bench/python-parity/results/latest.json
             bench/python-parity/results/latest.md
+            bench/python-parity/results/repeatability-latest.json
+            bench/python-parity/results/repeatability-latest.md
           if-no-files-found: ignore
 
       - name: Setup Node.js for project control
