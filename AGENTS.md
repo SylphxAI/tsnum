@@ -1,16 +1,16 @@
-# Repository Instructions
+# tsnum — local agent notes only
 
-Start with `PROJECT.md`, `project.manifest.json`, and `.doctrine/project.json` before changing this
-repository. They define the project goal, lifecycle, boundaries, public
-surfaces, delivery model, and adoption gaps.
+Doctrine and fleet delivery law live in the **host always-on constitution**
+(`~/.grok/AGENTS.md` / Doctrine template). This file must **not** restate,
+weaken, or fork that law (including PR-vs-direct-trunk delivery).
 
-Use `SylphxAI/doctrine` for enterprise standards. Keep `@sylphx/numpy`
-consumer-neutral while treating `tsnum` as repository history:
-product-specific numerical behavior, benchmark claims, and downstream usage
-policy belong in documented APIs, tests, benchmarks, or consuming products, not
-hidden package behavior.
+Local truth: `PROJECT.md`, `.doctrine/project.json` when present.
 
-For control-plane-only changes, validate with:
+## Boundary hazards
+
+- Never commit secrets, tokens, `.env` files, or credentials.
+
+## Local commands
 
 ```bash
 git diff --check
@@ -20,7 +20,7 @@ npm exec --yes --package groundatlas@0.1.2 -- ga audit --out .groundatlas-pilot
 npm run --silent groundatlas:fleet
 ```
 
-For package changes, also run the relevant Bun/Turbo, TypeScript, test, and
-benchmark commands for the touched packages before claiming release readiness.
+## Validation notes
 
-Generated `.groundatlas*` reports are evidence/navigation only. Do not treat them as source of truth.
+- Prefer the **narrowest** affected check before full workspace runs.
+- Report layers honestly: local diff · trunk FF · deploy · prod proof (do not collapse).
