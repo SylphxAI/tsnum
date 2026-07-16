@@ -1,5 +1,10 @@
 # @sylphx/numpy - NumPy for TypeScript
 
+<p align="center">
+  <img src="docs/banner.png" alt="tsnum banner" width="100%" />
+</p>
+
+
 NumPy-compatible numerical computing for TypeScript. The repository started as
 `tsnum`; the public package contract is now `@sylphx/numpy`, with `np` as the
 canonical import alias.
