@@ -1,9 +1,8 @@
 # @sylphx/numpy - NumPy for TypeScript
 
 <p align="center">
-  <img src="docs/banner.png" alt="tsnum banner" width="100%" />
+  <img src="https://mark.sylphx.com/api/v1/banner?type=glass&theme=tokyonight&text=tsnum&desc=Foundation+TypeScript+numerical+computing+library+%28NumPy-inspired+array%2C+math%2C+s&height=200&animation=rise&credit=0" alt="tsnum — Sylphx Mark banner" width="100%" />
 </p>
-
 
 NumPy-compatible numerical computing for TypeScript. The repository started as
 `tsnum`; the public package contract is now `@sylphx/numpy`, with `np` as the
