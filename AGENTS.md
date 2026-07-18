@@ -15,12 +15,13 @@ Local truth: `PROJECT.md`, `.doctrine/project.json` when present.
 ```bash
 git diff --check
 node --test test/project-control.node-test.mjs
-npm exec --yes --package groundatlas@0.1.2 -- ga update --out .groundatlas-pilot
-npm exec --yes --package groundatlas@0.1.2 -- ga audit --out .groundatlas-pilot
-npm run --silent groundatlas:fleet
 ```
 
 ## Validation notes
 
 - Prefer the **narrowest** affected check before full workspace runs.
 - Report layers honestly: local diff · trunk FF · deploy · prod proof (do not collapse).
+
+## GroundAtlas
+
+Retired as product dependency (Control Plane ADR-0014). Do not re-add package dogfood.

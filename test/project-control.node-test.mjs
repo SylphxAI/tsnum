@@ -5,7 +5,7 @@ import test from 'node:test'
 const readJson = (path) => JSON.parse(readFileSync(path, 'utf8'))
 const readText = (path) => readFileSync(path, 'utf8')
 
-test('project manifest is the vendor-neutral GroundAtlas control file', () => {
+test('project manifest remains valid project metadata without GroundAtlas product dogfood', () => {
   const manifest = readJson('project.manifest.json')
 
   assert.equal(manifest.schemaVersion, 1)
@@ -22,8 +22,14 @@ test('project manifest is the vendor-neutral GroundAtlas control file', () => {
     manifest.surfaces.some(
       (surface) =>
         surface.path === '.doctrine/project.json' &&
-        surface.description.includes('not the vendor-neutral GroundAtlas default'),
+        surface.description.toLowerCase().includes('adapter'),
     ),
+  )
+  const commandNames = (manifest.commands || []).map((c) => c.name)
+  assert.ok(!commandNames.includes('groundatlas:fleet'))
+  assert.ok(
+    String(manifest.adoption?.notes || '').includes('ADR-0014') ||
+      String(manifest.adoption?.notes || '').toLowerCase().includes('retired'),
   )
 })
 
@@ -37,35 +43,29 @@ test('Doctrine adapter remains Sylphx-specific and release boundary is explicit'
       (surface) => surface.type === 'manifest' && surface.location === 'project.manifest.json',
     ),
   )
-  assert.ok(doctrine.delivery.ciModel.includes('groundatlas'))
-  assert.ok(doctrine.delivery.productionProof.includes('GroundAtlas package dogfood'))
+  // GroundAtlas dogfood retired (CP ADR-0014) — do not require groundatlas strings.
+  assert.ok(!String(doctrine.delivery?.ciModel || '').toLowerCase().includes('groundatlas'))
   assert.ok(doctrine.delivery.packageRelease.publishProof.includes('release:readback'))
   assert.ok(doctrine.adoption.gaps.some((gap) => gap.id === 'release-workflow-unproven'))
 })
 
-test('CI runs project-control and dogfoods the released GroundAtlas package/action', () => {
+test('CI runs project-control and does not pin GroundAtlas package/action', () => {
   const workflow = readText('.github/workflows/ci.yml')
 
   assert.ok(workflow.includes('node --test test/project-control.node-test.mjs'))
-  assert.ok(workflow.includes('uses: SylphxAI/groundatlas@v0.1.2'))
-  assert.ok(workflow.includes('package-spec: groundatlas@0.1.2'))
-  assert.ok(workflow.includes('require-atlas: "true"'))
-  assert.ok(workflow.includes('strict: "true"'))
-  assert.ok(workflow.includes('project.manifest.json'))
-  assert.ok(workflow.includes('.doctrine/project.json'))
+  assert.ok(!workflow.includes('uses: SylphxAI/groundatlas@'))
+  assert.ok(!workflow.includes('package-spec: groundatlas@'))
+  assert.ok(workflow.includes('project.manifest.json') || workflow.includes('project-control'))
 })
 
-test('package scripts expose reproducible local project-control gates', () => {
+test('package scripts expose project-control without groundatlas:fleet', () => {
   const pkg = readJson('package.json')
 
   assert.equal(
     pkg.scripts['test:project-control'],
     'node --test test/project-control.node-test.mjs',
   )
-  assert.equal(
-    pkg.scripts['groundatlas:fleet'],
-    'npm exec --yes --package groundatlas@0.1.2 -- ga fleet . --out .groundatlas-pilot --require-atlas --strict --json',
-  )
+  assert.equal(pkg.scripts['groundatlas:fleet'], undefined)
   assert.equal(
     pkg.scripts.release,
     'echo "Direct changeset publish is unsafe for workspace packages; use the Sylphx release workflow." && exit 1',

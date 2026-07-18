@@ -9,7 +9,13 @@
     "visibility": "open-source",
     "repository": "https://github.com/SylphxAI/tsnum",
     "homepage": "https://github.com/SylphxAI/tsnum#readme",
-    "tags": ["typescript", "numpy", "numeric-computing", "benchmark-gated", "foundation-library"]
+    "tags": [
+      "typescript",
+      "numpy",
+      "numeric-computing",
+      "benchmark-gated",
+      "foundation-library"
+    ]
   },
   "truth": {
     "humanProjectFile": "PROJECT.md",
@@ -22,7 +28,10 @@
       "bench/python-parity/results/latest.md",
       "docs/specs/project-control-gate.md"
     ],
-    "adrs": ["docs/adr/0001-python-parity-launch-contract.md", ".sylphx/decisions/"],
+    "adrs": [
+      "docs/adr/0001-python-parity-launch-contract.md",
+      ".sylphx/decisions/"
+    ],
     "source": [
       "packages/numpy/src/",
       "packages/numpy-native/",
@@ -143,11 +152,6 @@
       "purpose": "Verify neutral manifest, Doctrine adapter, CI gate, and release-publication boundary."
     },
     {
-      "name": "groundatlas:fleet",
-      "command": "npm exec --yes --package groundatlas@0.1.2 -- ga fleet . --out .groundatlas-pilot --require-atlas --strict --json",
-      "purpose": "Prove the vendor-neutral manifest is selected and generated GroundAtlas files are navigation-only."
-    },
-    {
       "name": "release:readback",
       "command": "bun run release:readback",
       "purpose": "Read back every public npm package version after a future parity-gated release."
@@ -155,6 +159,6 @@
   ],
   "adoption": {
     "status": "adopted",
-    "notes": "Vendor-neutral GroundAtlas manifest for project-control dogfooding. .doctrine/project.json remains the Sylphx Doctrine adapter and local governance catalog. Generated .groundatlas* reports are evidence/navigation only, not source of truth. npm publication remains intentionally blocked until release:preflight proves repeatable parity and release readback succeeds."
+    "notes": "Vendor-neutral project.manifest retained as optional metadata. GroundAtlas package dogfood retired (Control Plane ADR-0014). .doctrine/project.json remains Sylphx adapter. npm publication remains intentionally blocked until release:preflight proves parity."
   }
 }

@@ -23,7 +23,6 @@
     "version": "changeset version",
     "release": "echo \"Direct changeset publish is unsafe for workspace packages; use the Sylphx release workflow.\" && exit 1",
     "test:project-control": "node --test test/project-control.node-test.mjs",
-    "groundatlas:fleet": "npm exec --yes --package groundatlas@0.1.2 -- ga fleet . --out .groundatlas-pilot --require-atlas --strict --json",
     "lint:fix": "biome check --write ."
   },
   "devDependencies": {
