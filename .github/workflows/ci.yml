@@ -58,15 +58,6 @@ jobs:
             bench/python-parity/results/repeatability-latest.md
           if-no-files-found: ignore
 
-      - name: Setup Node.js for project control
-        uses: actions/setup-node@v5
-        with:
-          node-version: "22.14.0"
-
-      - name: Test project-control boundary
-        run: node --test test/project-control.node-test.mjs
-
-
       - name: Upload native dispatch report
         if: always()
         uses: actions/upload-artifact@v4

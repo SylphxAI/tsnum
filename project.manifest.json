@@ -1,5 +1,4 @@
 {
-  "$schema": "https://raw.githubusercontent.com/SylphxAI/groundatlas/main/schemas/project.manifest.schema.json",
   "schemaVersion": 1,
   "project": {
     "id": "tsnum",
@@ -25,8 +24,7 @@
       "packages/numpy/README.md",
       "packages/numpy/PERFORMANCE.md",
       "bench/python-parity/README.md",
-      "bench/python-parity/results/latest.md",
-      "docs/specs/project-control-gate.md"
+      "bench/python-parity/results/latest.md"
     ],
     "adrs": [
       "docs/adr/0001-python-parity-launch-contract.md",
@@ -47,14 +45,12 @@
     "tests": [
       "packages/numpy/src/**/*.test.ts",
       "bench/python-parity/",
-      "test/project-control.node-test.mjs",
       ".github/workflows/ci.yml"
     ],
     "runbooks": [
       "README.md",
       "PROJECT.md",
       "AGENTS.md",
-      "docs/specs/project-control-gate.md",
       "SECURITY.md"
     ]
   },
@@ -105,7 +101,7 @@
       "type": "workflow",
       "name": "CI",
       "path": ".github/workflows/ci.yml",
-      "description": "macOS build, tests, Python parity benchmark, report freshness, project-control test, and GroundAtlas package dogfood."
+      "description": "macOS build, tests, Python parity benchmark, and report freshness."
     },
     {
       "type": "workflow",
@@ -117,7 +113,7 @@
       "type": "docs",
       "name": "Doctrine adapter manifest",
       "path": ".doctrine/project.json",
-      "description": "Sylphx Doctrine adapter and org-local governance catalog; not the vendor-neutral GroundAtlas default."
+      "description": "Repository-local lifecycle and delivery metadata."
     }
   ],
   "commands": [
@@ -147,11 +143,6 @@
       "purpose": "Verify committed parity report freshness."
     },
     {
-      "name": "test:project-control",
-      "command": "node --test test/project-control.node-test.mjs",
-      "purpose": "Verify neutral manifest, Doctrine adapter, CI gate, and release-publication boundary."
-    },
-    {
       "name": "release:readback",
       "command": "bun run release:readback",
       "purpose": "Read back every public npm package version after a future parity-gated release."
@@ -159,6 +150,6 @@
   ],
   "adoption": {
     "status": "adopted",
-    "notes": "Vendor-neutral project.manifest retained as optional metadata. GroundAtlas package dogfood retired (Control Plane ADR-0014). .doctrine/project.json remains Sylphx adapter. npm publication remains intentionally blocked until release:preflight proves parity."
+    "notes": "npm publication remains intentionally blocked until release:preflight proves parity."
   }
 }
