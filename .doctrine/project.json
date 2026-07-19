@@ -134,11 +134,6 @@
         "repo": "SylphxAI/doctrine",
         "surface": "project manifest schema, standards, and rollout audit",
         "direction": "downward"
-      },
-      {
-        "repo": "SylphxAI/groundatlas",
-        "surface": "Released GroundAtlas package/action for vendor-neutral project manifest validation and fleet dogfooding.",
-        "direction": "peer-public"
       }
     ],
     "forbiddenCouplings": [
@@ -175,7 +170,7 @@
     "requiredContexts": [
       "Build, test, and benchmark"
     ],
-    "deployPath": "Repo-local GitHub Actions CI validates pull requests, merge queue candidates, and main pushes with Bun install, build, tests, Python parity benchmark, generated report freshness, project-control test, and GroundAtlas package dogfood. Package publication remains manually triggered through .github/workflows/release.yml after release:preflight passes.",
+    "deployPath": "Repo-local GitHub Actions CI validates pull requests, merge queue candidates, and main pushes with Bun install, build, tests, Python parity benchmark, and project-control test. Package publication remains manually triggered through .github/workflows/release.yml after release:preflight passes.",
     "productionProof": "Merged package changes require green CI on the PR and main push, including the uploaded Python parity report artifact, project-control test, and project-control boundary tests. Published package changes additionally require a passing macOS release:preflight run with bench:python-parity:repeatability, all-public-package registry readback after release, provenance/attestation evidence, and consumer smoke proof for affected exports.",
     "recoveryClass": "forward-fix-only",
     "packageRelease": {
@@ -191,18 +186,16 @@
         "release:preflight",
         "release:readback"
       ],
-      "publishProof": "Required before publish: repo-local macOS release:preflight must pass install, build, tests, and bench:python-parity:repeatability. Required during central publish: the workspace must still build through the protected reusable release workflow. Required after publish: release:readback must verify every public workspace npm package version. Provenance/attestation evidence, changelog evidence, consumer smoke proof, and GroundAtlas project-control evidence are required for affected exports."
+      "publishProof": "Required before publish: repo-local macOS release:preflight must pass install, build, tests, and bench:python-parity:repeatability. Required during central publish: the workspace must still build through the protected reusable release workflow. Required after publish: release:readback must verify every public workspace npm package version. Provenance/attestation evidence, changelog evidence, and consumer smoke proof are required for affected exports."
     },
-    "localContexts": [
-      "CI includes GroundAtlas package dogfood and project-control boundary test"
-    ]
+    "localContexts": []
   },
   "adoption": {
     "status": "adopted",
     "gaps": [
       {
         "id": "ci-admission-not-adr29",
-        "description": "Repo-local CI validates pull requests, merge queue candidates, main pushes, and now GroundAtlas project-control dogfood, but full doctrine adoption still needs stable ADR-29 fan-in admission contexts, Sylphx runner profile policy, and workflow sanity checks.",
+        "description": "Repo-local CI validates pull requests, merge queue candidates, and main pushes, but full adoption still needs stable admission contexts and workflow sanity checks.",
         "owner": "SylphxAI/tsnum",
         "target": "Before full adoption"
       },
@@ -223,12 +216,6 @@
         "description": "Recent CI evidence consistently passes checksum parity, and PR #76 proved one all-row passing covered-speed artifact. The release gate now separates enforced hot-loop release rows from diagnostic allocation-return and short rows, so release preflight remains intentionally blocked until release rows pass repeatably and every benchmarked row keeps checksum parity on the release preflight runner.",
         "owner": "SylphxAI/tsnum",
         "target": "Before package publication or full Python-speed marketing"
-      },
-      {
-        "id": "groundatlas-fleet-ruleset",
-        "description": "Organization-wide mandatory GroundAtlas enforcement belongs in the owning fleet control plane, not this numerical package repo.",
-        "owner": "SylphxAI/groundatlas",
-        "target": "fleet control-plane rollout"
       }
     ]
   }
