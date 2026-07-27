@@ -19,7 +19,7 @@ permissions:
 jobs:
   preflight:
     name: release:preflight
-    runs-on: macos-latest
+    runs-on: [self-hosted, sylphx, macos, standard]
 
     steps:
       - name: Checkout
@@ -34,6 +34,12 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Verify static owned runner profiles
+        run: bash scripts/check-owned-runner-profiles.sh
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
