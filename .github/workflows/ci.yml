@@ -1,8 +1,8 @@
 name: CI
 
 on:
+  # No merge_group — Merge Queue off by default (Fast Trunk).
   pull_request:
-  merge_group:
   push:
     branches: [main]
 
