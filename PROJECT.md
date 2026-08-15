@@ -51,8 +51,8 @@ in consuming applications or separate adapter packages.
   performance evidence.
 - `package.json`, `turbo.json`, and `biome.json` define workspace commands and
   tool configuration.
-- `project.manifest.json` is optional project metadata.
-- `.doctrine/project.json` is the Sylphx Doctrine adapter and org-local governance catalog.
+- `` is optional project metadata.
+- `` is the Sylphx Doctrine adapter and org-local governance catalog.
 
 ## Delivery
 
@@ -88,4 +88,4 @@ The first `@sylphx/numpy` npm publication is not complete yet. Public docs may
 show the final package contract, but release status must continue to say that
 registry installation is pending the parity-gated release.
 
-The authoritative control-plane record is `.doctrine/project.json`.
+The authoritative control-plane record is ``.
